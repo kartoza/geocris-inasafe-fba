@@ -1,8 +1,8 @@
 --
--- Name: mv_non_flooded_building_summary; Type: MATERIALIZED VIEW; Schema: public; Owner: -
+-- Name: mv_building_summary; Type: MATERIALIZED VIEW; Schema: public; Owner: -
 --
-DROP MATERIALIZED VIEW IF EXISTS public.mv_non_flooded_building_summary;
-CREATE MATERIALIZED VIEW public.mv_non_flooded_building_summary AS
+DROP MATERIALIZED VIEW IF EXISTS public.mv_building_summary;
+CREATE MATERIALIZED VIEW public.mv_building_summary AS
  SELECT DISTINCT osm_buildings.district_id,
     osm_buildings.sub_district_id,
     osm_buildings.village_id,

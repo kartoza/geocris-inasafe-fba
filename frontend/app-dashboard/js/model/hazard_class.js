@@ -8,7 +8,7 @@ define([
      * - min_m
      */
     function (Backbone) {
-    const DepthClass = Backbone.Model.extend({
+    const HazardClass = Backbone.Model.extend({
         urlRoot: postgresUrl + 'hazard_class',
 
         url: function(){
@@ -17,7 +17,7 @@ define([
     });
 
     return Backbone.Collection.extend({
-        model: DepthClass,
+        model: HazardClass,
         urlRoot: postgresUrl + 'hazard_class',
         url: function () {
             return this.urlRoot

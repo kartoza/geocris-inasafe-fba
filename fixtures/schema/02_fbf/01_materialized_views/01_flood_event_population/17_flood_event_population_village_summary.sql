@@ -1,6 +1,6 @@
-DROP MATERIALIZED VIEW IF EXISTS public.mv_flood_event_population_village_summary;
-CREATE MATERIALIZED VIEW public.mv_flood_event_population_village_summary AS
-    WITH non_flooded_count as (
+DROP MATERIALIZED VIEW IF EXISTS public.mv_hazard_event_population_village_summary;
+CREATE MATERIALIZED VIEW public.mv_hazard_event_population_village_summary AS
+    WITH non_hazarded_count as (
         select
                a.district_id,
                a.sub_district_id,
@@ -10,45 +10,45 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_population_village_summary AS
                sum(a.females) as females_population_count,
                sum(a.elderly) as elderly_population_count,
                sum(a.unemployed) as unemployed_population_count
-        from mv_non_flooded_population_summary a
+        from mv_population_summary a
         where a.district_id is not null and a.sub_district_id is not null and a.village_id is not null
         group by a.district_id, a.sub_district_id, a.village_id
-    ), flooded_count as (
+    ), hazarded_count as (
         select
-                a.flood_event_id,
+                a.hazard_event_id,
                 a.district_id,
                 a.sub_district_id,
                 a.village_id,
-                sum(a.population) as flooded_population_count,
-                sum(a.males) as males_flooded_population_count,
-                sum(a.females) as females_flooded_population_count,
-                sum(a.elderly) as elderly_flooded_population_count,
-                sum(a.unemployed) as unemployed_flooded_population_count
-        from mv_flood_event_population a
+                sum(a.population) as hazarded_population_count,
+                sum(a.males) as males_hazarded_population_count,
+                sum(a.females) as females_hazarded_population_count,
+                sum(a.elderly) as elderly_hazarded_population_count,
+                sum(a.unemployed) as unemployed_hazarded_population_count
+        from mv_hazard_event_population a
         where a.district_id is not null and a.sub_district_id is not null and a.village_id is not null
-        group by a.flood_event_id, a.district_id, a.sub_district_id, a.village_id
+        group by a.hazard_event_id, a.district_id, a.sub_district_id, a.village_id
         )
     select
-           flooded_count.flood_event_id,
-           flooded_count.district_id,
-           flooded_count.sub_district_id,
-           flooded_count.village_id,
+           hazarded_count.hazard_event_id,
+           hazarded_count.district_id,
+           hazarded_count.sub_district_id,
+           hazarded_count.village_id,
            region.name,
-           non_flooded_count.population_count,
-           flooded_count.flooded_population_count,
-           flooded_count.males_flooded_population_count,
-           flooded_count.females_flooded_population_count,
-           flooded_count.elderly_flooded_population_count,
-           flooded_count.unemployed_flooded_population_count,
-           non_flooded_count.males_population_count,
-           non_flooded_count.females_population_count,
-           non_flooded_count.elderly_population_count,
-           non_flooded_count.unemployed_population_count,
+           non_hazarded_count.population_count,
+           hazarded_count.hazarded_population_count,
+           hazarded_count.males_hazarded_population_count,
+           hazarded_count.females_hazarded_population_count,
+           hazarded_count.elderly_hazarded_population_count,
+           hazarded_count.unemployed_hazarded_population_count,
+           non_hazarded_count.males_population_count,
+           non_hazarded_count.females_population_count,
+           non_hazarded_count.elderly_population_count,
+           non_hazarded_count.unemployed_population_count,
            trigger_status.trigger_status
     from
-         flooded_count
-         LEFT JOIN village_trigger_status trigger_status on flooded_count.flood_event_id = trigger_status.flood_event_id and flooded_count.village_id = trigger_status.village_id
-         JOIN non_flooded_count on flooded_count.village_id = non_flooded_count.village_id
-         JOIN village region on flooded_count.village_id = region.village_code
+         hazarded_count
+         LEFT JOIN village_trigger_status trigger_status on hazarded_count.hazard_event_id = trigger_status.hazard_event_id and hazarded_count.village_id = trigger_status.village_id
+         JOIN non_hazarded_count on hazarded_count.village_id = non_hazarded_count.village_id
+         JOIN village region on hazarded_count.village_id = region.village_code
   WITH NO DATA;
 

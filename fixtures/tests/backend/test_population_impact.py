@@ -5,13 +5,13 @@ from tests.backend import DatabaseTestCase
 
 class TestPopulationImpact(DatabaseTestCase):
 
-    def test_non_flooded_population_summary(self):
+    def test_population_summary(self):
         self.assertSQLResult(
-            self.sql_path('mv_non_flooded_population_summary.sql'),
-            self.json_path('mv_non_flooded_population_summary.json'),
+            self.sql_path('mv_population_summary.sql'),
+            self.json_path('mv_population_summary.json'),
         )
 
-    def test_flood_exposure_intersections(self):
+    def test_hazard_exposure_intersections(self):
         self.dbc.conn.autocommit = False
         with self.dbc.conn.cursor(cursor_factory=DictCursor) as c:
 
@@ -38,7 +38,7 @@ class TestPopulationImpact(DatabaseTestCase):
                         # Do sanity count check
                         # exposed count must less than total count
                         exposed_count = row[
-                            '{0}_flooded_population_count'.format(key)]
+                            '{0}_hazarded_population_count'.format(key)]
                         total_count = row[
                             '{0}_population_count'.format(key)]
                         self.assertLessEqual(exposed_count, total_count)
@@ -48,25 +48,25 @@ class TestPopulationImpact(DatabaseTestCase):
                     # total count (because there might be
                     # uncategorized) from the field
                     self.assertLessEqual(
-                        row['flooded_population_count'],
+                        row['hazarded_population_count'],
                         row['population_count'])
 
             mv_district_summary = self.sql_path(
-                'mv_flood_event_population_district_summary.sql')
+                'mv_hazard_event_population_district_summary.sql')
             self.execute_sql_file(mv_district_summary, cursor=c)
             results = c.fetchall()
 
             _test_summary_stats(self, results)
 
             mv_sub_district_summary = self.sql_path(
-                'mv_flood_event_population_sub_district_summary.sql')
+                'mv_hazard_event_population_sub_district_summary.sql')
             self.execute_sql_file(mv_sub_district_summary, cursor=c)
             results = c.fetchall()
 
             _test_summary_stats(self, results)
 
             mv_village_summary = self.sql_path(
-                'mv_flood_event_population_village_summary.sql')
+                'mv_hazard_event_population_village_summary.sql')
             self.execute_sql_file(mv_village_summary, cursor=c)
             results = c.fetchall()
 

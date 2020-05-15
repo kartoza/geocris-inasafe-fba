@@ -1,7 +1,7 @@
-DROP FUNCTION IF EXISTS public.flood_event_forecast_list_f;
+DROP FUNCTION IF EXISTS public.hazard_event_forecast_list_f;
 -- TODO:
 -- Remove acquisition_date_end and sync the request parameter with frontend
-CREATE OR REPLACE FUNCTION public.flood_event_forecast_list_f(acquisition_date_start timestamp without time zone, acquisition_date_end timestamp without time zone) RETURNS TABLE(total_forecast bigint, max_acquisition_date timestamp without time zone, lead_time bigint, trigger_status_id integer)
+CREATE OR REPLACE FUNCTION public.hazard_event_forecast_list_f(acquisition_date_start timestamp without time zone, acquisition_date_end timestamp without time zone) RETURNS TABLE(total_forecast bigint, max_acquisition_date timestamp without time zone, lead_time bigint, trigger_status_id integer)
     LANGUAGE plpgsql
     AS $$
 begin return query

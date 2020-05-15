@@ -3,43 +3,43 @@ define([
     'underscore',
     'jquery',
     'jqueryUi',
-    'js/view/layers/upload-flood.js',
+    'js/view/layers/upload-hazard.js',
     'js/view/panel-dashboard.js',
-], function (Backbone, _, $, JqueryUi, FloodUploadView, DashboardView) {
+], function (Backbone, _, $, JqueryUi, HazardUploadView, DashboardView) {
     return Backbone.View.extend({
         el: "#side-panel",
         events: {
-            'click .add-flood-scenario': 'openPanelFloodScenario',
+            'click .add-hazard-scenario': 'openPanelHazardScenario',
             'click .btn-back': 'backButtonAction',
-            'click #upload-flood': 'openUploadFloodForm',
-            'click .browse-floods': 'openBrowseFlood',
-            'click .hide-browse-flood': 'hideBrowseFlood',
-            'click .browse-arrow': 'fetchFloodById',
+            'click #upload-hazard': 'openUploadHazardForm',
+            'click .browse-hazards': 'openBrowseHazard',
+            'click .hide-browse-hazard': 'hideBrowseHazard',
+            'click .browse-arrow': 'fetchHazardById',
             'click #btn-browse-forecast': 'openBrowseByForecast',
             'click #btn-browse-return-period': 'openBrowseByReturnPeriod'
         },
         initialize: function () {
             let that = this;
             this.dashboard = new DashboardView();
-            $('.add-flood-scenario').click(function () {
-                that.openPanelFloodScenario()
+            $('.add-hazard-scenario').click(function () {
+                that.openPanelHazardScenario()
             });
 
-            $('.browse-floods').click(function () {
+            $('.browse-hazards').click(function () {
                 dispatcher.trigger('intro:hide');
-                that.openBrowseFlood()
+                that.openBrowseHazard()
             });
 
             // Initialize view
-            this.flood_upload_view = new FloodUploadView();
+            this.hazard_upload_view = new HazardUploadView();
             dispatcher.on('side-panel:open-dashboard', this.openDashboard, this);
             dispatcher.on('side-panel:open-welcome', this.openWelcome, this);
         },
-        openPanelFloodScenario: function () {
+        openPanelHazardScenario: function () {
             resetView = false;
             dispatcher.trigger('dashboard:hide');
-            $('.panel-body-wrapper').not('.panel-flood-scenario').not('.floating-panel').hide();
-            $('.panel-flood-scenario').show("slide", { direction: "right" }, 400);
+            $('.panel-body-wrapper').not('.panel-hazard-scenario').not('.floating-panel').hide();
+            $('.panel-hazard-scenario').show("slide", { direction: "right" }, 400);
         },
         backButtonAction: function (e) {
             $('form').trigger('reset');
@@ -49,29 +49,29 @@ define([
             $wrapper.hide("slide", { direction: "right" }, 300);
             $wrapper.prev().show("slide", { direction: "right" }, 400);
         },
-        openUploadFloodForm: function (e) {
-            $('.panel-body-wrapper').not('.panel-flood-form').not('.floating-panel').hide();
-            let $wrapper = $('.panel-flood-form');
+        openUploadHazardForm: function (e) {
+            $('.panel-body-wrapper').not('.panel-hazard-form').not('.floating-panel').hide();
+            let $wrapper = $('.panel-hazard-form');
             $wrapper.show();
-            $wrapper.find('.panel-upload-flood').show("slide", { direction: "right" }, 500);
+            $wrapper.find('.panel-upload-hazard').show("slide", { direction: "right" }, 500);
         },
         removeIntroWindow: function (e) {
             // Hide the intro window
             dispatcher.trigger('intro:hide');
         },
-        openBrowseFlood: function (e) {
+        openBrowseHazard: function (e) {
             $('.browse-btn-icon').hide();
-            $('.panel-browse-flood').show("slide", { direction: "down" }, 400);
+            $('.panel-browse-hazard').show("slide", { direction: "down" }, 400);
             $('.arrow-start').hide();
-            $('.browse-floods').removeClass('bounce-7');
+            $('.browse-hazards').removeClass('bounce-7');
         },
-        hideBrowseFlood: function () {
+        hideBrowseHazard: function () {
             $('.browse-btn-icon').show();
-            $('.panel-browse-flood').hide("slide", { direction: "down" }, 400);
+            $('.panel-browse-hazard').hide("slide", { direction: "down" }, 400);
         },
-        fetchFloodById: function (e) {
-            let flood_id = $(e.target).closest('.browse-arrow').attr('data-flood-id');
-            dispatcher.trigger('flood:fetch-flood-by-id', flood_id);
+        fetchHazardById: function (e) {
+            let hazard_id = $(e.target).closest('.browse-arrow').attr('data-hazard-id');
+            dispatcher.trigger('hazard:fetch-hazard-by-id', hazard_id);
         },
         openBrowseByForecast: function (e) {
             $(e.target).closest('.panel-body-wrapper').hide();
@@ -92,10 +92,10 @@ define([
         },
         openWelcome: function () {
             $('#panel-dashboard').hide();
-            this.hideBrowseFlood();
+            this.hideBrowseHazard();
             $('.panel-body-wrapper').not('.panel-welcome').not('.floating-panel').hide();
             $('.panel-welcome').show("slide", { direction: "right" }, 400);
-            $('.browse-floods').addClass('bounce-7');
+            $('.browse-hazards').addClass('bounce-7');
         }
     })
 });

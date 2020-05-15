@@ -19,7 +19,7 @@ CREATE FUNCTION public.save_excel_as_blob() RETURNS character varying
   worksheet = workbook.add_worksheet()
   worksheet.write('A1', 'Hello world')
   workbook.close()
-  # plan = plpy.prepare("UPDATE flood_event SET output = ($1)", ["bytea"])
+  # plan = plpy.prepare("UPDATE hazard_event SET output = ($1)", ["bytea"])
   # plpy.execute(plan, [ouput])
 
   return ouput

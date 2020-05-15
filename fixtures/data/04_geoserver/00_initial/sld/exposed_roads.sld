@@ -28,7 +28,7 @@
                     <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
                         <ogc:And>
                             <ogc:PropertyIsGreaterThanOrEqualTo>
-                                <ogc:PropertyName>depth_class</ogc:PropertyName>
+                                <ogc:PropertyName>hazard_class</ogc:PropertyName>
                                 <ogc:Literal>2</ogc:Literal>
                             </ogc:PropertyIsGreaterThanOrEqualTo>
                             <ogc:PropertyIsLessThanOrEqualTo>
@@ -62,7 +62,7 @@
                     <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
                         <ogc:And>
                             <ogc:PropertyIsLessThan>
-                                <ogc:PropertyName>depth_class</ogc:PropertyName>
+                                <ogc:PropertyName>hazard_class</ogc:PropertyName>
                                 <ogc:Literal>2</ogc:Literal>
                             </ogc:PropertyIsLessThan>
                             <ogc:PropertyIsLessThanOrEqualTo>
@@ -89,7 +89,7 @@
                         <ogc:And>
                             <ogc:And>
                                 <ogc:PropertyIsGreaterThanOrEqualTo>
-                                    <ogc:PropertyName>depth_class</ogc:PropertyName>
+                                    <ogc:PropertyName>hazard_class</ogc:PropertyName>
                                     <ogc:Literal>2</ogc:Literal>
                                 </ogc:PropertyIsGreaterThanOrEqualTo>
                                 <ogc:PropertyIsGreaterThan>
@@ -129,7 +129,7 @@
                         <ogc:And>
                             <ogc:And>
                                 <ogc:PropertyIsLessThan>
-                                    <ogc:PropertyName>depth_class</ogc:PropertyName>
+                                    <ogc:PropertyName>hazard_class</ogc:PropertyName>
                                     <ogc:Literal>2</ogc:Literal>
                                 </ogc:PropertyIsLessThan>
                                 <ogc:PropertyIsGreaterThan>
@@ -160,7 +160,7 @@
                     <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
                         <ogc:And>
                             <ogc:PropertyIsGreaterThanOrEqualTo>
-                                <ogc:PropertyName>depth_class</ogc:PropertyName>
+                                <ogc:PropertyName>hazard_class</ogc:PropertyName>
                                 <ogc:Literal>2</ogc:Literal>
                             </ogc:PropertyIsGreaterThanOrEqualTo>
                             <ogc:PropertyIsGreaterThan>
@@ -194,7 +194,7 @@
                     <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
                         <ogc:And>
                             <ogc:PropertyIsLessThan>
-                                <ogc:PropertyName>depth_class</ogc:PropertyName>
+                                <ogc:PropertyName>hazard_class</ogc:PropertyName>
                                 <ogc:Literal>2</ogc:Literal>
                             </ogc:PropertyIsLessThan>
                             <ogc:PropertyIsGreaterThan>

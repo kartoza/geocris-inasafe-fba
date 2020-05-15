@@ -4,7 +4,7 @@ define([
     Backbone, L, Base) {
     return Base.extend({
         xhr: null,
-        prefixView: 'flooded_buildings_',
+        prefixView: 'hazarded_buildings_',
         initialize: function (multiselectFilter, filters) {
             /**
              * multiselect view of backbone

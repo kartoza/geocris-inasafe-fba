@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS public.village_trigger_status (
     id integer NOT NULL,
     village_id double precision,
     trigger_status integer,
-    flood_event_id integer,
+    hazard_event_id integer,
     CONSTRAINT village_trigger_status_pkey PRIMARY KEY (id),
     CONSTRAINT village_trigger_status_trigger_status_fkey FOREIGN KEY (trigger_status) REFERENCES public.trigger_status(id)
 );

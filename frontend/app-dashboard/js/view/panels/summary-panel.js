@@ -28,49 +28,49 @@ define([
 
             let total_building_array = [];
             let graph_data = [];
-            let flood_graph_data = [];
+            let hazard_graph_data = [];
             let backgroundColours = [];
-            let total_flooded_count_key = `flooded_${exposure_name}_count`;
+            let total_hazarded_count_key = `hazarded_${exposure_name}_count`;
             let total_count_key = `${exposure_name}_count`;
             let unlisted_key = [
-                'id', 'flood_event_id', 'total_vulnerability_score', total_flooded_count_key, total_count_key,
+                'id', 'hazard_event_id', 'total_vulnerability_score', total_hazarded_count_key, total_count_key,
                 'village_id', 'name', 'region', 'district_id', 'sub_district_id', 'sub_dc_code', 'village_code', 'dc_code',
                 'trigger_status'
             ];
-            let primary_exposure_flood_data = [];
+            let primary_exposure_hazard_data = [];
             let primary_exposure_data = [];
-            let flooded_count_key_suffix = `_flooded_${exposure_name}_count`;
+            let hazarded_count_key_suffix = `_hazarded_${exposure_name}_count`;
             let total_count_key_suffix = `_${exposure_name}_count`;
             let label = [];
             for (let key in data) {
                 let is_in_unlisted = unlisted_key.indexOf(key) > -1;
                 if(is_in_unlisted) { continue; }
 
-                let is_flooded_count = key.endsWith(flooded_count_key_suffix);
+                let is_hazarded_count = key.endsWith(hazarded_count_key_suffix);
                 let is_primary_exposure = key.indexOf(this.primary_exposure_key) > -1;
 
-                if(is_primary_exposure && is_flooded_count){
+                if(is_primary_exposure && is_hazarded_count){
                     // Record primary exposure data for pie chart
-                    primary_exposure_flood_data = data[key];
-                    primary_exposure_data = data[key.replace(flooded_count_key_suffix, total_count_key_suffix)];
+                    primary_exposure_hazard_data = data[key];
+                    primary_exposure_data = data[key.replace(hazarded_count_key_suffix, total_count_key_suffix)];
                 }
-                else if(is_flooded_count){
-                    // Record flooded data for bar chart
-                    let breakdown_key = key.replace(flooded_count_key_suffix, '');
-                    let total_count_key = key.replace(flooded_count_key_suffix, total_count_key_suffix);
-                    flood_graph_data.push({
+                else if(is_hazarded_count){
+                    // Record hazarded data for bar chart
+                    let breakdown_key = key.replace(hazarded_count_key_suffix, '');
+                    let total_count_key = key.replace(hazarded_count_key_suffix, total_count_key_suffix);
+                    hazard_graph_data.push({
                         y: breakdown_key,
                         x: data[key]
                     })
 
-                    // Figure out non flooded count
-                    let non_flooded_count = data[total_count_key] - data[key];
-                    if(isNaN(non_flooded_count)){
-                        non_flooded_count = 0;
+                    // Figure out non hazarded count
+                    let non_hazarded_count = data[total_count_key] - data[key];
+                    if(isNaN(non_hazarded_count)){
+                        non_hazarded_count = 0;
                     }
                     graph_data.push({
                         y: breakdown_key,
-                        x: non_flooded_count
+                        x: non_hazarded_count
                     });
 
                     // Figure out total count
@@ -100,7 +100,7 @@ define([
                 return label.indexOf(a.y) - label.indexOf(b.y);
             });
 
-            flood_graph_data.sort(function (a, b) {
+            hazard_graph_data.sort(function (a, b) {
                 return label.indexOf(a.y) - label.indexOf(b.y);
             });
 
@@ -111,9 +111,9 @@ define([
 
             let ctxPrimaryExposure = $parentWrapper.find('.summary-chart-primary').get(0).getContext('2d');
             let datasetsPrimaryExposure = {
-                labels: ["Not Flooded", "Flooded"],
+                labels: ["Not Affected", "Affected"],
                 datasets: [{
-                    data: [primary_exposure_data - primary_exposure_flood_data, primary_exposure_flood_data],
+                    data: [primary_exposure_data - primary_exposure_hazard_data, primary_exposure_hazard_data],
                     backgroundColor: ['#e5e5e5', '#82B7CA']
                 }]
             };
@@ -122,17 +122,17 @@ define([
                 labels: humanLabel,
                 datasets: [
                     {
-                        label: "Not Flooded",
+                        label: "Not Affected",
                         data: graph_data
                     }, {
-                        label: "Flooded",
-                        data: flood_graph_data,
+                        label: "Affected",
+                        data: hazard_graph_data,
                         backgroundColor: backgroundColours
                     }]
             };
 
             let is_vulnerability_score_exists = data['total_vulnerability_score'] !== undefined;
-            let is_exposed_count_exists = data[total_flooded_count_key] !== undefined;
+            let is_exposed_count_exists = data[total_hazarded_count_key] !== undefined;
             let $vulnerability_info = $parentWrapper.find('.vulnerability-score');
             if(is_vulnerability_score_exists){
                 let total_vulnerability_score = data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2) : 0;
@@ -142,7 +142,7 @@ define([
             else{
                 $vulnerability_info.parent().hide();
             }
-            $parentWrapper.find('.exposed-count').html(is_exposed_count_exists ? data[total_flooded_count_key] : 0);
+            $parentWrapper.find('.exposed-count').html(is_exposed_count_exists ? data[total_hazarded_count_key] : 0);
 
             this.renderChartData(datasets, ctx, this.primary_exposure_label, datasetsPrimaryExposure, ctxPrimaryExposure, this.other_category_exposure_label);
         },

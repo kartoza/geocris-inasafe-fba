@@ -5,13 +5,13 @@ from tests.backend import DatabaseTestCase
 
 class TestBuildingImpact(DatabaseTestCase):
 
-    def test_non_flooded_building_summary(self):
+    def test_building_summary(self):
         self.assertSQLResult(
-            self.sql_path('mv_non_flooded_building_summary.sql'),
-            self.json_path('mv_non_flooded_building_summary.json'),
+            self.sql_path('mv_building_summary.sql'),
+            self.json_path('mv_building_summary.json'),
         )
 
-    def test_flood_exposure_intersections(self):
+    def test_hazard_exposure_intersections(self):
         self.dbc.conn.autocommit = False
         with self.dbc.conn.cursor(cursor_factory=DictCursor) as c:
 
@@ -46,7 +46,7 @@ class TestBuildingImpact(DatabaseTestCase):
                         # Do sanity count check
                         # exposed count must less than total count
                         exposed_count = row[
-                            '{0}_flooded_building_count'.format(key)]
+                            '{0}_hazarded_building_count'.format(key)]
                         total_count = row[
                             '{0}_building_count'.format(key)]
                         self.assertLessEqual(exposed_count, total_count)
@@ -58,27 +58,27 @@ class TestBuildingImpact(DatabaseTestCase):
                     # total count (because there might be
                     # uncategorized building) from the field
                     self.assertLessEqual(
-                        sum_exposed_count, row['flooded_building_count'])
+                        sum_exposed_count, row['hazarded_building_count'])
                     # Same reason with total count
                 self.assertLessEqual(
                     sum_total_count, row['building_count'])
 
             mv_district_summary = self.sql_path(
-                'mv_flood_event_district_summary.sql')
+                'mv_hazard_event_district_summary.sql')
             self.execute_sql_file(mv_district_summary, cursor=c)
             results = c.fetchall()
 
             _test_summary_stats(self, results)
 
             mv_sub_district_summary = self.sql_path(
-                'mv_flood_event_sub_district_summary.sql')
+                'mv_hazard_event_sub_district_summary.sql')
             self.execute_sql_file(mv_sub_district_summary, cursor=c)
             results = c.fetchall()
 
             _test_summary_stats(self, results)
 
             mv_village_summary = self.sql_path(
-                'mv_flood_event_village_summary.sql')
+                'mv_hazard_event_village_summary.sql')
             self.execute_sql_file(mv_village_summary, cursor=c)
             results = c.fetchall()
 
@@ -182,7 +182,7 @@ class TestBuildingImpact(DatabaseTestCase):
 
                 # should have spreadsheets
                 self.execute_statement(
-                    'select * from spreadsheet_reports where flood_event_id = {}'.format(hazard_event_id),
+                    'select * from spreadsheet_reports where hazard_event_id = {}'.format(hazard_event_id),
                     cursor=c)
                 results = c.fetchone()
 

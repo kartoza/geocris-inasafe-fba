@@ -424,7 +424,7 @@ make test
 
 Will run python unittests in `fixtures/tests/backend` directory.
 Should you have new tests to create, please create it in this directory/modules.
-The data that is used by unittests, for example to populate dummy flood data, is stored in:
+The data that is used by unittests, for example to populate dummy hazard data, is stored in:
 `fixtures/tests/backend/data` directory.
 
 The organizations in this directory might change in the future if more complex operations involved in the backend.

@@ -74,10 +74,10 @@ require([
     'utils',
     'js/view/map.js',
     'js/request.js',
-    'js/view/flood-collection.js',
-], function ($, bootstrap, Backbone, _, moment, L, LDraw, AirDatepicker, AirDatepickerEN,  utils, MAP, RequestView, FloodCollectionView) {
+    'js/view/hazard-collection.js',
+], function ($, bootstrap, Backbone, _, moment, L, LDraw, AirDatepicker, AirDatepickerEN,  utils, MAP, RequestView, HazardCollectionView) {
     AppRequest = new RequestView();
     dispatcher = _.extend({}, Backbone.Events);
     mapView = new MAP();
-    floodCollectionView = new FloodCollectionView();
+    hazardCollectionView = new HazardCollectionView();
 });

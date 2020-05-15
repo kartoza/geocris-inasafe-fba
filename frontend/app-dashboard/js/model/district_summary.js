@@ -4,7 +4,7 @@ define([
 ], function (Backbone) {
 
     const DistrictSummary = Backbone.Model.extend({
-        urlRoot: postgresUrl + 'mv_flood_event_district_summary',
+        urlRoot: postgresUrl + 'mv_hazard_event_district_summary',
         url: function () {
             return `${this.urlRoot}?id=eq.${this.id}`
         }
@@ -12,7 +12,7 @@ define([
 
     return Backbone.Collection.extend({
         model: DistrictSummary,
-        urlRoot: postgresUrl + 'mv_flood_event_district_summary',
+        urlRoot: postgresUrl + 'mv_hazard_event_district_summary',
         url: function () {
             return this.urlRoot;
         }

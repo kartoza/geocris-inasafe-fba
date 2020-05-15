@@ -6,7 +6,7 @@ define([
     function (Backbone, Wellknown, L, moment) {
     /**
      * Attributes:
-     *  - flood_map_id
+     *  - hazard_map_id
      *  - acquisition_date
      *  - forecast_datex
      *  - source
@@ -15,21 +15,21 @@ define([
      *  - trigger_status
      *
      */
-    const _forecast_flood_url = postgresUrl + 'hazard_event';
-    const _flood_event_forecast_list_f_url = postgresUrl + 'rpc/flood_event_forecast_list_f';
-    const _flood_event_historical_forecast_list_f_url = postgresUrl + 'rpc/flood_event_historical_forecast_list_f';
+    const _forecast_hazard_url = postgresUrl + 'hazard_event';
+    const _hazard_event_forecast_list_f_url = postgresUrl + 'rpc/hazard_event_forecast_list_f';
+    const _hazard_event_historical_forecast_list_f_url = postgresUrl + 'rpc/hazard_event_historical_forecast_list_f';
     // We define which column to take because we don't want to fetch the whole spreadsheet blob.
-    const _select_query_param = 'select=id,flood_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status';
+    const _select_query_param = 'select=id,hazard_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status';
     const ForecastEvent = Backbone.Model.extend({
             // attribute placeholder
             _url: {
-                forecast_flood: _forecast_flood_url,
-                forecast_flood_queue: `${_forecast_flood_url}_queue`,
-                forecast_flood_extent: postgresUrl + 'vw_hazard_event_extent'
+                forecast_hazard: _forecast_hazard_url,
+                forecast_hazard_queue: `${_forecast_hazard_url}_queue`,
+                forecast_hazard_extent: postgresUrl + 'vw_hazard_event_extent'
             },
             _table_attrs: {
-                forecast_flood: {
-                    flood_id: 'flood_map_id',
+                forecast_hazard: {
+                    hazard_id: 'hazard_map_id',
                     acquisition_date: 'acquisition_date',
                     forecast_date: 'forecast_date',
                     source: 'upload_source',
@@ -41,10 +41,10 @@ define([
             _constants: {
                 PRE_ACTIVATION_TRIGGER: 1,
                 ACTIVATION_TRIGGER: 2,
-                WMS_LAYER_NAME: 'kartoza:flood_forecast_layer'
+                WMS_LAYER_NAME: 'kartoza:hazard_forecast_layer'
             },
 
-            urlRoot: _forecast_flood_url,
+            urlRoot: _forecast_hazard_url,
 
             initialize: function(){
                 if(this.id) {
@@ -55,7 +55,7 @@ define([
 
             url: function () {
                 let is_for_queue = this.get('queue_status') !== undefined;
-                let urlRoot = is_for_queue ? this._url.forecast_flood_queue : this._url.forecast_flood;
+                let urlRoot = is_for_queue ? this._url.forecast_hazard_queue : this._url.forecast_hazard;
                 if(this.id){
                     return `${urlRoot}?id=eq.${this.id}`;
                 }
@@ -68,7 +68,7 @@ define([
                 const that = this;
                 return new Promise(function (resolve, reject) {
                     AppRequest.get(
-                        that._url.forecast_flood_extent,
+                        that._url.forecast_hazard_extent,
                         {
                             id: `eq.${that.get('id')}`
                         },
@@ -144,10 +144,10 @@ define([
             }
         },
         {
-            fromFloodLayer: function (flood_layer) {
-                const flood_map_id = flood_layer.get('id');
+            fromHazardLayer: function (hazard_layer) {
+                const hazard_map_id = hazard_layer.get('id');
                 const forecast = new ForecastEvent({
-                    flood_map_id: flood_map_id
+                    hazard_map_id: hazard_map_id
                 });
                 return forecast
             },
@@ -168,7 +168,7 @@ define([
                     let forecast_date_start = forecast_date.clone().utc();
                     let forecast_date_end = forecast_date_start.clone().add(1, 'days').utc();
                     let query_param = `and=(acquisition_date.gte.${acquisition_date_start.format()},acquisition_date.lt.${acquisition_date_end.format()},forecast_date.gte.${forecast_date_start.format()},forecast_date.lt.${forecast_date_end.format()})`;
-                    AppRequest.get(`${_forecast_flood_url}?${_select_query_param}&${query_param}`)
+                    AppRequest.get(`${_forecast_hazard_url}?${_select_query_param}&${query_param}`)
                         .done(function(data){
                             // we will get array of forecast event
                             let forecast_events = data.map(function(value){
@@ -189,7 +189,7 @@ define([
                     let forecast_date_start = forecast_date.clone().utc();
                     let forecast_date_end = forecast_date_start.clone().add(1, 'days').utc();
                     let query_param = `and=(forecast_date.gte.${forecast_date_start.format()},forecast_date.lt.${forecast_date_end.format()})&order=acquisition_date.desc`;
-                    AppRequest.get(`${_forecast_flood_url}?${_select_query_param}&${query_param}`)
+                    AppRequest.get(`${_forecast_hazard_url}?${_select_query_param}&${query_param}`)
                         .done(function (data) {
                             let forecast_events = data.map(function (value) {
                                 return new ForecastEvent(value);
@@ -222,7 +222,7 @@ define([
                     let date_end = forecast_date_range_end.clone().local().momentDateOnly().utc();
 
                     AppRequest.post(
-                        _flood_event_historical_forecast_list_f_url,
+                        _hazard_event_historical_forecast_list_f_url,
                         {
                             forecast_date_range_start: date_start,
                             forecast_date_range_end: date_end
@@ -274,7 +274,7 @@ define([
                     let acquisition_date_start = acquisition_date.clone().local().momentDateOnly().utc();
                     let acquisition_date_end = acquisition_date_start.clone().add(1, 'days').utc();
                     AppRequest.post(
-                        _flood_event_forecast_list_f_url,
+                        _hazard_event_forecast_list_f_url,
                         {
                             acquisition_date_start: acquisition_date_start,
                             acquisition_date_end: acquisition_date_end

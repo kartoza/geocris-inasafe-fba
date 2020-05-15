@@ -1,13 +1,13 @@
 
 --
--- Name: kartoza_refresh_non_flooded_roads_summary_mv(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: kartoza_refresh_roads_summary_mv(); Type: FUNCTION; Schema: public; Owner: -
 --
-DROP FUNCTION IF EXISTS public.kartoza_refresh_non_flooded_roads_summary_mv CASCADE ;
-CREATE FUNCTION public.kartoza_refresh_non_flooded_roads_summary_mv() RETURNS trigger
+DROP FUNCTION IF EXISTS public.kartoza_refresh_roads_summary_mv CASCADE ;
+CREATE FUNCTION public.kartoza_refresh_roads_summary_mv() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
   BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY mv_non_flooded_roads_summary WITH DATA ;
+    REFRESH MATERIALIZED VIEW CONCURRENTLY mv_roads_summary WITH DATA ;
     RETURN NULL;
   END
   $$;

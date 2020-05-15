@@ -1,13 +1,13 @@
 
 --
--- Name: kartoza_refresh_flood_non_flooded_building_summary(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: kartoza_refresh_building_summary_mv(); Type: FUNCTION; Schema: public; Owner: -
 --
-DROP FUNCTION IF EXISTS public.kartoza_refresh_flood_non_flooded_building_summary CASCADE ;
-CREATE FUNCTION public.kartoza_refresh_flood_non_flooded_building_summary() RETURNS trigger
+DROP FUNCTION IF EXISTS public.kartoza_refresh_building_summary_mv CASCADE ;
+CREATE FUNCTION public.kartoza_refresh_building_summary_mv() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
   BEGIN
-    REFRESH MATERIALIZED VIEW  mv_non_flooded_building_summary WITH DATA ;
+    REFRESH MATERIALIZED VIEW  mv_building_summary WITH DATA ;
     RETURN NULL;
   END
   $$;

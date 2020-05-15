@@ -25,16 +25,16 @@ define([
              PopulationDistrictSummaryCollection, PopulationSubDistrictSummaryCollection, PopulationVillageSummaryCollection,
              WorldPopulationDistrictSummaryCollection, WorldPopulationSubDistrictSummaryCollection, WorldPopulationVillageSummaryCollection) {
     return Backbone.View.extend({
-        el: '.panel-browse-flood',
+        el: '.panel-browse-hazard',
         forecasts_list: [],
         historical_forecasts_list: [],
         event_date_hash: {},
-        selected_flood: null,
+        selected_hazard: null,
         building_type: {},
-        flood_collection: null,
-        flood_on_date: null,
-        displayed_flood: null,
-        flood_dates: [],
+        hazard_collection: null,
+        hazard_on_date: null,
+        displayed_hazard: null,
+        hazard_dates: [],
         villageStats: null,
         subDistrictStats: null,
         districtStats: null,
@@ -63,14 +63,14 @@ define([
         },
         initialize: function () {
             // jquery element
-            this.$flood_info = this.$el.find('.flood-info');
+            this.$hazard_info = this.$el.find('.hazard-info');
             this.$prev_date_arrow = this.$el.find('#prev-date');
             this.$next_date_arrow = this.$el.find('#next-date');
-            this.$datepicker_browse = this.$el.find('#date-browse-flood');
+            this.$datepicker_browse = this.$el.find('#date-browse-hazard');
             this.$forecast_arrow_up = this.$el.find('.browse-arrow.arrow-up');
             this.$forecast_arrow_down = this.$el.find('.browse-arrow.arrow-down');
-            this.$hide_browse_flood = this.$el.find('.hide-browse-flood');
-            this.$flood_summary = $('#flood-summary');
+            this.$hide_browse_hazard = this.$el.find('.hide-browse-hazard');
+            this.$hazard_summary = $('#hazard-summary');
             this.$date_legend = this.$el.find('#date-legend');
             this.datepicker_browse = null;
 
@@ -90,14 +90,14 @@ define([
             this.world_population_subdistrict_summaries = new WorldPopulationSubDistrictSummaryCollection();
 
             // dispatcher registration
-            dispatcher.on('flood:fetch-forecast-collection', this.fetchForecastCollection, this);
-            dispatcher.on('flood:update-forecast-collection', this.initializeDatePickerBrowse, this);
-            dispatcher.on('flood:fetch-forecast', this.fetchForecast, this);
-            dispatcher.on('flood:fetch-stats-data', this.fetchStatisticData, this);
-            dispatcher.on('flood:fetch-stats-data-road', this.fetchRoadStatisticData, this);
-            dispatcher.on('flood:fetch-stats-data-population', this.fetchPopulationStatisticData, this);
-            dispatcher.on('flood:deselect-forecast', this.deselectForecast, this);
-            dispatcher.on('flood:fetch-historical-forecast', this.fetchHistoricalForecastCollection, this);
+            dispatcher.on('hazard:fetch-forecast-collection', this.fetchForecastCollection, this);
+            dispatcher.on('hazard:update-forecast-collection', this.initializeDatePickerBrowse, this);
+            dispatcher.on('hazard:fetch-forecast', this.fetchForecast, this);
+            dispatcher.on('hazard:fetch-stats-data', this.fetchStatisticData, this);
+            dispatcher.on('hazard:fetch-stats-data-road', this.fetchRoadStatisticData, this);
+            dispatcher.on('hazard:fetch-stats-data-population', this.fetchPopulationStatisticData, this);
+            dispatcher.on('hazard:deselect-forecast', this.deselectForecast, this);
+            dispatcher.on('hazard:fetch-historical-forecast', this.fetchHistoricalForecastCollection, this);
 
 
             // get forecast collections
@@ -117,8 +117,8 @@ define([
                             html += `<td><span class="colour trigger-status-${value.id}"></span><span>${value.name.capitalize()}</span></td>`;
                             html += `<td><span class="colour trigger-status-historical trigger-status-${value.id}"></span><span>Historical ${value.name.capitalize()}</span></td>`;
                             if (value.id !== 0) {
-                                that.$flood_summary.prepend(
-                                    `<div class="flood-count trigger-status-${value.id}" style="display: none"><span id="flood-summary-trigger-status-${value.id}"><i class="fa fa-spinner fa-spin fa-fw"></i></span> ${value.name.capitalize()} event(s)</div>`);
+                                that.$hazard_summary.prepend(
+                                    `<div class="hazard-count trigger-status-${value.id}" style="display: none"><span id="hazard-summary-trigger-status-${value.id}"><i class="fa fa-spinner fa-spin fa-fw"></i></span> ${value.name.capitalize()} event(s)</div>`);
                             }
                         }
                         html += '</tr>';
@@ -151,7 +151,7 @@ define([
                     let date_string = moment(date).formatDate();
                     let event = that.event_date_hash[date_string];
                     if (cellType === 'day' && event) {
-                        let classes = 'flood-date trigger-status-' + (event.trigger_status_id ? event.trigger_status_id : 0);
+                        let classes = 'hazard-date trigger-status-' + (event.trigger_status_id ? event.trigger_status_id : 0);
                         if (event.is_historical) {
                             classes += ' trigger-status-historical';
                         }
@@ -246,7 +246,7 @@ define([
             const today = moment().utc();
             const that = this;
 
-            // Get flood forecast collection
+            // Get hazard forecast collection
             ForecastEvent.getCurrentForecastList(today)
                 .then(function(data){
 
@@ -265,29 +265,29 @@ define([
 
                     _.extend(that.event_date_hash, date_hash);
 
-                    dispatcher.trigger('flood:update-forecast-collection', predefined_event);
+                    dispatcher.trigger('hazard:update-forecast-collection', predefined_event);
                     that.updateForecastsSummary();
                     that.getListCentroid()
             })
         },
         updateForecastsSummary: function(){
-            let flood_summary = {
+            let hazard_summary = {
                 [TriggerStatusCollection.constants.NOT_ACTIVATED]: 0,
                 [TriggerStatusCollection.constants.PRE_ACTIVATION]: 0,
                 [TriggerStatusCollection.constants.ACTIVATION]: 0,
                 all: 0
             }
-            flood_summary = this.forecasts_list.reduce( function(accumulator, value) {
+            hazard_summary = this.forecasts_list.reduce( function(accumulator, value) {
                 let status_id = value.trigger_status_id || TriggerStatusCollection.constants.NOT_ACTIVATED;
                 accumulator[status_id]++;
                 accumulator.all++;
                 return accumulator;
-            }, flood_summary);
+            }, hazard_summary);
 
-            _.mapObject(flood_summary, function (value, key) {
-                let $element = $('#flood-summary-trigger-status-' + key);
+            _.mapObject(hazard_summary, function (value, key) {
+                let $element = $('#hazard-summary-trigger-status-' + key);
                 if ($element.length !== 0) {
-                    $element.closest('.flood-count').show();
+                    $element.closest('.hazard-count').show();
                     $element.html(value);
                 }
             });
@@ -341,21 +341,21 @@ define([
                 });
             });
 
-            // dispatch event to draw flood
-            // change flood info
+            // dispatch event to draw hazard
+            // change hazard info
             let name = forecast.get('notes') ? forecast.get('notes') : '<i>no name</i>';
-            this.$flood_info.html(`<div>${name}</div>`);
+            this.$hazard_info.html(`<div>${name}</div>`);
             // close browser
-            this.$hide_browse_flood.click();
+            this.$hide_browse_hazard.click();
         },
         deselectForecast: function () {
             // when no forecast, deselect
             this.selected_forecast = null;
-            this.$flood_info.empty();
+            this.$hazard_info.empty();
             this.$datepicker_browse.val('Select forecast date');
             dispatcher.trigger('map:remove-forecast-layer');
             // close browser
-            this.$hide_browse_flood.click();
+            this.$hide_browse_hazard.click();
         },
         fetchForecast: function (date, optional_forecast_id) {
             const that = this;
@@ -407,13 +407,13 @@ define([
         },
         onFocusOut: function (e) {
             // if(!this.is_browsing) {
-            //     this.$hide_browse_flood.click();
+            //     this.$hide_browse_hazard.click();
             // }
         },
         clickNavigateForecast: function (e) {
             let date_string = $(e.currentTarget).attr('data-forecast-date');
             let selected_date = moment(date_string);
-            // selecting date in date picker will trigger flood selection again.
+            // selecting date in date picker will trigger hazard selection again.
             this.datepicker_browse.selectDate(selected_date.toJavascriptDate());
         },
         fetchStatisticData: function (region, region_id, renderRegionDetail) {
@@ -445,9 +445,9 @@ define([
                         }
                     })
                 });
-                if (overall.hasOwnProperty('police_flooded_building_count')) {
-                    overall['police_station_flooded_building_count'] = overall['police_flooded_building_count'];
-                    delete overall['police_flooded_building_count'];
+                if (overall.hasOwnProperty('police_hazarded_building_count')) {
+                    overall['police_station_hazarded_building_count'] = overall['police_hazarded_building_count'];
+                    delete overall['police_hazarded_building_count'];
                 }
                 delete overall['region_id'];
                 delete overall[region + '_id'];
@@ -479,8 +479,8 @@ define([
                     $.each(statData, function (idx, value) {
                         buildings[idx] = [];
                         $.each(value, function (key, value) {
-                            if (key === 'police_flooded_building_count') {
-                                key = 'police_station_flooded_building_count'
+                            if (key === 'police_hazarded_building_count') {
+                                key = 'police_station_hazarded_building_count'
                             }
                             buildings[idx][key] = value;
                         })
@@ -490,9 +490,9 @@ define([
                 for (let index = 0; index < data[region].length; index++) {
                     if (data[region][index][that.keyStats[region]] === parseInt(region_id)) {
                         overall = data[region][index];
-                        if (overall.hasOwnProperty('police_flooded_building_count')) {
-                            overall['police_station_flooded_building_count'] = overall['police_flooded_building_count'];
-                            delete overall['police_flooded_building_count'];
+                        if (overall.hasOwnProperty('police_hazarded_building_count')) {
+                            overall['police_station_hazarded_building_count'] = overall['police_hazarded_building_count'];
+                            delete overall['police_hazarded_building_count'];
                         }
                         break
                     }
@@ -502,11 +502,11 @@ define([
             dispatcher.trigger('dashboard:render-chart-building', overall, 'building');
             dispatcher.trigger('dashboard:render-region-summary', overall, buildings, main_panel, region_render, that.keyStats[region_render], 'building');
         },
-        fetchVillageData: function (flood_event_id) {
+        fetchVillageData: function (hazard_event_id) {
             let that = this;
             this.village_summaries.fetch({
                 data: {
-                    flood_event_id: `eq.${flood_event_id}`,
+                    hazard_event_id: `eq.${hazard_event_id}`,
                     order: 'trigger_status.desc,total_vulnerability_score.desc'
                 }
             }).then(function (data) {
@@ -519,11 +519,11 @@ define([
                     console.log(data)
             });
         },
-        fetchDistrictData: function (flood_event_id) {
+        fetchDistrictData: function (hazard_event_id) {
             let that = this;
             this.district_summaries.fetch({
                 data: {
-                    flood_event_id: `eq.${flood_event_id}`,
+                    hazard_event_id: `eq.${hazard_event_id}`,
                     order: 'trigger_status.desc,total_vulnerability_score.desc'
                 }
             }).then(function (data) {
@@ -536,11 +536,11 @@ define([
                 console.log(data);
             });
         },
-        fetchSubDistrictData: function (flood_event_id) {
+        fetchSubDistrictData: function (hazard_event_id) {
             let that = this;
             this.subdistrict_summaries.fetch({
                 data: {
-                    flood_event_id: `eq.${flood_event_id}`,
+                    hazard_event_id: `eq.${hazard_event_id}`,
                     order: 'trigger_status.desc,total_vulnerability_score.desc'
                 }
             }).then(function (data) {
@@ -663,11 +663,11 @@ define([
             dispatcher.trigger('dashboard:render-chart-road', overall, 'road');
             dispatcher.trigger('dashboard:render-region-summary', overall, roads, main_panel, region_render, that.keyStats[region_render], 'road');
         },
-        fetchRoadDistrictData: function (flood_event_id) {
+        fetchRoadDistrictData: function (hazard_event_id) {
             let that = this;
             this.road_district_summaries.fetch({
                 data: {
-                    flood_event_id: `eq.${flood_event_id}`,
+                    hazard_event_id: `eq.${hazard_event_id}`,
                     order: 'trigger_status.desc,total_vulnerability_score.desc'
                 }
             }).then(function (data) {
@@ -680,11 +680,11 @@ define([
                 console.log(data);
             });
         },
-        fetchRoadSubDistrictData: function (flood_event_id) {
+        fetchRoadSubDistrictData: function (hazard_event_id) {
             let that = this;
             this.road_subdistrict_summaries.fetch({
                 data: {
-                    flood_event_id: `eq.${flood_event_id}`,
+                    hazard_event_id: `eq.${hazard_event_id}`,
                     order: 'trigger_status.desc,total_vulnerability_score.desc'
                 }
             }).then(function (data) {
@@ -697,11 +697,11 @@ define([
                 console.log(data);
             })
         },
-        fetchRoadVillageData: function (flood_event_id) {
+        fetchRoadVillageData: function (hazard_event_id) {
             let that = this;
             this.road_village_summaries.fetch({
                 data: {
-                    flood_event_id: `eq.${flood_event_id}`,
+                    hazard_event_id: `eq.${hazard_event_id}`,
                     order: 'trigger_status.desc,total_vulnerability_score.desc'
                 }
             }).then(function (data) {
@@ -789,13 +789,13 @@ define([
             dispatcher.trigger('dashboard:render-chart-population', overall, 'population');
             dispatcher.trigger('dashboard:render-region-summary', overall, population, main_panel, region_render, that.keyStats[region_render], 'population');
         },
-        _merge_population_stats: function(flood_event_id, stats_data, stats_collections, region){
+        _merge_population_stats: function(hazard_event_id, stats_data, stats_collections, region){
             let that = this;
             let region_id = `${region}_id`;
             let stats_promises = stats_collections.map((o, i) => o.fetch({
                     data: {
-                        flood_event_id: `eq.${flood_event_id}`,
-                        order: 'trigger_status.desc,flooded_population_count.desc'
+                        hazard_event_id: `eq.${hazard_event_id}`,
+                        order: 'trigger_status.desc,hazarded_population_count.desc'
                     }
                 }));
             Promise.all(stats_promises).then(function (data) {
@@ -812,14 +812,14 @@ define([
                         extra_data.splice(matching_extra_stat_index, 1);
                     }
                     // mark population count of census as a census_count key
-                    base_stat['census_count'] = base_stat['flooded_population_count'];
-                    delete base_stat['flooded_population_count'];
+                    base_stat['census_count'] = base_stat['hazarded_population_count'];
+                    delete base_stat['hazarded_population_count'];
                     delete base_stat['population_count'];
                     let merged_stat = {...base_stat, ...matching_extra_stat};
                     merged_pop_data.push(merged_stat);
                 }
                 // sort by affected population (descending)
-                merged_pop_data.sort( (a,b) => b['flooded_population_count'] - a['flooded_population_count'])
+                merged_pop_data.sort( (a,b) => b['hazarded_population_count'] - a['hazarded_population_count'])
                 that[stats_data[0]] = merged_pop_data;
                 that[stats_data[1]] = extra_data;
                 if (that.populationVillageStats !== null && that.populationDistrictStats !== null && that.populationSubDistrictStats !== null) {
@@ -830,32 +830,32 @@ define([
                 console.log(data);
             });
         },
-        fetchPopulationDistrictData: function (flood_event_id) {
+        fetchPopulationDistrictData: function (hazard_event_id) {
             let that = this;
 
             // Population data stats are a combined data from census population and world pop population stats
             let stats_collections = [this.population_district_summaries, this.world_population_district_summaries];
             let stats_data = ['populationDistrictStats', 'worldPopulationDistrictStats'];
             let region = 'district';
-            this._merge_population_stats(flood_event_id, stats_data, stats_collections, region);
+            this._merge_population_stats(hazard_event_id, stats_data, stats_collections, region);
         },
-        fetchPopulationSubDistrictData: function (flood_event_id) {
+        fetchPopulationSubDistrictData: function (hazard_event_id) {
             let that = this;
 
             // Population data stats are a combined data from census population and world pop population stats
             let stats_collections = [this.population_subdistrict_summaries, this.world_population_subdistrict_summaries];
             let stats_data = ['populationSubDistrictStats', 'worldPopulationSubDistrictStats'];
             let region = 'sub_district';
-            this._merge_population_stats(flood_event_id, stats_data, stats_collections, region);
+            this._merge_population_stats(hazard_event_id, stats_data, stats_collections, region);
         },
-        fetchPopulationVillageData: function (flood_event_id) {
+        fetchPopulationVillageData: function (hazard_event_id) {
             let that = this;
 
             // Population data stats are a combined data from census population and world pop population stats
             let stats_collections = [this.population_village_summaries, this.world_population_village_summaries];
             let stats_data = ['populationVillageStats', 'worldPopulationVillageStats'];
             let region = 'village';
-            this._merge_population_stats(flood_event_id, stats_data, stats_collections, region);
+            this._merge_population_stats(hazard_event_id, stats_data, stats_collections, region);
         }
     })
 });

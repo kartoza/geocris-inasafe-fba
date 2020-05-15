@@ -23,13 +23,13 @@ class TestGloFASForecast(unittest.TestCase):
         self.job.source_text = '[TEST] GloFAS - Reporting Point'
         self.job.run()
 
-        hazard_event = self.job.flood_forecast_events[0]
+        hazard_event = self.job.hazard_forecast_events[0]
         hazard_id = hazard_event['id']
         self.assertEqual(
             hazard_event['alert_level_key'],
             ReportingPointResult.ALERT_LEVEL_SEVERE)
         # fetch districts summaries
-        url = '{postgrest_url}/mv_flood_event_district_summary?flood_event_id' \
+        url = '{postgrest_url}/mv_hazard_event_district_summary?hazard_event_id' \
               '=eq.{id}&order=trigger_status.desc,' \
               'total_vulnerability_score.desc'.format(
             postgrest_url=self.job.postgrest_url,
@@ -40,14 +40,14 @@ class TestGloFASForecast(unittest.TestCase):
         self.assertEqual(len(district_summaries), 3)
         district_summary = district_summaries[2]
         self.assertEqual(district_summary['name'], 'Bogor')
-        self.assertEqual(district_summary['flooded_building_count'], 371)
+        self.assertEqual(district_summary['hazarded_building_count'], 371)
         self.assertEqual(district_summary['building_count'], 5156)
         self.assertAlmostEqual(
             district_summary['total_vulnerability_score'], 211.2, 2)
         self.assertEqual(district_summary['trigger_status'], 1)
         # fetch sub districts summaries
-        url = '{postgrest_url}/mv_flood_event_sub_district_summary?' \
-              'flood_event_id=eq.{id}&order=trigger_status.desc,' \
+        url = '{postgrest_url}/mv_hazard_event_sub_district_summary?' \
+              'hazard_event_id=eq.{id}&order=trigger_status.desc,' \
               'total_vulnerability_score.desc'.format(
             postgrest_url=self.job.postgrest_url,
             id=hazard_id)
@@ -62,14 +62,14 @@ class TestGloFASForecast(unittest.TestCase):
         sub_district_summary = sub_district_summaries[1]
         self.assertEqual(sub_district_summary['name'], 'Rumpin')
         self.assertEqual(
-            sub_district_summary['flooded_building_count'], 150)
+            sub_district_summary['hazarded_building_count'], 150)
         self.assertEqual(sub_district_summary['building_count'], 2198)
         self.assertAlmostEqual(
             sub_district_summary['total_vulnerability_score'], 85.6, 2)
         self.assertEqual(sub_district_summary['trigger_status'], 1)
         # fetch village summaries
-        url = '{postgrest_url}/mv_flood_event_village_summary?' \
-              'flood_event_id=eq.{id}&order=trigger_status.desc,' \
+        url = '{postgrest_url}/mv_hazard_event_village_summary?' \
+              'hazard_event_id=eq.{id}&order=trigger_status.desc,' \
               'total_vulnerability_score.desc'.format(
             postgrest_url=self.job.postgrest_url,
             id=hazard_id)
@@ -85,7 +85,7 @@ class TestGloFASForecast(unittest.TestCase):
         village_summary = village_summaries[0]
         self.assertEqual(village_summary['name'], 'Sukamulya')
         self.assertEqual(
-            village_summary['flooded_building_count'], 150)
+            village_summary['hazarded_building_count'], 150)
         self.assertEqual(village_summary['building_count'], 2198)
         self.assertAlmostEqual(
             village_summary['total_vulnerability_score'], 85.6, 2)
@@ -95,7 +95,7 @@ class TestGloFASForecast(unittest.TestCase):
         data = {
             'hazard_event_id': hazard_id
         }
-        url = '{postgrest_url}/rpc/flood_event_spreadsheet'.format(
+        url = '{postgrest_url}/rpc/hazard_event_spreadsheet'.format(
             postgrest_url=self.job.postgrest_url)
         response = requests.post(url, json=data)
         result = response.json()
@@ -114,13 +114,13 @@ class TestGloFASForecast(unittest.TestCase):
         self.job.run(generate_report=False)
 
         # validate activation result
-        hazard_event = self.job.flood_forecast_events[1]
+        hazard_event = self.job.hazard_forecast_events[1]
         self.assertEqual(
             hazard_event['trigger_status'],
             GloFASForecast.TRIGGER_STATUS_ACTIVATION)
 
         # fetch districts summaries
-        url = '{postgrest_url}/mv_flood_event_district_summary?flood_event_id' \
+        url = '{postgrest_url}/mv_hazard_event_district_summary?hazard_event_id' \
               '=eq.{id}&order=trigger_status.desc,' \
               'total_vulnerability_score.desc'.format(
             postgrest_url=self.job.postgrest_url,
@@ -134,7 +134,7 @@ class TestGloFASForecast(unittest.TestCase):
             GloFASForecast.TRIGGER_STATUS_ACTIVATION,
             trigger_statuses)
 
-        self.job.flood_forecast_events = self.find_test_events(
+        self.job.hazard_forecast_events = self.find_test_events(
             self.job.source_text)
 
     def find_test_events(self, source_text):
@@ -152,7 +152,7 @@ class TestGloFASForecast(unittest.TestCase):
             'district_trigger_status'
         ]
         for t in table_names:
-            url = '{postgrest_url}/{table_name}?flood_event_id=in.({event_ids})'.format(
+            url = '{postgrest_url}/{table_name}?hazard_event_id=in.({event_ids})'.format(
                 postgrest_url=self.job.postgrest_url,
                 table_name=t,
                 event_ids=','.join([str(i) for i in forecast_event_ids])
@@ -160,7 +160,7 @@ class TestGloFASForecast(unittest.TestCase):
             requests.delete(url)
 
     def delete_spreadsheets(self, forecast_event_ids):
-        url = '{postgrest_url}/spreadsheet_reports?flood_event_id=in.({event_ids})'.format(
+        url = '{postgrest_url}/spreadsheet_reports?hazard_event_id=in.({event_ids})'.format(
             postgrest_url=self.job.postgrest_url,
             event_ids=','.join([str(i) for i in forecast_event_ids])
         )
@@ -177,7 +177,7 @@ class TestGloFASForecast(unittest.TestCase):
         # Remove testing related data
         # Get all forecast events
 
-        event_ids = [f['id'] for f in self.job.flood_forecast_events]
+        event_ids = [f['id'] for f in self.job.hazard_forecast_events]
         self.delete_trigger_status(event_ids)
         self.delete_spreadsheets(event_ids)
         self.delete_hazard_event(event_ids)

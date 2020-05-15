@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.hazard_event_queue (
     id bigint NOT NULL,
-    flood_map_id integer,
+    hazard_map_id integer,
     acquisition_date timestamp without time zone DEFAULT now() NOT NULL,
     forecast_date timestamp without time zone,
     source text,

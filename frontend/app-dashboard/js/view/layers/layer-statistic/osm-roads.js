@@ -53,7 +53,7 @@ define([
                     });
             } else {
                 // this is for not filtered by polygon
-                let url = postgresUrl + 'osm_roads_flood_count_v?flood_id=eq.' + this.polygonID;
+                let url = postgresUrl + 'osm_roads_hazard_count_v?hazard_id=eq.' + this.polygonID;
                 that.xhr = AppRequest.get(
                     url, [], {},
                     function (data, textStatus, request) {

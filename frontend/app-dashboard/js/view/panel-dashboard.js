@@ -19,8 +19,8 @@ define([
         template: _.template($('#dashboard-template').html()),
         loading_template: '<i class="fa fa-spinner fa-spin fa-fw"></i>',
         status_wrapper: '#action-status',
-        general_summary: '#flood-general-summary',
-        sub_summary: '#flood-sub-summary',
+        general_summary: '#hazard-general-summary',
+        sub_summary: '#hazard-sub-summary',
         el: '#panel-dashboard',
         referer_region: [],
         sub_region_title_template: _.template($('#region-title-panel-template').html()),
@@ -69,21 +69,21 @@ define([
 
             let general_template = that.template;
 
-            let flood_acquisition_date = new Date(floodCollectionView.selected_forecast.attributes.acquisition_date);
-            let flood_forecast_date = new Date(floodCollectionView.selected_forecast.attributes.forecast_date);
+            let hazard_acquisition_date = new Date(hazardCollectionView.selected_forecast.attributes.acquisition_date);
+            let hazard_forecast_date = new Date(hazardCollectionView.selected_forecast.attributes.forecast_date);
 
-            let lead_time = floodCollectionView.selected_forecast.attributes.lead_time;
+            let lead_time = hazardCollectionView.selected_forecast.attributes.lead_time;
             let event_status = 'Current';
-            if(floodCollectionView.selected_forecast.attributes.is_historical){
+            if(hazardCollectionView.selected_forecast.attributes.is_historical){
                 event_status = 'Historical'
             }
             $(that.general_summary).html(general_template({
-                flood_name: floodCollectionView.selected_forecast.attributes.notes,
-                acquisition_date: flood_acquisition_date.getDate() + ' ' + monthNames[flood_acquisition_date.getMonth()] + ' ' + flood_acquisition_date.getFullYear(),
-                forecast_date: flood_forecast_date.getDate() + ' ' + monthNames[flood_forecast_date.getMonth()] + ' ' + flood_forecast_date.getFullYear(),
-                source: floodCollectionView.selected_forecast.attributes.source,
-                notes: floodCollectionView.selected_forecast.attributes.notes,
-                link: floodCollectionView.selected_forecast.attributes.link,
+                hazard_name: hazardCollectionView.selected_forecast.attributes.notes,
+                acquisition_date: hazard_acquisition_date.getDate() + ' ' + monthNames[hazard_acquisition_date.getMonth()] + ' ' + hazard_acquisition_date.getFullYear(),
+                forecast_date: hazard_forecast_date.getDate() + ' ' + monthNames[hazard_forecast_date.getMonth()] + ' ' + hazard_forecast_date.getFullYear(),
+                source: hazardCollectionView.selected_forecast.attributes.source,
+                notes: hazardCollectionView.selected_forecast.attributes.notes,
+                link: hazardCollectionView.selected_forecast.attributes.link,
                 lead_time: lead_time + ' Day(s)',
                 event_status: event_status
             }));
@@ -91,7 +91,7 @@ define([
             $('#building-count').html(that.loading_template);
             $('#vulnerability-score-road').html(that.loading_template);
             $('#road-count').html(that.loading_template);
-            this.changeStatus(floodCollectionView.selected_forecast.attributes.trigger_status);
+            this.changeStatus(hazardCollectionView.selected_forecast.attributes.trigger_status);
             if(callback){
                 callback();
             }
@@ -116,7 +116,7 @@ define([
                 if (!that.containsReferer(referer, that.referer_region)) {
                     that.referer_region.push(referer);
                 }
-                $('#main-panel-header').html('Summary for Flood ' + floodCollectionView.selected_forecast.attributes.notes)
+                $('#main-panel-header').html('Summary for Hazard ' + hazardCollectionView.selected_forecast.attributes.notes)
             } else {
                 $('.btn-back-summary-panel').show();
                 let referer = {
@@ -168,9 +168,9 @@ define([
                         id: item[id_field],
                         name: item['name'],
                         loading_template: that.loading_template,
-                        flooded_road_count: that.loading_template,
-                        flooded_building_count: that.loading_template,
-                        flooded_population_count: that.loading_template,
+                        hazarded_road_count: that.loading_template,
+                        hazarded_building_count: that.loading_template,
+                        hazarded_population_count: that.loading_template,
                         trigger_status: trigger_status
                     }));
                 }
@@ -194,7 +194,7 @@ define([
                     // continue if there is no data for current row
                     continue;
                 }
-                let exposed_count = item[`flooded_${exposure_name}_count`];
+                let exposed_count = item[`hazarded_${exposure_name}_count`];
                 let total_score = exposed_count ? exposed_count : '-';
                 let $el = $wrapper.find(`[data-region-id=${item[id_field]}] .score.${exposure_name}`);
                 $el.html(total_score);
@@ -236,11 +236,11 @@ define([
                 .attr('data-region-id', that.referer_region[that.referer_region.length -1].id)
                 .attr('data-region-trigger-status', that.referer_region[that.referer_region.length -1].trigger_status);
             this.changeStatus(trigger_status);
-            dispatcher.trigger('flood:fetch-stats-data', region, region_id, false);
-            dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, false);
-            dispatcher.trigger('flood:fetch-stats-data-population', region, region_id, false);
+            dispatcher.trigger('hazard:fetch-stats-data', region, region_id, false);
+            dispatcher.trigger('hazard:fetch-stats-data-road', region, region_id, false);
+            dispatcher.trigger('hazard:fetch-stats-data-population', region, region_id, false);
             this.fetchExtent(region_id, region);
-            let forecast_id = floodCollectionView.selected_forecast.id;
+            let forecast_id = hazardCollectionView.selected_forecast.id;
             dispatcher.trigger('map:show-exposed-roads', forecast_id, region, region_id);
             dispatcher.trigger('map:show-region-boundary', region, region_id);
             dispatcher.trigger('map:show-exposed-buildings', forecast_id, region, region_id);
@@ -279,11 +279,11 @@ define([
                 .attr('data-region-trigger-status', referer_trigger_status);
             this.changeStatus(trigger_status);
             this.panel_handlers.map(o => o.stats_data = []);
-            dispatcher.trigger('flood:fetch-stats-data', region, region_id, main);
-            dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, main);
-            dispatcher.trigger('flood:fetch-stats-data-population', region, region_id, main);
+            dispatcher.trigger('hazard:fetch-stats-data', region, region_id, main);
+            dispatcher.trigger('hazard:fetch-stats-data-road', region, region_id, main);
+            dispatcher.trigger('hazard:fetch-stats-data-population', region, region_id, main);
             this.fetchExtent(region_id, region);
-            let forecast_id = floodCollectionView.selected_forecast.id;
+            let forecast_id = hazardCollectionView.selected_forecast.id;
             dispatcher.trigger('map:show-exposed-roads', forecast_id, region, region_id);
             dispatcher.trigger('map:show-region-boundary', region, region_id);
             dispatcher.trigger('map:show-exposed-buildings', forecast_id, region, region_id);
@@ -325,7 +325,7 @@ define([
 
             let type = 'application/vnd.ms-excel';
             const blob = b64toBlob(data, type);
-            saveAs(blob, floodCollectionView.selected_forecast.attributes.notes + ".xlsx");
+            saveAs(blob, hazardCollectionView.selected_forecast.attributes.notes + ".xlsx");
 
         },
         fetchExcel: function (){
@@ -335,9 +335,9 @@ define([
             $loadingIcon.show();
             $loadingIcon.closest('button').prop('disabled', true);
             $.post({
-                url: `${postgresUrl}rpc/flood_event_spreadsheet`,
+                url: `${postgresUrl}rpc/hazard_event_spreadsheet`,
                 data: {
-                    "hazard_event_id":floodCollectionView.selected_forecast.attributes.id
+                    "hazard_event_id":hazardCollectionView.selected_forecast.attributes.id
                 },
                 success: function (data) {
                     $loadingIcon.hide();
@@ -363,7 +363,7 @@ define([
             }
 
             if(region_id === 'main'){
-                dispatcher.trigger('map:fit-forecast-layer-bounds', floodCollectionView.selected_forecast)
+                dispatcher.trigger('map:fit-forecast-layer-bounds', hazardCollectionView.selected_forecast)
             }
 
             $.get({

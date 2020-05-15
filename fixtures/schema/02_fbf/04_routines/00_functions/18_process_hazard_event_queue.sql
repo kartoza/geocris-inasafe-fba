@@ -1,7 +1,7 @@
 drop function if exists kartoza_process_hazard_event_queue;
 create or replace function kartoza_process_hazard_event_queue() returns
     table (
-        flood_event_id int
+        hazard_event_id int
           )
     language plpgsql
 as
@@ -19,7 +19,7 @@ as
                 )
                 insert into hazard_event
                     (
-                     flood_map_id,
+                     hazard_map_id,
                      acquisition_date,
                      forecast_date,
                      source,
@@ -29,7 +29,7 @@ as
                      progress,
                      hazard_type_id
                         )
-                    (select flood_map_id,
+                    (select hazard_map_id,
                             acquisition_date,
                             forecast_date,
                             source,

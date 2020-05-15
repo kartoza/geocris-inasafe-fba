@@ -47,8 +47,8 @@ if __name__ == '__main__':
                 'style_name': 'exposed_roads'
             },
             {
-                'layer_name': 'flood_forecast_layer',
-                'style_name': 'flood_depth_class'
+                'layer_name': 'hazard_forecast_layer',
+                'style_name': 'hazard_class'
             },
             {
                 'layer_name': 'osm_buildings',
@@ -67,15 +67,15 @@ if __name__ == '__main__':
                 'style_name': 'osm_admin_web'
             },
             {
-                'layer_name': 'flood_map_district',
+                'layer_name': 'hazard_map_district',
                 'style_name': 'district_map'
             },
             {
-                'layer_name': 'flood_map_sub_district',
+                'layer_name': 'hazard_map_sub_district',
                 'style_name': 'sub_district_map'
             },
             {
-                'layer_name': 'flood_map_village',
+                'layer_name': 'hazard_map_village',
                 'style_name': 'village_map'
             },
         ]

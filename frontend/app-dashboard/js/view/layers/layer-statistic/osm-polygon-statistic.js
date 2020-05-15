@@ -1,6 +1,6 @@
 define([
-    'backbone', 'leaflet', 'js/view/layers/flood-form.js'], function (
-    Backbone, L, FloodForm) {
+    'backbone', 'leaflet', 'js/view/layers/hazard-form.js'], function (
+    Backbone, L, HazardForm) {
     return Backbone.View.extend({
         xhrPolygon: null,
         polygon: null,
@@ -18,7 +18,7 @@ define([
             this.polygon = null;
             if (this.polygonID) {
                 AppRequest.delete(
-                    postgresUrl + 'flood?id=eq.' + this.polygonID,
+                    postgresUrl + 'hazard?id=eq.' + this.polygonID,
                     {},
                     null,
                     null);
@@ -34,11 +34,11 @@ define([
                 statistic.loading();
             });
             if (this.polygon) {
-                let flood_form = new FloodForm(this.polygon);
-                let post_data = flood_form.post_data;
+                let hazard_form = new HazardForm(this.polygon);
+                let post_data = hazard_form.post_data;
 
                 that.xhrPolygon = AppRequest.post(
-                    postgresUrl + 'flood',
+                    postgresUrl + 'hazard',
                     post_data,
                     function (data, textStatus, response) {
                         if (response.status === 201) {

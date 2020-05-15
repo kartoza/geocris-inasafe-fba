@@ -10,7 +10,7 @@ define([
         primary_exposure_label: 'Estimated Affected people (based on World Pop Data)',
         other_category_exposure_label: 'Affected Administrative Region Demographic (based on Census Data)',
         renderChartElement: function (data, exposure_name) {
-            data['affected_flooded_population_count'] = data['flooded_population_count'];
+            data['affected_hazarded_population_count'] = data['hazarded_population_count'];
             data['affected_population_count'] = data['population_count'];
             SummaryPanel.prototype.renderChartElement.call(this, data, exposure_name);
             let $parentWrapper = $(`#chart-score-panel .tab-${exposure_name}`);

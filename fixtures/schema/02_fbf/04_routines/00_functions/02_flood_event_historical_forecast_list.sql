@@ -1,9 +1,9 @@
 
 --
--- Name: flood_event_historical_forecast_list_f(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hazard_event_historical_forecast_list_f(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: -
 --
-DROP FUNCTION IF EXISTS public.flood_event_historical_forecast_list_f;
-CREATE FUNCTION public.flood_event_historical_forecast_list_f(forecast_date_range_start timestamp without time zone, forecast_date_range_end timestamp without time zone) RETURNS TABLE(total_forecast bigint, relative_forecast_date bigint, minimum_lead_time bigint, maximum_lead_time bigint, trigger_status_id integer)
+DROP FUNCTION IF EXISTS public.hazard_event_historical_forecast_list_f;
+CREATE FUNCTION public.hazard_event_historical_forecast_list_f(forecast_date_range_start timestamp without time zone, forecast_date_range_end timestamp without time zone) RETURNS TABLE(total_forecast bigint, relative_forecast_date bigint, minimum_lead_time bigint, maximum_lead_time bigint, trigger_status_id integer)
     LANGUAGE plpgsql
     AS $$
 begin return query

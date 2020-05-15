@@ -1,9 +1,9 @@
 
 --
--- Name: kartoza_fba_generate_excel_report_for_flood(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: kartoza_fba_generate_excel_report_for_hazard(integer); Type: FUNCTION; Schema: public; Owner: -
 --
-DROP FUNCTION IF EXISTS public.kartoza_fba_generate_excel_report_for_flood;
-CREATE OR REPLACE FUNCTION public.kartoza_fba_generate_excel_report_for_flood(flood_event_id integer) RETURNS character varying
+DROP FUNCTION IF EXISTS public.kartoza_fba_generate_excel_report_for_hazard;
+CREATE OR REPLACE FUNCTION public.kartoza_fba_generate_excel_report_for_hazard(hazard_event_id integer) RETURNS character varying
     LANGUAGE plpython3u
     AS $_$
     import io
@@ -15,15 +15,15 @@ CREATE OR REPLACE FUNCTION public.kartoza_fba_generate_excel_report_for_flood(fl
     wms_base_url = json.loads(result[0]['value'])
 
     from smartexcel.smart_excel import SmartExcel
-    from smartexcel.fbf.data_model import FbfFloodData
+    from smartexcel.fbf.data_model import FbfHazardData
     from smartexcel.fbf.definition import FBF_DEFINITION
 
     excel = SmartExcel(
         output=io.BytesIO(),
         definition=FBF_DEFINITION,
-        data=FbfFloodData(
+        data=FbfHazardData(
             wms_base_url=wms_base_url,
-            flood_event_id=flood_event_id,
+            hazard_event_id=hazard_event_id,
             pl_python_env=True
         )
     )
@@ -39,7 +39,7 @@ CREATE OR REPLACE FUNCTION public.kartoza_fba_generate_excel_report_for_flood(fl
     #   We escape backslash twice. So, in python string, the format becomes:
     #   E'\\\\x[the bytes string as hex code]'. For example:
     #   E'\\\\x01ff77de
-    query = "UPDATE spreadsheet_reports SET spreadsheet = (E'\\\\x{}') where flood_event_id = ({})".format(excel.output.getvalue().hex(), flood_event_id)
+    query = "UPDATE spreadsheet_reports SET spreadsheet = (E'\\\\x{}') where hazard_event_id = ({})".format(excel.output.getvalue().hex(), hazard_event_id)
     plpy.execute(query)
 
     return "OK"

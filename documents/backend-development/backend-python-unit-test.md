@@ -48,9 +48,9 @@ python3 -m unittest tests.backend.test_building_impact -v
 # run tests in `TestBuildingImpact` class in `tests.backend.test_building_impact` module
 python3 -m unittest tests.backend.test_building_impact.TestBuildingImpact -v
 
-# run tests for method name `test_non_flooded_building_summary` in a 
+# run tests for method name `test_building_summary` in a 
 # class called `TestBuildingImpact` in a module called `tests.backend.test_building_impact`
-python3 -m unittest tests.backend.test_building_impact.TestBuildingImpact.test_non_flooded_building_summary -v
+python3 -m unittest tests.backend.test_building_impact.TestBuildingImpact.test_building_summary -v
 
 ```
 

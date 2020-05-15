@@ -20,10 +20,10 @@ if __name__ == '__main__':
         data = {
             'featureType': {
                 'name': 'exposed_roads',
-                'nativeName': 'mv_flood_event_roads',
-                'title': 'Flood Event Roads Map',
+                'nativeName': 'mv_hazard_event_roads',
+                'title': 'Hazard Event Roads Map',
                 'srs': 'EPSG:4326',
-                'abstract': 'This layer shows the roads for a given flood event. It is intended that you use a CQL filter passing the flood_event_id when using this layer.',
+                'abstract': 'This layer shows the roads for a given hazard event. It is intended that you use a CQL filter passing the hazard_event_id when using this layer.',
                 'nativeBoundingBox': {
                     'minx': -180,
                     'maxx': 180,

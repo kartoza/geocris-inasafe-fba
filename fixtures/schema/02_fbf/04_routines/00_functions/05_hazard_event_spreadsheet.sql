@@ -7,6 +7,6 @@ CREATE FUNCTION public.hazard_event_spreadsheet(hazard_event_id integer) RETURNS
     LANGUAGE plpgsql
     AS $$
 begin return query
-        select encode(spreadsheet, 'base64') as spreadsheet_content from spreadsheet_reports where flood_event_id=hazard_event_id;
+        select encode(spreadsheet, 'base64') as spreadsheet_content from spreadsheet_reports where hazard_event_id=hazard_event_id;
     end;
 $$;

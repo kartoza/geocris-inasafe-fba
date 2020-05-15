@@ -7,7 +7,7 @@ define([
      * Attributes:
      *  - areas []
      *      - geometry
-     *      - depth_class
+     *      - hazard_class
      *  - geojson
      *  - id
      *  - place_name
@@ -18,32 +18,32 @@ define([
      *      - name
      *      - geometry
      */
-    const FloodLayer = Backbone.Model.extend({
+    const HazardLayer = Backbone.Model.extend({
 
             // attribute placeholder
             _url : {
-                flooded_area: postgresUrl + 'hazard_area',
-                flooded_areas: postgresUrl + 'hazard_areas',
-                flood_map: postgresUrl + 'hazard_map'
+                hazarded_area: postgresUrl + 'hazard_area',
+                hazarded_areas: postgresUrl + 'hazard_areas',
+                hazard_map: postgresUrl + 'hazard_map'
             },
             _table_attrs: {
-                flood_map: {
+                hazard_map: {
                     place_name: 'place_name',
                     notes: 'notes',
                     return_period: 'return_period'
                 },
-                flooded_areas: {
-                    flood_id: 'flood_map_id',
-                    flooded_area_id: 'flooded_area_id'
+                hazarded_areas: {
+                    hazard_id: 'hazard_map_id',
+                    hazarded_area_id: 'hazarded_area_id'
                 },
-                flooded_area: {
-                    depth_class: 'depth_class',
+                hazarded_area: {
+                    hazard_class: 'hazard_class',
                     geometry: 'geometry'
                 }
             },
 
             _geojson_attrs: {
-                flood_class_field: "class"
+                hazard_class_field: "class"
             },
         
             initialize: function (){
@@ -51,11 +51,11 @@ define([
                 this.on('feature-uploaded', this.featureUploaded, this);
             },
 
-            getFloodMapAttributes: function(){
+            getHazardMapAttributes: function(){
                 return {
-                    [this._table_attrs.flood_map.place_name]: this.get('place_name'),
-                    [this._table_attrs.flood_map.notes]: this.get('notes'),
-                    [this._table_attrs.flood_map.return_period]: this.get('return_period')
+                    [this._table_attrs.hazard_map.place_name]: this.get('place_name'),
+                    [this._table_attrs.hazard_map.notes]: this.get('notes'),
+                    [this._table_attrs.hazard_map.return_period]: this.get('return_period')
                 }
             },
 
@@ -80,30 +80,30 @@ define([
                 return this._uploaded_features
             },
 
-            _createFloodMap: function () {
+            _createHazardMap: function () {
                 const that = this
                 return new Promise(function (resolve, reject) {
-                    // Create new flood map first, then retrieve the id
+                    // Create new hazard map first, then retrieve the id
                     AppRequest.post(
-                        that._url.flood_map,
-                        that.getFloodMapAttributes())
+                        that._url.hazard_map,
+                        that.getHazardMapAttributes())
                         .done( function(data, textStatus, response){
                             if(response.status === 201){
-                                // Flood map creation succeed
-                                // get the flood map id
-                                const flood_map_url = postgresBaseUrl + response.getResponseHeader('Location')
-                                AppRequest.get(flood_map_url)
+                                // Hazard map creation succeed
+                                // get the hazard map id
+                                const hazard_map_url = postgresBaseUrl + response.getResponseHeader('Location')
+                                AppRequest.get(hazard_map_url)
                                     .done(
                                         function (data) {
                                             if (data && data[0]) {
-                                                const flood_map_id = data[0].id
-                                                // Create flooded area relationship
-                                                that._createFloodedAreas(flood_map_id)
+                                                const hazard_map_id = data[0].id
+                                                // Create hazarded area relationship
+                                                that._createHazardedAreas(hazard_map_id)
                                                 // if succeed, done
                                                     .then(function () {
                                                         resolve({
-                                                            id: flood_map_id,
-                                                            url: flood_map_url
+                                                            id: hazard_map_id,
+                                                            url: hazard_map_url
                                                         })
                                                     })
                                                     // if fails, reject
@@ -119,41 +119,41 @@ define([
                 })
             },
 
-            _createFloodedAreas: function (flood_map_id) {
+            _createHazardedAreas: function (hazard_map_id) {
                 // Bulk insert doesn't return ids, so we insert one by one
                 const areas = this.get('areas')
                 const that = this
 
                 const on_post_fails = function (data) {
                     console.log(data)
-                    console.log('Flooded Area post fails: ' + data)
+                    console.log('Hazarded Area post fails: ' + data)
                 }
 
                 const on_post_relations_fails = function (data) {
-                    console.log('Flooded Area relationship post fails: ' + data)
+                    console.log('Hazarded Area relationship post fails: ' + data)
                 }
 
                 const created_areas = areas.map(function(value){
-                    // Insert flood area, one by one, as promise.
-                    return that._createFloodedArea({
-                        [that._table_attrs.flooded_area.geometry]: 'SRID=4326;' + Wellknown.stringify(value.geometry),
-                        [that._table_attrs.flooded_area.depth_class]: value.depth_class
+                    // Insert hazard area, one by one, as promise.
+                    return that._createHazardedArea({
+                        [that._table_attrs.hazarded_area.geometry]: 'SRID=4326;' + Wellknown.stringify(value.geometry),
+                        [that._table_attrs.hazarded_area.hazard_class]: value.hazard_class
                     }).catch(on_post_fails)
                 })
 
                 return new Promise(function (resolve, reject) {
                     // If all posted areas succeed, insert relationships
                     Promise.all(created_areas).then(function (values) {
-                        // Make lists of Flood_Area - Flood_Areas relationship
+                        // Make lists of Hazard_Area - Hazard_Areas relationship
                         const relations = values.map(function (value) {
                             return {
-                                [that._table_attrs.flooded_areas.flood_id]: flood_map_id,
-                                [that._table_attrs.flooded_areas.flooded_area_id]: value.id
+                                [that._table_attrs.hazarded_areas.hazard_id]: hazard_map_id,
+                                [that._table_attrs.hazarded_areas.hazarded_area_id]: value.id
                             }
                         })
                         // Bulk insert relationship
                         AppRequest.post(
-                            that._url.flooded_areas,
+                            that._url.hazarded_areas,
                             relations,
                             null,
                             null,
@@ -164,7 +164,7 @@ define([
                                         // Bulk insert succeed
                                         // we resolve but nothing to return since the REST API doesn't have anything useful returned
                                         that.set({
-                                            id: flood_map_id
+                                            id: hazard_map_id
                                         })
                                         resolve()
                                     }
@@ -178,28 +178,28 @@ define([
                             // request error
                             .catch(reject)
 
-                        // one of the promise to post flood area fails
+                        // one of the promise to post hazard area fails
                     }).catch(on_post_fails)
                 })
             },
 
-            _createFloodedArea: function (area) {
-                // Return promised created flooded area object
+            _createHazardedArea: function (area) {
+                // Return promised created hazarded area object
                 const that = this
                 return new Promise(function (resolve, reject) {
                     // Insert an area
                     AppRequest.post(
-                        that._url.flooded_area,
+                        that._url.hazarded_area,
                         area)
                         .done(
                             // callback to get area id
                             function (data, textStatus, response) {
                                 if(response.status === 201){
                                     // get object
-                                    const flooded_area_url = postgresBaseUrl + response.getResponseHeader('Location')
+                                    const hazarded_area_url = postgresBaseUrl + response.getResponseHeader('Location')
                                     AppRequest.get(
                                         // created object were given via Location header
-                                        flooded_area_url,
+                                        hazarded_area_url,
                                         null,
                                         null,
                                         function (data) {
@@ -257,13 +257,13 @@ define([
                 return false;
             },
         
-            _validateDepthClassAttribute: function () {
+            _validateHazardClassAttribute: function () {
                 const geojson = this.get('geojson');
                 const areas = geojson.features;
                 const that = this;
                 if(areas !== undefined && areas.length > 0) {
                     let feature = areas[0];
-                    return (that._geojson_attrs.flood_class_field in feature.properties)
+                    return (that._geojson_attrs.hazard_class_field in feature.properties)
                 }
                 else {
                     return false;
@@ -271,30 +271,30 @@ define([
             }
         },
         {
-            uploadFloodMap: function(flood_map_attributes){
+            uploadHazardMap: function(hazard_map_attributes){
                 return new Promise(function (resolve, reject) {
-                    // Upload flood map from file specified in HTML input dom
+                    // Upload hazard map from file specified in HTML input dom
                     // We only handle one single GeoJSON
-                    const selected_file = flood_map_attributes.files[0]
-                    const geojson = flood_map_attributes.geojson
-                    const place_name = flood_map_attributes.place_name
-                    const return_period = flood_map_attributes.return_period
-                    const flood_model_notes = flood_map_attributes.flood_model_notes
+                    const selected_file = hazard_map_attributes.files[0]
+                    const geojson = hazard_map_attributes.geojson
+                    const place_name = hazard_map_attributes.place_name
+                    const return_period = hazard_map_attributes.return_period
+                    const hazard_model_notes = hazard_map_attributes.hazard_model_notes
 
                     function _process_geojson(geojson){
                         try {
-                            const layer = FloodLayer.fromGeoJSON(JSON.parse(geojson));
+                            const layer = HazardLayer.fromGeoJSON(JSON.parse(geojson));
                             layer.set({
                                 place_name: place_name,
                                 return_period: return_period,
-                                notes: flood_model_notes
+                                notes: hazard_model_notes
                             })
 
                             // send the layer object
                             resolve(layer)
 
                             // Perform upload to backend in async
-                            layer._createFloodMap()
+                            layer._createHazardMap()
                                 .then(function (data) {
                                     // what to do when succeed
                                     layer.trigger('upload-finished', layer)
@@ -309,7 +309,7 @@ define([
                         }
                     }
 
-                    if("geojson" in flood_map_attributes){
+                    if("geojson" in hazard_map_attributes){
                         _process_geojson(geojson);
                     }
                     else {
@@ -334,7 +334,7 @@ define([
                  * geojson_layer is a geojson object
                  */
 
-                const layer = new FloodLayer(attributes)
+                const layer = new HazardLayer(attributes)
                 layer.set('geojson', geojson_layer)
 
                 // validations
@@ -347,12 +347,12 @@ define([
                     throw e
                 }
 
-                let is_valid_attributes = layer._validateDepthClassAttribute();
+                let is_valid_attributes = layer._validateHazardClassAttribute();
                 if(! is_valid_attributes){
 
                     let e = {
                         'layer': layer,
-                        'message': `Depth class attribute "${layer._geojson_attrs.flood_class_field}" does not exists in the flood layer`
+                        'message': `Depth class attribute "${layer._geojson_attrs.hazard_class_field}" does not exists in the hazard layer`
                     }
                     throw e
                 }
@@ -361,7 +361,7 @@ define([
 
                 const areas = validated_geojson.features.map(function(value){
                     return {
-                        depth_class: value.properties[layer._geojson_attrs.flood_class_field],
+                        hazard_class: value.properties[layer._geojson_attrs.hazard_class_field],
                         geometry: value.geometry
                     }
                 })
@@ -369,5 +369,5 @@ define([
                 return layer
             },
         })
-    return FloodLayer
+    return HazardLayer
 })

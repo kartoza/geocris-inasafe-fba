@@ -43,37 +43,37 @@ class GloFASForecast(object):
     _default_pre_activation_impact_limit = 0
     _default_activation_impact_limit = 0
 
-    # Flood map query filter
+    # Hazard map query filter
     _default_postgrest_url = 'http://78.46.133.148:3000/'
-    _default_flood_map_query_filter = 'hazard_map?select=*,reporting_point(id,glofas_id)&reporting_point.glofas_id=eq.{station_id}&measuring_station_id=not.is.null&and=(return_period.gte.{return_period_min},return_period.lt.{return_period_max})'
-    _default_plpy_query_flood_map_filter ='select flood_map.* from flood_map join reporting_point on flood_map.measuring_station_id = reporting_point.id where reporting_point.glofas_id = $1 and return_period >= $2 and return_period < $3'
+    _default_hazard_map_query_filter = 'hazard_map?select=*,reporting_point(id,glofas_id)&reporting_point.glofas_id=eq.{station_id}&measuring_station_id=not.is.null&and=(return_period.gte.{return_period_min},return_period.lt.{return_period_max})'
+    _default_plpy_query_hazard_map_filter ='select hazard_map.* from hazard_map join reporting_point on hazard_map.measuring_station_id = reporting_point.id where reporting_point.glofas_id = $1 and return_period >= $2 and return_period < $3'
 
-    # Flood Forecast query filter
-    _default_flood_forecast_event_query_filter = 'hazard_event?select=id,flood_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress&acquisition_date=lt.{acquisition_date}&forecast_date=eq.{forecast_date}&source=eq.{source}&order=acquisition_date.desc'
-    _default_plpy_flood_forecast_event_filter = 'select id,flood_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress from flood_event where acquisition_date < $1 and forecast_date = $2 and source = $3'
+    # Hazard Forecast query filter
+    _default_hazard_forecast_event_query_filter = 'hazard_event?select=id,hazard_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress&acquisition_date=lt.{acquisition_date}&forecast_date=eq.{forecast_date}&source=eq.{source}&order=acquisition_date.desc'
+    _default_plpy_hazard_forecast_event_filter = 'select id,hazard_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress from hazard_event where acquisition_date < $1 and forecast_date = $2 and source = $3'
 
-    # Flood forecast delete
-    _default_flood_event_delete_query_filter = '&and=(flood_map_id.eq.{flood_map_id},acquisition_date.eq.{acquisition_date},forecast_date.eq.{forecast_date},source.eq.{source})'
-    _default_plpy_flood_event_delete_filter = 'delete from flood_event where flood_map_id = $1 and acquisition_date = $2 and forecast_date = $3 and source = $4'
+    # Hazard forecast delete
+    _default_hazard_event_delete_query_filter = '&and=(hazard_map_id.eq.{hazard_map_id},acquisition_date.eq.{acquisition_date},forecast_date.eq.{forecast_date},source.eq.{source})'
+    _default_plpy_hazard_event_delete_filter = 'delete from hazard_event where hazard_map_id = $1 and acquisition_date = $2 and forecast_date = $3 and source = $4'
 
-    # Flood Forecast insert
-    _default_flood_event_insert_endpoint = 'hazard_event?select=id,flood_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress'
-    _default_plpy_flood_event_insert_query = 'insert into flood_event (flood_map_id, acquisition_date, forecast_date, source, notes, link, trigger_status, progress) select flood_map_id, acquisition_date, forecast_date, source, notes, link, trigger_status, progress from json_populate_recordset(null::flood_event, $1) returning id'
+    # Hazard Forecast insert
+    _default_hazard_event_insert_endpoint = 'hazard_event?select=id,hazard_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress'
+    _default_plpy_hazard_event_insert_query = 'insert into hazard_event (hazard_map_id, acquisition_date, forecast_date, source, notes, link, trigger_status, progress) select hazard_map_id, acquisition_date, forecast_date, source, notes, link, trigger_status, progress from json_populate_recordset(null::hazard_event, $1) returning id'
 
     # Impact query
-    _default_impacted_village_query_filter = 'vw_village_impact?flood_event_id=eq.{flood_event_id}&impact_ratio=gte.{impact_limit}'
+    _default_impacted_village_query_filter = 'vw_village_impact?hazard_event_id=eq.{hazard_event_id}&impact_ratio=gte.{impact_limit}'
 
     # Region trigger status query
     _default_region_trigger_status_endpoint = '{region}_trigger_status'
-    _default_region_trigger_status_delete_query_param = '?flood_event_id=eq.{flood_event_id}'
-    _default_region_trigger_status_query_filter = '{region}_trigger_status?flood_event_id=eq.{flood_event_id}'
+    _default_region_trigger_status_delete_query_param = '?hazard_event_id=eq.{hazard_event_id}'
+    _default_region_trigger_status_query_filter = '{region}_trigger_status?hazard_event_id=eq.{hazard_event_id}'
 
     # Administrative mapping
     _default_parent_administrative_mapping = 'mv_administrative_mapping?select={parent_region}_id,{child_region}_id&{child_region}_id=in.{child_ids}'
 
     # Calculate impact
     _default_rpc_calculate_impact='rpc/kartoza_calculate_impact'
-    _default_rpc_generate_report = 'rpc/kartoza_fba_generate_excel_report_for_flood'
+    _default_rpc_generate_report = 'rpc/kartoza_fba_generate_excel_report_for_hazard'
 
     def __init__(
             self,
@@ -90,18 +90,18 @@ class GloFASForecast(object):
             #  Query config
             use_plpy=False,
             postgrest_url=_default_postgrest_url,
-            # Flood Map Query
-            flood_map_query_filter=_default_flood_map_query_filter,
-            plpy_query_flood_map_filter=_default_plpy_query_flood_map_filter,
-            # Flood Event Query
-            flood_event_query_filter=_default_flood_forecast_event_query_filter,
-            plpy_flood_event_filter=_default_plpy_flood_forecast_event_filter,
-            # Flood Event Deletion
-            flood_event_delete_query_filter=_default_flood_event_delete_query_filter,
-            plpy_flood_event_delete_filter=_default_plpy_flood_event_delete_filter,
-            # Flood Event insertion
-            flood_event_insert_endpoint=_default_flood_event_insert_endpoint,
-            plpy_flood_event_insert_query=_default_plpy_flood_event_insert_query,
+            # Hazard Map Query
+            hazard_map_query_filter=_default_hazard_map_query_filter,
+            plpy_query_hazard_map_filter=_default_plpy_query_hazard_map_filter,
+            # Hazard Event Query
+            hazard_event_query_filter=_default_hazard_forecast_event_query_filter,
+            plpy_hazard_event_filter=_default_plpy_hazard_forecast_event_filter,
+            # Hazard Event Deletion
+            hazard_event_delete_query_filter=_default_hazard_event_delete_query_filter,
+            plpy_hazard_event_delete_filter=_default_plpy_hazard_event_delete_filter,
+            # Hazard Event insertion
+            hazard_event_insert_endpoint=_default_hazard_event_insert_endpoint,
+            plpy_hazard_event_insert_query=_default_plpy_hazard_event_insert_query,
             # Impact limit query
             impacted_village_query_filter=_default_impacted_village_query_filter,
             # Region trigger status query
@@ -128,15 +128,15 @@ class GloFASForecast(object):
         self.activation_impact_limit = activation_impact_limit
         ##
         self.postgrest_url = postgrest_url
-        self.flood_map_query_filter = flood_map_query_filter
+        self.hazard_map_query_filter = hazard_map_query_filter
         self.use_plpy = use_plpy
-        self.plpy_query_flood_map_filter = plpy_query_flood_map_filter
-        self.flood_event_query_filter = flood_event_query_filter
-        self.plpy_flood_event_filter = plpy_flood_event_filter
-        self.flood_event_insert_endpoint = flood_event_insert_endpoint
-        self.plpy_flood_event_insert_query = plpy_flood_event_insert_query
-        self.flood_event_delete_query_filter = flood_event_delete_query_filter
-        self.plpy_flood_event_delete_filter = plpy_flood_event_delete_filter
+        self.plpy_query_hazard_map_filter = plpy_query_hazard_map_filter
+        self.hazard_event_query_filter = hazard_event_query_filter
+        self.plpy_hazard_event_filter = plpy_hazard_event_filter
+        self.hazard_event_insert_endpoint = hazard_event_insert_endpoint
+        self.plpy_hazard_event_insert_query = plpy_hazard_event_insert_query
+        self.hazard_event_delete_query_filter = hazard_event_delete_query_filter
+        self.plpy_hazard_event_delete_filter = plpy_hazard_event_delete_filter
         self.impacted_village_query_filter = impacted_village_query_filter
         self.region_trigger_status_endpoint = region_trigger_status_endpoint
         self.region_trigger_status_delete_query_param = region_trigger_status_delete_query_param
@@ -147,7 +147,7 @@ class GloFASForecast(object):
         ##
         self.source_text = 'GloFAS - Reporting Point'
         self.feature_info = []
-        self.flood_forecast_events = []
+        self.hazard_forecast_events = []
 
     @property
     def acquisition_time(self):
@@ -158,25 +158,25 @@ class GloFASForecast(object):
         self.api.time = value or datetime.today().replace(
             hour=0, minute=0, second=0, microsecond=0)
 
-    def find_flood_map_plpy(self, station_id, return_period_min, return_period_max):
+    def find_hazard_map_plpy(self, station_id, return_period_min, return_period_max):
         import plpy
 
-        plan = plpy.prepare(self.plpy_query_flood_map_filter,
+        plan = plpy.prepare(self.plpy_query_hazard_map_filter,
                             ["int", "int", "int"])
         result = plpy.execute(plan, [station_id, return_period_min,
                                      return_period_max])
 
         if len(result) == 0:
-            # We didn't found any flood map
+            # We didn't found any hazard map
             return None
 
-        # We found the flood map
+        # We found the hazard map
         row = result[0]
         return row['id']
 
-    def find_flood_map_postgrest(
+    def find_hazard_map_postgrest(
             self, station_id, return_period_min, return_period_max):
-        query_param = self.flood_map_query_filter.format(
+        query_param = self.hazard_map_query_filter.format(
             station_id=station_id,
             return_period_min=return_period_min,
             return_period_max=return_period_max
@@ -186,15 +186,15 @@ class GloFASForecast(object):
             query_param=query_param)
         response = requests.get(url)
         try:
-            flood_map_id = None
+            hazard_map_id = None
             result = response.json()
-            flood_map_id = result[0]['id']
+            hazard_map_id = result[0]['id']
         finally:
-            return flood_map_id
+            return hazard_map_id
 
-    def find_previous_flood_forecast_postgrest(
+    def find_previous_hazard_forecast_postgrest(
             self, forecast_date, maximum_acquisition_date, source):
-        query_param = self.flood_event_query_filter.format(
+        query_param = self.hazard_event_query_filter.format(
             acquisition_date=maximum_acquisition_date,
             forecast_date=forecast_date,
             source=source)
@@ -203,32 +203,32 @@ class GloFASForecast(object):
             query_param=query_param)
         response = requests.get(url)
         try:
-            flood_event = None
+            hazard_event = None
             result = response.json()
-            flood_event = result[0]
+            hazard_event = result[0]
         finally:
-            return flood_event
+            return hazard_event
 
-    def find_previous_flood_forecast_plpy(
+    def find_previous_hazard_forecast_plpy(
             self, forecast_date, maximum_acquisition_date, source):
         import plpy
 
-        plan = plpy.prepare(self.plpy_query_flood_map_filter,
+        plan = plpy.prepare(self.plpy_query_hazard_map_filter,
                             ["timestamp", "timestamp", "varchar"])
         result = plpy.execute(
             plan, [maximum_acquisition_date.isoformat(), forecast_date.isoformat(), source])
 
         if len(result) == 0:
-            # We didn't found any flood map
+            # We didn't found any hazard map
             return None
 
-        # We found the flood map
+        # We found the hazard map
         row = result[0]
         return row
 
-    def _evaluate_flood_forecast_activation_candidate(
+    def _evaluate_hazard_forecast_activation_candidate(
             self,
-            current_flood_forecast,
+            current_hazard_forecast,
             forecast_eps,
             relative_forecast_day,
             reporting_point_result,
@@ -263,7 +263,7 @@ class GloFASForecast(object):
             forecast_date = acquisition_date + timedelta(
                 days=relative_forecast_day)
 
-            # Find available corresponding flood map model from
+            # Find available corresponding hazard map model from
             # database
             # Criteria is based on:
             #  - matching of return period in range
@@ -274,41 +274,41 @@ class GloFASForecast(object):
             return_period_max = return_period[1]
 
             if self.use_plpy:
-                flood_map_id = self.find_flood_map_plpy(
+                hazard_map_id = self.find_hazard_map_plpy(
                     station_id,
                     return_period_min,
                     return_period_max)
             else:
-                flood_map_id = self.find_flood_map_postgrest(
+                hazard_map_id = self.find_hazard_map_postgrest(
                     station_id,
                     return_period_min,
                     return_period_max)
 
-            # If we don't have flood map, skip
-            if not flood_map_id:
+            # If we don't have hazard map, skip
+            if not hazard_map_id:
                 continue
 
-            # The forecast_eps will have flood map and
+            # The forecast_eps will have hazard map and
             # is eligible for activation test
             # Determine eligibility based on previous pre-activation
 
             # Check previous forecast activation
             if self.use_plpy:
-                flood_event = self.find_previous_flood_forecast_plpy(
+                hazard_event = self.find_previous_hazard_forecast_plpy(
                     forecast_date,
                     acquisition_date - timedelta(days=1),
-                    current_flood_forecast['source'])
+                    current_hazard_forecast['source'])
             else:
-                flood_event = self.find_previous_flood_forecast_postgrest(
+                hazard_event = self.find_previous_hazard_forecast_postgrest(
                     forecast_date,
                     acquisition_date - timedelta(days=1),
-                    current_flood_forecast['source'])
+                    current_hazard_forecast['source'])
 
-            if not flood_event:
+            if not hazard_event:
                 # No previous forecast
                 continue
 
-            previous_trigger_status = flood_event['trigger_status']
+            previous_trigger_status = hazard_event['trigger_status']
             if not (
                     previous_trigger_status ==
                     GloFASForecast.TRIGGER_STATUS_PRE_ACTIVATION
@@ -318,30 +318,30 @@ class GloFASForecast(object):
                 # Skip
                 continue
 
-            # This flood forecast_eps now an activation candidate
+            # This hazard forecast_eps now an activation candidate
             # Because several days ago the forecast_eps has been in a
             # pre-activation trigger state
-            # Define new flood forecast_eps definition
-            current_flood_forecast = {
-                'flood_map_id': flood_map_id,
+            # Define new hazard forecast_eps definition
+            current_hazard_forecast = {
+                'hazard_map_id': hazard_map_id,
                 'acquisition_date': acquisition_date,
                 'forecast_date': forecast_date,
                 'source': self.source_text,
                 'alert_level_key': alert_level,
                 'notes': 'Alert Warning Level: {alert_level}'.format(
                     alert_level=alert_level.upper()),
-                'link': 'https://globalfloods.eu/',
+                'link': 'https://globalhazards.eu/',
                 'trigger_status_candidate':
                     GloFASForecast.TRIGGER_STATUS_ACTIVATION
             }
-            # This means, out of this loop, current flood forecast_eps is
+            # This means, out of this loop, current hazard forecast_eps is
             # from the highest severity available that passes
             # activation criteria
-        return current_flood_forecast
+        return current_hazard_forecast
 
-    def _evaluate_flood_forecast_pre_activation_candidate(
+    def _evaluate_hazard_forecast_pre_activation_candidate(
             self,
-            current_flood_forecast,
+            current_hazard_forecast,
             forecast_eps,
             relative_forecaste_day,
             reporting_point_result,
@@ -378,7 +378,7 @@ class GloFASForecast(object):
             forecast_date = acquisition_date + timedelta(
                 days=relative_forecaste_day)
 
-            # Find available corresponding flood map model from database
+            # Find available corresponding hazard map model from database
             # Criteria is based on:
             #  - matching of return period in range
             #  - matching station id
@@ -388,55 +388,55 @@ class GloFASForecast(object):
             return_period_max = return_period[1]
 
             if self.use_plpy:
-                flood_map_id = \
-                    self.find_flood_map_plpy(
+                hazard_map_id = \
+                    self.find_hazard_map_plpy(
                         station_id,
                         return_period_min,
                         return_period_max)
             else:
-                flood_map_id = \
-                    self.find_flood_map_postgrest(
+                hazard_map_id = \
+                    self.find_hazard_map_postgrest(
                         station_id,
                         return_period_min,
                         return_period_max)
 
-            # If we don't have flood map, skip
-            if not flood_map_id:
-                contexts.append('Skip because flood map not found')
+            # If we don't have hazard map, skip
+            if not hazard_map_id:
+                contexts.append('Skip because hazard map not found')
                 continue
 
-            # If we have flood map. Make a flood forecast_eps candidate
-            current_flood_forecast = {
-                'flood_map_id': flood_map_id,
+            # If we have hazard map. Make a hazard forecast_eps candidate
+            current_hazard_forecast = {
+                'hazard_map_id': hazard_map_id,
                 'acquisition_date': acquisition_date,
                 'forecast_date': forecast_date,
                 'source': self.source_text,
                 'alert_level_key': alert_level,
                 'notes': 'Alert Warning Level: {alert_level}'.format(
                     alert_level=alert_level.upper()),
-                'link': 'https://globalfloods.eu/',
+                'link': 'https://globalhazards.eu/',
                 'trigger_status_candidate':
                     GloFASForecast.TRIGGER_STATUS_PRE_ACTIVATION,
             }
             # The forecast_eps is eligible for pre-activation
-            # This means, out of this loop, current flood forecast_eps is
+            # This means, out of this loop, current hazard forecast_eps is
             # from the highest severity available that passes
             # pre-activation criteria
 
-        return current_flood_forecast
+        return current_hazard_forecast
 
-    def push_flood_forecast_event_postgrest(self, flood_forecast_events):
+    def push_hazard_forecast_event_postgrest(self, hazard_forecast_events):
         url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
-            query_param=self.flood_event_insert_endpoint)
+            query_param=self.hazard_event_insert_endpoint)
         headers = {
             'Content-Type': 'application/json',
             'Prefer': 'return=representation'
         }
         # Filter only the needed column
-        flood_events = [
+        hazard_events = [
             {
-                'flood_map_id': v['flood_map_id'],
+                'hazard_map_id': v['hazard_map_id'],
                 'acquisition_date': v['acquisition_date'].isoformat(),
                 'forecast_date': v['forecast_date'].isoformat(),
                 'source': v['source'],
@@ -446,13 +446,13 @@ class GloFASForecast(object):
                 # Progress 1 means, impact level has not been calculated
                 'progress': GloFASForecast.PROGRESS_IN_PROGRESS
             }
-            for v in flood_forecast_events
+            for v in hazard_forecast_events
         ]
-        json_string = json.dumps(flood_events)
+        json_string = json.dumps(hazard_events)
 
         # The process needs to be idempotent, so delete matching forecast first
-        query_param = self.flood_event_delete_query_filter
-        for event in flood_events:
+        query_param = self.hazard_event_delete_query_filter
+        for event in hazard_events:
             delete_url = url + query_param.format(**event)
             requests.delete(delete_url)
 
@@ -465,13 +465,13 @@ class GloFASForecast(object):
         created = response.json()
         return [c['id'] for c in created]
 
-    def push_flood_forecast_event_plpy(self, flood_forecast_events):
+    def push_hazard_forecast_event_plpy(self, hazard_forecast_events):
         import plpy
 
         # Filter only the needed column
-        flood_events = [
+        hazard_events = [
             {
-                'flood_map_id': v['flood_map_id'],
+                'hazard_map_id': v['hazard_map_id'],
                 'acquisition_date': v['acquisition_date'].isoformat(),
                 'forecast_date': v['forecast_date'].isoformat(),
                 'source': v['source'],
@@ -481,17 +481,17 @@ class GloFASForecast(object):
                 # Progress 1 means, impact level has not been calculated
                 'progress': GloFASForecast.PROGRESS_IN_PROGRESS
             }
-            for v in flood_forecast_events
+            for v in hazard_forecast_events
         ]
-        json_string = json.dumps(flood_events)
+        json_string = json.dumps(hazard_events)
 
         # The process needs to be idempotent, so delete matching forecast first
-        for event in flood_events:
+        for event in hazard_events:
             plan = plpy.prepare(
-                self.plpy_flood_event_delete_filter,
+                self.plpy_hazard_event_delete_filter,
                 ["int", "timestamp", "timestamp", "varchar"])
             plpy.execute(plan,[
-                event['flood_map_id'],
+                event['hazard_map_id'],
                 event['acquisition_date'],
                 event['forecast_date'],
                 event['source']
@@ -499,7 +499,7 @@ class GloFASForecast(object):
 
         # We bulk insert the events
         plan = plpy.prepare(
-            self.plpy_flood_event_insert_query, ["text"])
+            self.plpy_hazard_event_insert_query, ["text"])
         result = plpy.execute(plan, [json_string])
         return result
 
@@ -516,7 +516,7 @@ class GloFASForecast(object):
         # determine current date
         today = self.acquisition_time
 
-        flood_forecast_events = []
+        hazard_forecast_events = []
 
         # iterate thru all reporting points
         for info in self.feature_info:
@@ -547,49 +547,49 @@ class GloFASForecast(object):
 
                 # Get the forecast
                 forecast = forecast_days[i]
-                current_flood_forecast = {}
+                current_hazard_forecast = {}
 
                 # Evaluate pre activation condition
-                current_flood_forecast = \
-                    self._evaluate_flood_forecast_pre_activation_candidate(
-                        current_flood_forecast, forecast, i, info, today)
+                current_hazard_forecast = \
+                    self._evaluate_hazard_forecast_pre_activation_candidate(
+                        current_hazard_forecast, forecast, i, info, today)
 
                 # If we don't have pre-activation candidate, skip to next day
-                if not current_flood_forecast:
+                if not current_hazard_forecast:
                     continue
 
                 # Activation evaluation should be considered if the event
                 # is a pre-activation candidate
                 # Other than that, we don't have to evaluate it.
                 # Now evaluate activation condition
-                current_flood_forecast = \
-                    self._evaluate_flood_forecast_activation_candidate(
-                        current_flood_forecast, forecast, i, info, today)
+                current_hazard_forecast = \
+                    self._evaluate_hazard_forecast_activation_candidate(
+                        current_hazard_forecast, forecast, i, info, today)
 
                 # current forecast now is best guess/candidate
-                # of flood forecast
-                if current_flood_forecast:
-                    flood_forecast_events.append(current_flood_forecast)
+                # of hazard forecast
+                if current_hazard_forecast:
+                    hazard_forecast_events.append(current_hazard_forecast)
 
-        # We now have flood forecast event candidate
+        # We now have hazard forecast event candidate
         # We push it to DB so the impact level can be calculated
         if self.use_plpy:
-            created_ids = self.push_flood_forecast_event_plpy(flood_forecast_events)
+            created_ids = self.push_hazard_forecast_event_plpy(hazard_forecast_events)
         else:
-            created_ids = self.push_flood_forecast_event_postgrest(flood_forecast_events)
+            created_ids = self.push_hazard_forecast_event_postgrest(hazard_forecast_events)
 
         # patch id into the objects
-        for i in range(len(flood_forecast_events)):
-            flood_event_id = created_ids[i]
-            flood_event = flood_forecast_events[i]
-            flood_event['id'] = flood_event_id
+        for i in range(len(hazard_forecast_events)):
+            hazard_event_id = created_ids[i]
+            hazard_event = hazard_forecast_events[i]
+            hazard_event['id'] = hazard_event_id
 
         # store candidates data
-        self.flood_forecast_events = flood_forecast_events
+        self.hazard_forecast_events = hazard_forecast_events
 
-    def fetch_impacted_village(self, flood_event_id, impact_limit):
+    def fetch_impacted_village(self, hazard_event_id, impact_limit):
         query_param = self.impacted_village_query_filter.format(
-            flood_event_id=flood_event_id,
+            hazard_event_id=hazard_event_id,
             impact_limit=impact_limit)
         url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
@@ -597,24 +597,24 @@ class GloFASForecast(object):
         response = requests.get(url)
         return response.json()
 
-    def find_region_trigger_status(self, region, flood_event_id):
+    def find_region_trigger_status(self, region, hazard_event_id):
         query_param = self.region_trigger_status_query_filter.format(
             region=region,
-            flood_event_id=flood_event_id)
+            hazard_event_id=hazard_event_id)
         url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=query_param)
         response = requests.get(url)
         return response.json()
 
-    def find_village_trigger_status(self, flood_event_id):
-        return self.find_region_trigger_status('village', flood_event_id)
+    def find_village_trigger_status(self, hazard_event_id):
+        return self.find_region_trigger_status('village', hazard_event_id)
 
-    def find_sub_district_trigger_status(self, flood_event_id):
-        return self.find_region_trigger_status('sub_district', flood_event_id)
+    def find_sub_district_trigger_status(self, hazard_event_id):
+        return self.find_region_trigger_status('sub_district', hazard_event_id)
 
-    def find_district_trigger_status(self, flood_event_id):
-        return self.find_region_trigger_status('district', flood_event_id)
+    def find_district_trigger_status(self, hazard_event_id):
+        return self.find_region_trigger_status('district', hazard_event_id)
 
     def push_region_trigger_status(self, region, trigger_status_array):
         endpoint = self.region_trigger_status_endpoint.format(
@@ -628,8 +628,8 @@ class GloFASForecast(object):
         query_param = self.region_trigger_status_delete_query_param
         if not trigger_status_array:
             return
-        flood_event_id = trigger_status_array[0]['flood_event_id']
-        delete_url = url + query_param.format(flood_event_id=flood_event_id)
+        hazard_event_id = trigger_status_array[0]['hazard_event_id']
+        delete_url = url + query_param.format(hazard_event_id=hazard_event_id)
         requests.delete(delete_url)
 
         headers = {
@@ -680,24 +680,24 @@ class GloFASForecast(object):
     def fetch_district_mapping(self, child_ids):
         return self.fetch_parent_administrative_mapping('district', 'sub_district', child_ids)
 
-    def update_flood_event_forecast(self, flood_event):
+    def update_hazard_event_forecast(self, hazard_event):
         url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
-            query_param=self.flood_event_insert_endpoint)
+            query_param=self.hazard_event_insert_endpoint)
         headers = {
             'Content-Type': 'application/json',
             'Prefer': 'return=representation'
         }
         # Filter only the needed column to patch
         patch_data = {
-            'trigger_status': flood_event['trigger_status'],
-            'progress': flood_event['progress']
+            'trigger_status': hazard_event['trigger_status'],
+            'progress': hazard_event['progress']
         }
         json_string = json.dumps(patch_data)
 
         # Perform update
         response = requests.patch(
-            url + '&id=eq.{id}'.format(id=flood_event['id']),
+            url + '&id=eq.{id}'.format(id=hazard_event['id']),
             data=json_string,
             headers=headers)
         # Get the returned ids
@@ -706,34 +706,34 @@ class GloFASForecast(object):
         return updated
 
     def evaluate_trigger_status(self, forecast_events=None):
-        self.flood_forecast_events = (
-            forecast_events or self.flood_forecast_events)
+        self.hazard_forecast_events = (
+            forecast_events or self.hazard_forecast_events)
 
         # Evaluate trigger status by considering impact level
         # At this point, impact data should already been calculated in the DB
-        for flood_forecast in self.flood_forecast_events:
+        for hazard_forecast in self.hazard_forecast_events:
 
             # Evaluate pre activation criteria
             # Find impact data:
             villages_data = self.fetch_impacted_village(
-                flood_forecast['id'], self.pre_activation_impact_limit)
+                hazard_forecast['id'], self.pre_activation_impact_limit)
             # Update each municipality trigger status
             # All villages that exceed impact limit means it is a
             # pre activation candidate
 
             if not villages_data:
                 # Skip if impact tolerated
-                flood_forecast['trigger_status'] = GloFASForecast.TRIGGER_STATUS_NO_ACTIVATION
-                flood_forecast['progress'] = GloFASForecast.PROGRESS_DONE
+                hazard_forecast['trigger_status'] = GloFASForecast.TRIGGER_STATUS_NO_ACTIVATION
+                hazard_forecast['progress'] = GloFASForecast.PROGRESS_DONE
 
-                # Update flood_forecast information
-                self.update_flood_event_forecast(flood_forecast)
+                # Update hazard_forecast information
+                self.update_hazard_event_forecast(hazard_forecast)
                 continue
 
             # Create village trigger status mapping
             village_trigger_status = [
                 {
-                    'flood_event_id': flood_forecast['id'],
+                    'hazard_event_id': hazard_forecast['id'],
                     'village_id': v['village_id'],
                     'trigger_status': GloFASForecast.TRIGGER_STATUS_PRE_ACTIVATION
                 } for v in villages_data
@@ -741,28 +741,28 @@ class GloFASForecast(object):
 
             # Evaluate activation criteria
             # Check previous forecast activation
-            forecast_date = flood_forecast['forecast_date']
-            today = flood_forecast['acquisition_date']
+            forecast_date = hazard_forecast['forecast_date']
+            today = hazard_forecast['acquisition_date']
             if isinstance(today, str):
                 today = isoparse(today)
 
             acquisition_date = today - timedelta(days=1)
             if self.use_plpy:
-                flood_event = self.find_previous_flood_forecast_plpy(
+                hazard_event = self.find_previous_hazard_forecast_plpy(
                     forecast_date,
                     acquisition_date,
-                    flood_forecast['source'])
+                    hazard_forecast['source'])
             else:
-                flood_event = self.find_previous_flood_forecast_postgrest(
+                hazard_event = self.find_previous_hazard_forecast_postgrest(
                     forecast_date,
                     acquisition_date,
-                    flood_forecast['source'])
+                    hazard_forecast['source'])
 
-            if flood_event:
+            if hazard_event:
                 # We have previous forecast
                 # Check if previous forecast is in pre activation stage
                 previous_village_trigger_status = self.find_village_trigger_status(
-                    flood_event['id'])
+                    hazard_event['id'])
                 # Create hash
                 prev_village_hash = {}
                 for village_state in previous_village_trigger_status:
@@ -772,7 +772,7 @@ class GloFASForecast(object):
 
                 # Evaluate which village exceed activation impact limit
                 activation_candidate_village_data = self.fetch_impacted_village(
-                    flood_forecast['id'], self.activation_impact_limit)
+                    hazard_forecast['id'], self.activation_impact_limit)
 
                 activation_candidate_village_data = [v['village_id'] for v in activation_candidate_village_data]
 
@@ -804,7 +804,7 @@ class GloFASForecast(object):
             for key, value in sub_district_hash.items():
                 sub_district_trigger_status.append({
                     'sub_district_id': key,
-                    'flood_event_id': flood_forecast['id'],
+                    'hazard_event_id': hazard_forecast['id'],
                     'trigger_status': value
                 })
             self.push_sub_district_trigger_status(sub_district_trigger_status)
@@ -828,7 +828,7 @@ class GloFASForecast(object):
             for key, value in district_hash.items():
                 district_trigger_status.append({
                     'district_id': key,
-                    'flood_event_id': flood_forecast['id'],
+                    'hazard_event_id': hazard_forecast['id'],
                     'trigger_status': value
                 })
             self.push_district_trigger_status(district_trigger_status)
@@ -839,11 +839,11 @@ class GloFASForecast(object):
                 status = district_state['trigger_status']
                 final_trigger_status = status if status > final_trigger_status else final_trigger_status
 
-            flood_forecast['trigger_status'] = final_trigger_status
-            flood_forecast['progress'] = GloFASForecast.PROGRESS_DONE
+            hazard_forecast['trigger_status'] = final_trigger_status
+            hazard_forecast['progress'] = GloFASForecast.PROGRESS_DONE
 
-            # Update flood_forecast information
-            self.update_flood_event_forecast(flood_forecast)
+            # Update hazard_forecast information
+            self.update_hazard_event_forecast(hazard_forecast)
 
     def calculate_impact(self):
         # We calculate impact by triggering database functions.
@@ -860,9 +860,9 @@ class GloFASForecast(object):
         url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=self.rpc_generate_report)
-        for f in self.flood_forecast_events:
+        for f in self.hazard_forecast_events:
             data = {
-                'flood_event_id': f['id']
+                'hazard_event_id': f['id']
             }
             requests.post(url, json=data)
         return True

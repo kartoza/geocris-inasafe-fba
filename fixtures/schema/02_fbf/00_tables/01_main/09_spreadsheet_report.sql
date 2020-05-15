@@ -4,10 +4,10 @@
 
 CREATE TABLE IF NOT EXISTS public.spreadsheet_reports (
     id integer NOT NULL,
-    flood_event_id integer,
+    hazard_event_id integer,
     spreadsheet bytea,
     CONSTRAINT spreadsheet_reports_pkey PRIMARY KEY (id),
-    CONSTRAINT spreadsheet_reports_flood_event_id_fkey FOREIGN KEY (flood_event_id) REFERENCES public.hazard_event(id)
+    CONSTRAINT spreadsheet_reports_hazard_event_id_fkey FOREIGN KEY (hazard_event_id) REFERENCES public.hazard_event(id)
 );
 
 

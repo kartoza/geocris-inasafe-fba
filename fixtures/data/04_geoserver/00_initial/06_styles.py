@@ -73,7 +73,7 @@ if __name__ == '__main__':
             'red_outline',
             'building_vulnerability',
             'exposed_roads',
-            'flood_depth_class',
+            'hazard_class',
             'osm_buildings',
             'osm_roads',
             'osm_waterways_scale',

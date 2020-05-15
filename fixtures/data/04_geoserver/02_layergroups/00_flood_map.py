@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
         response = runner.assert_get(
             s,
-            '/workspaces/kartoza/layergroups/flood_map')
+            '/workspaces/kartoza/layergroups/hazard_map')
 
         if response.ok:
             print('Resource exists.')
@@ -19,22 +19,22 @@ if __name__ == '__main__':
 
         data = {
             'layerGroup': {
-                'name': 'flood_map',
+                'name': 'hazard_map',
                 'mode': 'SINGLE',
-                'title': 'flood map',
+                'title': 'hazard map',
                 'publishables': {
                     'published': [
                         {
                             '@type': 'layer',
-                            'name': 'flood_map_district',
+                            'name': 'hazard_map_district',
                         },
                         {
                             '@type': 'layer',
-                            'name': 'flood_map_sub_district',
+                            'name': 'hazard_map_sub_district',
                         },
                         {
                             '@type': 'layer',
-                            'name': 'flood_map_village',
+                            'name': 'hazard_map_village',
                         }
                     ]
                 },

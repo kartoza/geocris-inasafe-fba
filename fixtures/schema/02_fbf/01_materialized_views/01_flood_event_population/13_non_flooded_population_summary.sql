@@ -1,5 +1,5 @@
-DROP MATERIALIZED VIEW IF EXISTS public.mv_non_flooded_population_summary;
-CREATE MATERIALIZED VIEW public.mv_non_flooded_population_summary AS
+DROP MATERIALIZED VIEW IF EXISTS public.mv_population_summary;
+CREATE MATERIALIZED VIEW public.mv_population_summary AS
     select
            a.district_id,
            a.sub_district_id,

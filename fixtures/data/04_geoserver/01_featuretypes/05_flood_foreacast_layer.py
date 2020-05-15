@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
         response = runner.assert_get(
             s,
-            '/workspaces/kartoza/datastores/gis/featuretypes/flood_forecast_layer')
+            '/workspaces/kartoza/datastores/gis/featuretypes/hazard_forecast_layer')
 
         if response.ok:
             print('Resource exists.')
@@ -19,26 +19,26 @@ if __name__ == '__main__':
 
         data = {
             'featureType': {
-                'name': 'flood_forecast_layer',
-                'nativeName': 'flood_forecast_layer',
-                'title': 'Flood Forecast Map',
+                'name': 'hazard_forecast_layer',
+                'nativeName': 'hazard_forecast_layer',
+                'title': 'Hazard Forecast Map',
                 'srs': 'EPSG:4326',
-                'abstract': 'This layer shows the flood extent for a given flood event. It is intended that you use a CQL filter passing the id when using this layer.',
+                'abstract': 'This layer shows the hazard extent for a given hazard event. It is intended that you use a CQL filter passing the id when using this layer.',
                 'metadata': {
                     'entry': [
                         {
                             '@key': 'JDBC_VIRTUAL_TABLE',
                             'virtualTable': {
-                                'name': 'flood_forecast_layer',
+                                'name': 'hazard_forecast_layer',
                                 'sql': """select 
                                 row_number() OVER () AS gid,
                                 hazard_event.id as id,
                                 geometry,
-                                depth_class
+                                hazard_class
                                 from hazard_event
-                                inner join hazard_map on hazard_event.flood_map_id = hazard_map.id
-                                inner join hazard_areas on hazard_map.id = hazard_areas.flood_map_id
-                                inner join hazard_area on hazard_areas.flooded_area_id = hazard_area.id""",
+                                inner join hazard_map on hazard_event.hazard_map_id = hazard_map.id
+                                inner join hazard_areas on hazard_map.id = hazard_areas.hazard_map_id
+                                inner join hazard_area on hazard_areas.hazarded_area_id = hazard_area.id""",
                                 'escapeSql': False,
                                 'geometry': {
                                     'name': 'geometry',

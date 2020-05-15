@@ -43,12 +43,12 @@ job = GloFASForecast(
 
 url = '{postgrest_url}{endpoint}{query_param}'.format(
     postgrest_url=postgrest_url,
-    endpoint=job.flood_event_insert_endpoint,
+    endpoint=job.hazard_event_insert_endpoint,
     query_param='&id=eq.{id}'.format(id=hazard_event_id))
 
 response = requests.get(url)
-job.flood_forecast_events = response.json()
-job.evaluate_trigger_status(job.flood_forecast_events)
+job.hazard_forecast_events = response.json()
+job.evaluate_trigger_status(job.hazard_forecast_events)
 job.calculate_impact()
 
 return 'OK'
@@ -99,7 +99,7 @@ url = '{postgrest_url}/hazard_event?id=eq.{hazard_event_id}'.format(
     postgrest_url=postgrest_url,
     hazard_event_id=hazard_event_id)
 response = requests.get(url)
-job.flood_forecast_events = response.json()
+job.hazard_forecast_events = response.json()
 # Impact needs to be calculated twice to consider before and after trigger status
 job.calculate_impact()
 job.evaluate_trigger_status()
