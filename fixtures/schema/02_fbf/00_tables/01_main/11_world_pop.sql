@@ -17,20 +17,13 @@ create table if not exists world_pop
         constraint enforce_scaley_rast
             check (round((st_scaley(rast))::numeric, 10) =
                    round((- 0.000833333330000975), 10))
-        constraint enforce_max_extent_rast
-            check (st_envelope(rast) @
-                   '0103000020E61000000100000005000000C0237B9B36BE57409F12174D550526C0C0237B9B36BE57406F26E36EC94F1840FD436FFB62A061406F26E36EC94F1840FD436FFB62A061409F12174D550526C0C0237B9B36BE57409F12174D550526C0'::geometry)
-        constraint enforce_height_rast
-            check (st_height(rast) = ANY (ARRAY [100, 6]))
         constraint enforce_num_bands_rast
             check (st_numbands(rast) = 1)
         constraint enforce_same_alignment_rast
             check (st_samealignment(rast,
                                     '0100000000A96313B3814E4B3F751E13B3814E4BBF891DD0F08BC357406F26E36EC94F184000000000000000000000000000000000E610000001000100'::raster))
         constraint enforce_srid_rast
-            check (st_srid(rast) = 4326)
-        constraint enforce_width_rast
-            check (st_width(rast) = ANY (ARRAY [100, 48])),
+            check (st_srid(rast) = 4326),
     filename text
 );
 
