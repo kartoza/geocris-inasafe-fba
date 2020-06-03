@@ -15,6 +15,9 @@ env:
     GEOSERVER_BASE_URL=http://fbf.test/geoserver
     POSTGREST_BASE_URL=http://fbf.test/api
     PGRST_SERVER_PROXY_URI=http://fbf.test/api
+    RESOURCE_IMAGE_NAME=inasafe/inasafe-fba-resources
+    RESOURCE_IMAGE_TAG=grenada
+    REGION=grenada
 
 addons:
   hosts:
@@ -43,7 +46,7 @@ before_script:
   - popd
   # Docker OSM backend
   - pushd docker-osm/indonesia-buildings
-  - make prepare-integration-tests
+  - make prepare-integration-tests RESOURCE_IMAGE_NAME=${RESOURCE_IMAGE_NAME} RESOURCE_IMAGE_TAG=${RESOURCE_IMAGE_TAG}
   - popd
   # Geoserver
   - pushd geoserver
@@ -79,7 +82,7 @@ before_script:
 
 script:
   # Disable test now because sample data and schema are related with GeoCRIS dataset
-  - echo "noop"
+#  - echo "noop"
 #  # Backend deployment tests
 #  - pushd deployment
 #  - make backend-test
@@ -88,3 +91,11 @@ script:
 #  - make backend-import-fixtures TARGET=tests/backend/data/sql/hazard_map.sql
 #  - make backend-forecast-test
 #  - popd
+  # Test geocris data
+  - pushd deployment
+  - make backend-import-fixtures TARGET=tests/backend/data/${REGION}/sql/hazard_map.sql
+  - make backend-import-fixtures TARGET=tests/backend/data/${REGION}/sql/world_pop.sql
+  - make backend-import-fixtures TARGET=tests/backend/data/${REGION}/sql/hazard_event_queue.sql
+  - make backend-import-fixtures TARGET=tests/backend/data/sql/process_hazard_event_queue.sql
+  - make backend-import-fixtures TARGET=tests/backend/data/sql/calculate_impact.sql
+  - popd
