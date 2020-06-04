@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION public.kartoza_evaluate_building_score() RETURNS VARC
 AS $$
 BEGIN
     UPDATE osm_buildings
-    SET building_area = st_area(gis.public.osm_buildings.geometry::geography)
+    SET building_area = st_area(public.osm_buildings.geometry::geography)
     WHERE building_area is null;
     UPDATE osm_buildings
     SET building_area_score = CASE

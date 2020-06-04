@@ -21,6 +21,6 @@ refresh materialized view mv_non_flooded_population_summary with data;
 select kartoza_census_kemendagri_populate_all_census();
 
 -- check trigger
-update census_kemendagri set objectid = gis.public.census_kemendagri.objectid
+update census_kemendagri set objectid = public.census_kemendagri.objectid
 where objectid in (
     select objectid from census_kemendagri limit 1)
