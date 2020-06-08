@@ -1,20 +1,20 @@
 
     LAYER
-		NAME "osm_waterways"
+		NAME "exposed_buildings"
 		METADATA
-			"ows_title" "osm_waterways"
+			"ows_title" "exposed_buildings"
 		END
 		STATUS ON
-		TYPE LINE
+		TYPE POLYGON
 		CONNECTIONTYPE postgis
 		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
-		DATA "geometry from osm_waterways using unique id"
+		DATA "geometry from mv_flood_event_buildings using unique id"
 
 		CLASS
 			NAME "default"
 			STYLE
-				COLOR 0 0 255
-                WIDTH 2
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
 			END
 		END
 	END

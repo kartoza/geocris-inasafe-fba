@@ -1,0 +1,29 @@
+
+    LAYER
+		NAME "flood_forecast_layer"
+		METADATA
+			"ows_title" "flood_forecast_layer"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from (select
+            row_number() OVER () AS gid,
+            hazard_event.id as id,
+            geometry,
+            depth_class
+            from hazard_event
+            inner join hazard_map on hazard_event.flood_map_id = hazard_map.id
+            inner join hazard_areas on hazard_map.id = hazard_areas.flood_map_id
+            inner join hazard_area on hazard_areas.flooded_area_id = hazard_area.id) as subquery
+         using unique gid using srid=4326"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END

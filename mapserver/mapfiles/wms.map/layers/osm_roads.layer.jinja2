@@ -5,7 +5,7 @@
 			"ows_title" "osm_roads"
 		END
 		STATUS ON
-		TYPE POLYGON
+		TYPE LINE
 		CONNECTIONTYPE postgis
 		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
 		DATA "geometry from osm_roads using unique id"
@@ -14,7 +14,7 @@
 			NAME "default"
 			STYLE
 				COLOR 255 0 0
-				OUTLINECOLOR 0 0 0
+                WIDTH 2
 			END
 		END
 	END
