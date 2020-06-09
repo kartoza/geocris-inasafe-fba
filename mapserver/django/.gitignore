@@ -1,0 +1,4 @@
+django_project/core/settings/secret.py
+logs
+media
+static

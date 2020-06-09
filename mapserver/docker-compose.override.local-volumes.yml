@@ -19,3 +19,6 @@ services:
       - mapfiles-volume:/etc/mapserver
     ports:
       - "${MAPSERVER_PORT}:80"
+  django-web:
+    ports:
+      - "${DJANGO_PORT}:8080"
