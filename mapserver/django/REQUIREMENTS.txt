@@ -3,3 +3,4 @@ djangorestframework==3.9.2
 djangorestframework-gis==0.14
 psycopg2-binary==2.8.3
 Pillow
+requests

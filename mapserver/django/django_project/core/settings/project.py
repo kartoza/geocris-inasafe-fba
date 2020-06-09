@@ -29,3 +29,11 @@ LANGUAGES = (
 
 # Set storage path for the translation files
 LOCALE_PATHS = (ABS_PATH('locale'),)
+
+INSTALLED_APPS += (
+    'mapserver',
+)
+
+MAPSERVER_PUBLIC_WMS_URL = os.environ.get('MAPSERVER_PUBLIC_WMS_URL', None)
+MAPSERVER_PUBLIC_SLD_URL = os.environ.get('MAPSERVER_PUBLIC_SLD_URL', None)
+FIXTURES = '/home/web/fixtures'

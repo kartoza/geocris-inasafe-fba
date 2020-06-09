@@ -1,0 +1,15 @@
+{
+  "district_boundary": "red_outline.sld",
+  "sub_district_boundary": "red_outline.sld",
+  "village_boundary": "red_outline.sld",
+  "exposed_buildings": "building_vulnerability.sld",
+  "exposed_roads": "exposed_roads.sld",
+  "flood_forecast_layer": "flood_depth_class.sld",
+  "osm_buildings": "BlueprintBuildings.sld",
+  "osm_roads": "BlueprintRoads.sld",
+  "osm_waterways": "BlueprintRivers.sld",
+  "osm_admin": "osm_admin_web.sld",
+  "flood_map_district": "district_map.sld",
+  "flood_map_sub_district": "sub_district_map.sld",
+  "flood_map_village": "village_map.sld"
+}

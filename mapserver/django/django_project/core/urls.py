@@ -4,15 +4,13 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from core.views.template import HomeView, MapView
+from django.urls import include
 
 admin.autodiscover()
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-
-    url(r'^home/', HomeView.as_view(), name='home'),
-    url(r'^map/', MapView.as_view(), name='map'),
+    url(r'', include('mapserver.urls')),
 
 ]
 

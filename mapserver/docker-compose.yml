@@ -26,7 +26,10 @@ services:
       - DJANGO_SETTINGS_MODULE=core.settings.prod_docker
       - VIRTUAL_HOST=project.com
       - VIRTUAL_PORT=8080
+      - MAPSERVER_PUBLIC_WMS_URL=${MAPSERVER_PUBLIC_WMS_URL}
+      - MAPSERVER_PUBLIC_SLD_URL=${MAPSERVER_PUBLIC_SLD_URL}
     volumes:
+      - ./fixtures:/home/web/fixtures
       - ./django/django_project:/home/web/django_project
       - ./django/volumes/static:/home/web/static
       - ./django/volumes/media:/home/web/media
@@ -66,7 +69,10 @@ services:
       - PYTHONPATH=/home/web/django_project
       - VIRTUAL_HOST=project.com
       - VIRTUAL_PORT=8080
+      - MAPSERVER_PUBLIC_WMS_URL=${MAPSERVER_PUBLIC_WMS_URL}
+      - MAPSERVER_PUBLIC_SLD_URL=${MAPSERVER_PUBLIC_SLD_URL}
     volumes:
+      - ./fixtures:/home/web/fixtures
       - ./django/django_project:/home/web/django_project
       - ./django/volumes/static:/home/web/static
       - ./django/volumes/media:/home/web/media
