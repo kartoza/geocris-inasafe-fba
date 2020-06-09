@@ -33,3 +33,27 @@ function toTitleCase(str) {
 const monthNames = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ];
+
+/** Return xml filter format from data
+ * the format is in xml
+ * @param data = dictionary
+ */
+function toXmlAndFilter(data) {
+    let filter = '<Filter>'
+    if (Object.keys(data).length > 1) {
+        filter += '<AND>'
+    }
+    Object.keys(data).forEach(function (key) {
+        let value = data[key]
+        filter += '' +
+            '<PropertyIsEqualTo>' +
+            '<PropertyName>' + key + '</PropertyName>' +
+            '<Literal>' + value + '</Literal>' +
+            '</PropertyIsEqualTo>'
+    })
+    if (Object.keys(data).length > 1) {
+        filter += '</AND>'
+    }
+    filter += '</Filter>'
+    return filter
+}

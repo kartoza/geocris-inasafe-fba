@@ -323,7 +323,7 @@ define([
                     transparent: true,
                     srs: 'EPSG:4326',
                     tiled: true,
-                    cql_filter: `id_code=${region_id}`,
+                    filter: toXmlAndFilter({id_code: region_id})
                 });
             this.region_layer.setZIndex(20);
             this.addOverlayLayer(this.region_layer, 'Administrative Boundary');
@@ -348,6 +348,11 @@ define([
 
             this.exposed_layers = this.depth_class_collection.map(function (depth_class) {
                 let label = `Exposed Buildings in Depth Class: ${depth_class.get('label')}`
+                let filter = {
+                    flood_event_id: forecast_id,
+                    depth_class: depth_class.id
+                }
+                filter[id_key[region]] = region_id
                 let exposed_layer = L.tileLayer.wms(
                     geoserverUrl,
                     {
@@ -356,7 +361,7 @@ define([
                         transparent: true,
                         srs: 'EPSG:4326',
                         tiled: true,
-                        cql_filter: `flood_event_id=${forecast_id} AND ${id_key[region]}=${region_id} AND depth_class=${depth_class.id}`,
+                        filter: toXmlAndFilter(filter)
                     }
                 );
                 exposed_layer.setZIndex(10 + depth_class.id);
@@ -389,6 +394,10 @@ define([
                 return;
             }
 
+            let filter = {
+                flood_event_id: forecast_id
+            }
+            filter[id_key[region]] = region_id
             this.exposed_road_layer = L.tileLayer.wms(
                 geoserverUrl,
                 {
@@ -397,7 +406,7 @@ define([
                     transparent: true,
                     srs: 'EPSG:4326',
                     tiled: true,
-                    cql_filter: `flood_event_id=${forecast_id} AND ${id_key[region]}=${region_id}`,
+                    filter: toXmlAndFilter(filter),
                 }
             );
             this.exposed_road_layer.setZIndex(3);
