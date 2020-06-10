@@ -6,10 +6,12 @@ import os
 import requests
 from urllib.parse import unquote
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
+from django.http import (
+    HttpResponse, HttpResponseForbidden, HttpResponseBadRequest,
+    HttpResponseServerError)
 
 
-def getSLDStyle(layer_name):
+def get_sld_style(layer_name):
     """ return sld style in json
     :param layer_name: the layer name that needs to be checked
     :return:
@@ -22,18 +24,24 @@ def getSLDStyle(layer_name):
     return None
 
 
-def wms(request):
+def redirect_mapserver(request, mapserver_url):
+    """ Return updated url for redirect to mapserver
+    :param request:
+    :return: params
+    :rtype: str
+    """
     try:
         if request.method == 'GET':
             params = unquote(request.build_absolute_uri().split('?')[1].lower())
             params = params.replace('kartoza:', '')
             if 'GetMap' == request.GET.get('request', None):
-                layers = request.GET['layers'] if 'layers' in request.GET else request.GET['LAYERS']
+                layers = request.GET['layers'] \
+                    if 'layers' in request.GET else request.GET['LAYERS']
                 layers = layers.replace('kartoza:', '')
-                sld = getSLDStyle(layers)
+                sld = get_sld_style(layers)
                 if sld:
                     params += '&sld=' + sld
-            mapserver_url = '{}?{}'.format(settings.MAPSERVER_PUBLIC_WMS_URL, params)
+            mapserver_url = '{}?{}'.format(mapserver_url, params)
             response = requests.get(mapserver_url)
             return HttpResponse(
                 content=response.content,
@@ -46,3 +54,14 @@ def wms(request):
     except KeyError as e:
         return HttpResponseBadRequest(
             '{} is needed'.format(e))
+    except Exception as e:
+        return HttpResponseServerError(
+            '{}'.format(e))
+
+
+def wms(request):
+    return redirect_mapserver(request, settings.MAPSERVER_PUBLIC_WMS_URL)
+
+
+def ows(request):
+    return redirect_mapserver(request, settings.MAPSERVER_PUBLIC_OWS_URL)

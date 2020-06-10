@@ -18,6 +18,7 @@ services:
       - VIRTUAL_HOST=project.com
       - VIRTUAL_PORT=8080
       - MAPSERVER_PUBLIC_WMS_URL=${MAPSERVER_PUBLIC_WMS_URL}
+      - MAPSERVER_PUBLIC_OWS_URL=${MAPSERVER_PUBLIC_OWS_URL}
       - MAPSERVER_PUBLIC_SLD_URL=${MAPSERVER_PUBLIC_SLD_URL}
     volumes:
       - ./fixtures:/home/web/fixtures

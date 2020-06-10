@@ -30,6 +30,7 @@ services:
     environment:
       DJANGO_SETTINGS_MODULE: core.settings.prod_docker
       MAPSERVER_PUBLIC_WMS_URL: ${MAPSERVER_PUBLIC_WMS_URL}
+      MAPSERVER_PUBLIC_OWS_URL: ${MAPSERVER_PUBLIC_OWS_URL}
       MAPSERVER_PUBLIC_SLD_URL: ${MAPSERVER_PUBLIC_SLD_URL}
     volumes:
       - ./fixtures:/home/web/fixtures
