@@ -1,4 +1,7 @@
-PROJECT_ID := fbf-mapserver
+
+build:
+	@docker build django -t project_uwsgi
+
 up-docker:
 	@docker-compose up -d
 
@@ -17,14 +20,17 @@ logs:
 shell:
 	@docker-compose exec mapserver bash
 
-wait-geoserver-ready:
-	@docker-compose exec mapserver bash -c 'until wget -qO- localhost:8080/geoserver &> /dev/null; do echo "Geoserver not ready. Waiting."; done; echo "Geoserver ready"'
+wait-mapserver-ready:
+	@docker-compose exec mapserver bash -c 'until wget -qO- localhost:80 &> /dev/null; do echo "Mapserver not ready. Waiting."; sleep 10; done; echo "Mapserver ready"'
+
+django-shell:
+	@docker-compose exec django-uwsgi bash
 
 django-migrate:
-	@docker exec -t -i $(PROJECT_ID)_django-uwsgi_1 python manage.py migrate
+	@docker-compose exec django-uwsgi python manage.py migrate
 
 django-collectstatic:
-	@docker exec -t -i $(PROJECT_ID)_django-uwsgi_1 python manage.py collectstatic --noinput
+	@docker-compose exec django-uwsgi python manage.py collectstatic --noinput
 
 django-create-superuser:
-	@docker exec -t -i $(PROJECT_ID)_django-uwsgi_1 python manage.py createsuperuser
+	@docker-compose exec django-uwsgi python manage.py createsuperuser

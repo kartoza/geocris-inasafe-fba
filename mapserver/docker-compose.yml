@@ -4,19 +4,10 @@ services:
     image: camptocamp/mapserver:7.4
     restart: unless-stopped
 
-  django-db:
-    # Note you cannot scale if you use container_name
-    image: kartoza/postgis:9.6-2.4
-    environment:
-      - ALLOW_IP_RANGE=0.0.0.0/0
-      - USERNAME=docker
-      - PASS=docker
-    restart: on-failure:5
-
   django-uwsgi:
     # Note you cannot scale if you use container_name
     build: django
-    hostname: uwsgi
+    command: uwsgi --ini /home/web/django_project/uwsgi.conf
     environment:
       - DATABASE_NAME=gis
       - DATABASE_USERNAME=docker
@@ -35,7 +26,6 @@ services:
       - ./django/volumes/media:/home/web/media
       - ./django/volumes/logs:/var/log/
     links:
-      - django-db:db
       - mapserver:mapserver
 
   # This is normally the main entry point for a production server
@@ -53,30 +43,3 @@ services:
       - django-uwsgi:uwsgi
       - mapserver:mapserver
     restart: on-failure:5
-
-  # This is normally the main entry point for a production server
-  django-dev:
-    build:
-      context: django
-      dockerfile: Dockerfile-dev
-    hostname: uwsgi
-    environment:
-      - DATABASE_NAME=gis
-      - DATABASE_USERNAME=docker
-      - DATABASE_PASSWORD=docker
-      - DATABASE_HOST=db
-      - DJANGO_SETTINGS_MODULE=core.settings.prod_docker
-      - PYTHONPATH=/home/web/django_project
-      - VIRTUAL_HOST=project.com
-      - VIRTUAL_PORT=8080
-      - MAPSERVER_PUBLIC_WMS_URL=${MAPSERVER_PUBLIC_WMS_URL}
-      - MAPSERVER_PUBLIC_SLD_URL=${MAPSERVER_PUBLIC_SLD_URL}
-    volumes:
-      - ./fixtures:/home/web/fixtures
-      - ./django/django_project:/home/web/django_project
-      - ./django/volumes/static:/home/web/static
-      - ./django/volumes/media:/home/web/media
-      - ./django/volumes/logs:/var/log/
-    links:
-      - django-db:db
-      - mapserver:mapserver

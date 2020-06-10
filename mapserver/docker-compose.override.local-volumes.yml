@@ -22,3 +22,23 @@ services:
   django-web:
     ports:
       - "${DJANGO_PORT}:8080"
+
+  django-uwsgi-dev:
+    build:
+      context: django
+      dockerfile: Dockerfile-dev
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings.prod_docker
+      MAPSERVER_PUBLIC_WMS_URL: ${MAPSERVER_PUBLIC_WMS_URL}
+      MAPSERVER_PUBLIC_SLD_URL: ${MAPSERVER_PUBLIC_SLD_URL}
+    volumes:
+      - ./fixtures:/home/web/fixtures
+      - ./django/django_project:/home/web/django_project
+      - ./django/volumes/static:/home/web/static
+      - ./django/volumes/media:/home/web/media
+      - ./django/volumes/logs:/var/log/
+    links:
+      - mapserver:mapserver
+    ports:
+      - "${DJANGO_DEV_SSH}:22"
+      - "${DJANGO_DEV_PORT}:8080"
