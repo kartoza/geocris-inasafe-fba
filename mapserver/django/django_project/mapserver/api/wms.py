@@ -6,7 +6,7 @@ import os
 import requests
 from urllib.parse import unquote
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 
 
 def getSLDStyle(layer_name):
@@ -23,20 +23,26 @@ def getSLDStyle(layer_name):
 
 
 def wms(request):
-    if request.method == 'GET':
-        params = unquote(request.build_absolute_uri().split('?')[1].lower())
-        params = params.replace('kartoza:', '')
-        layers = request.GET.get('layers').replace('kartoza:', '')
-        sld = getSLDStyle(layers)
-        if sld:
-            params += '&sld=' + sld
-        mapserver_url = '{}?{}'.format(settings.MAPSERVER_PUBLIC_WMS_URL, params)
-        response = requests.get(mapserver_url)
-        return HttpResponse(
-            content=response.content,
-            status=response.status_code,
-            content_type=response.headers['Content-Type']
-        )
-    else:
-        return HttpResponseForbidden(
-            'Method is forbidden')
+    try:
+        if request.method == 'GET':
+            params = unquote(request.build_absolute_uri().split('?')[1].lower())
+            params = params.replace('kartoza:', '')
+            if 'GetMap' == request.GET.get('request', None):
+                layers = request.GET['layers'] if 'layers' in request.GET else request.GET['LAYERS']
+                layers = layers.replace('kartoza:', '')
+                sld = getSLDStyle(layers)
+                if sld:
+                    params += '&sld=' + sld
+            mapserver_url = '{}?{}'.format(settings.MAPSERVER_PUBLIC_WMS_URL, params)
+            response = requests.get(mapserver_url)
+            return HttpResponse(
+                content=response.content,
+                status=response.status_code,
+                content_type=response.headers['Content-Type']
+            )
+        else:
+            return HttpResponseForbidden(
+                'Method is forbidden')
+    except KeyError as e:
+        return HttpResponseBadRequest(
+            '{} is needed'.format(e))

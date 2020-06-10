@@ -5,8 +5,6 @@
         <UserStyle>
             <se:Name>osm_roads</se:Name>
             <se:FeatureTypeStyle>
-
-
                 <se:Rule>
                     <se:Name>Roads</se:Name>
                     <se:MaxScaleDenominator>100000</se:MaxScaleDenominator>

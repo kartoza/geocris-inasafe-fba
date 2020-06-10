@@ -11,5 +11,6 @@
   "osm_admin": "osm_admin_web.sld",
   "flood_map_district": "district_map.sld",
   "flood_map_sub_district": "sub_district_map.sld",
-  "flood_map_village": "village_map.sld"
+  "flood_map_village": "village_map.sld",
+  "web": "web.sld"
 }

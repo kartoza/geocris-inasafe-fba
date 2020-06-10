@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <StyledLayerDescriptor xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" xmlns:se="http://www.opengis.net/se" version="1.1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.1.0/StyledLayerDescriptor.xsd">
-    <NamedLayer>
-        <se:Name>admin</se:Name>
+   <NamedLayer>
+        <se:Name>osm_admin</se:Name>
         <UserStyle>
-            <se:Name>admin</se:Name>
+            <se:Name>osm_admin</se:Name>
             <se:FeatureTypeStyle>
                 <se:Rule>
                     <se:Name>Admin level 2</se:Name>
@@ -18,9 +18,8 @@
                     </ogc:Filter>
                     <se:PolygonSymbolizer>
                         <se:Fill>
-                            <se:SvgParameter name="fill">#001c22</se:SvgParameter>
+                            <se:SvgParameter name="fill">#808080</se:SvgParameter>
                         </se:Fill>
-
                     </se:PolygonSymbolizer>
                 </se:Rule>
                 <se:Rule>
@@ -35,7 +34,6 @@
                         </ogc:PropertyIsEqualTo>
                     </ogc:Filter>
                     <se:PolygonSymbolizer>
-
                         <se:Stroke>
                             <se:SvgParameter name="stroke">#ffffff</se:SvgParameter>
                             <se:SvgParameter name="stroke-width">1</se:SvgParameter>
@@ -57,7 +55,6 @@
                     <se:MinScaleDenominator>1</se:MinScaleDenominator>
                     <se:MaxScaleDenominator>2500000</se:MaxScaleDenominator>
                     <se:PolygonSymbolizer>
-
                         <se:Stroke>
                             <se:SvgParameter name="stroke">#ffffff</se:SvgParameter>
                             <se:SvgParameter name="stroke-width">1</se:SvgParameter>
@@ -79,7 +76,6 @@
                     <se:MinScaleDenominator>1</se:MinScaleDenominator>
                     <se:MaxScaleDenominator>1000000</se:MaxScaleDenominator>
                     <se:PolygonSymbolizer>
-
                         <se:Stroke>
                             <se:SvgParameter name="stroke">#ffffff</se:SvgParameter>
                             <se:SvgParameter name="stroke-width">1</se:SvgParameter>
@@ -112,7 +108,6 @@
                     <se:MinScaleDenominator>1</se:MinScaleDenominator>
                     <se:MaxScaleDenominator>500000</se:MaxScaleDenominator>
                     <se:PolygonSymbolizer>
-
                         <se:Stroke>
                             <se:SvgParameter name="stroke">#ffffff</se:SvgParameter>
                             <se:SvgParameter name="stroke-width">1</se:SvgParameter>
