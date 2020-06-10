@@ -7,6 +7,7 @@ services:
   django-uwsgi:
     # Note you cannot scale if you use container_name
     build: django
+    image: project_uwsgi
     command: uwsgi --ini /home/web/django_project/uwsgi.conf
     environment:
       - DATABASE_NAME=gis

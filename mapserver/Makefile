@@ -1,6 +1,7 @@
 
 build:
 	@docker build django -t project_uwsgi
+	@docker-compose build django-uwsgi-dev
 
 up-docker:
 	@docker-compose up -d

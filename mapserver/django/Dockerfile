@@ -10,8 +10,6 @@ RUN apt-get install -y python3-pip python3-dev gdal-bin gettext libcurl4-openssl
 
 ENV PATH /usr/local/bin:$PATH
 
-ADD uwsgi.conf /uwsgi.conf
-
 #RUN dpkg-divert --local --rename --add /sbin/initctl
 
 RUN apt-get install locales -y && \
@@ -21,15 +19,15 @@ ENV LANG en_ZA.UTF-8
 ENV LANGUAGE en_ZA:en
 ENV LC_ALL en_ZA.UTF-8
 
-ADD REQUIREMENTS.txt /REQUIREMENTS.txt
+WORKDIR /home/web/django_project
+
+ADD django_project/REQUIREMENTS.txt REQUIREMENTS.txt
 RUN pip3 install --upgrade pip && pip install --upgrade pip
-RUN pip install -r /REQUIREMENTS.txt
+RUN pip install -r REQUIREMENTS.txt
 RUN pip install uwsgi==2.0.18
 
 RUN ln -s /usr/bin/python3 /usr/local/bin/python
 
 # Open port 8080 as we will be running our uwsgi socket on that
 EXPOSE 8080
-
-WORKDIR /home/web/django_project
-CMD ["uwsgi", "--ini", "/uwsgi.conf"]
+CMD ["uwsgi", "--ini", "/home/web/django_project/uwsgi.conf"]
