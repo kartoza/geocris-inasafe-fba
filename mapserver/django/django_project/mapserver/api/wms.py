@@ -4,7 +4,7 @@ __date__ = '09/06/20'
 import json
 import os
 import requests
-from urllib.parse import unquote
+from urllib.parse import urlparse, parse_qs, urlencode
 from django.conf import settings
 from django.http import (
     HttpResponse, HttpResponseForbidden, HttpResponseBadRequest,
@@ -32,16 +32,28 @@ def redirect_mapserver(request, mapserver_url):
     """
     try:
         if request.method == 'GET':
-            params = unquote(request.build_absolute_uri().split('?')[1].lower())
-            params = params.replace('kartoza:', '')
-            if 'GetMap' == request.GET.get('request', None):
-                layers = request.GET['layers'] \
-                    if 'layers' in request.GET else request.GET['LAYERS']
-                layers = layers.replace('kartoza:', '')
-                sld = get_sld_style(layers)
+            # Parse querystring
+            parse_result = urlparse(request.build_absolute_uri())
+            query_params = parse_qs(parse_result.query)
+            # make dictionary key all lowercase
+            params = dict((k.lower(), v) for k, v in query_params.items())
+            if 'getmap' == params.get('request', [''])[0].lower():
+                layers = params.get('layers')
+                layers = [l.split(':')[-1] for l in layers]
+                params['layers'] = layers
+                # only use style from first layer
+                sld = get_sld_style(layers[0] if layers else '')
                 if sld:
-                    params += '&sld=' + sld
-            mapserver_url = '{}?{}'.format(mapserver_url, params)
+                    params['sld'] = sld
+            if 'getlegendgraphic' == params.get('request', [''])[0].lower():
+                layer = params.get('layer')
+                layer = [l.split(':')[-1] for l in layer]
+                params['layer'] = layer
+                # only use style from first layer
+                sld = get_sld_style(layer[0] if layer else '')
+                if sld:
+                    params['sld'] = sld
+            mapserver_url = '{}?{}'.format(mapserver_url, urlencode(params, doseq=True))
             response = requests.get(mapserver_url)
             return HttpResponse(
                 content=response.content,

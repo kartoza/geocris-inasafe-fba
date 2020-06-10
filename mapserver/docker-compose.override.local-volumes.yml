@@ -23,11 +23,17 @@ services:
     ports:
       - "${DJANGO_PORT}:8080"
 
+  django-uwsgi:
+    build:
+      context: django
+      dockerfile: Dockerfile
+
   django-uwsgi-dev:
     build:
       context: django
       dockerfile: Dockerfile-dev
     environment:
+      DEBUG: "True"
       DJANGO_SETTINGS_MODULE: core.settings.prod_docker
       MAPSERVER_PUBLIC_WMS_URL: ${MAPSERVER_PUBLIC_WMS_URL}
       MAPSERVER_PUBLIC_OWS_URL: ${MAPSERVER_PUBLIC_OWS_URL}

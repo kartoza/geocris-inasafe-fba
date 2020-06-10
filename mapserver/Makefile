@@ -27,6 +27,9 @@ wait-mapserver-ready:
 django-shell:
 	@docker-compose exec django-uwsgi bash
 
+django-dev-shell:
+	@docker-compose exec django-uwsgi-dev bash
+
 django-migrate:
 	@docker-compose exec django-uwsgi python manage.py migrate
 
