@@ -32,27 +32,29 @@ def redirect_mapserver(request, mapserver_url):
     """
     try:
         if request.method == 'GET':
-            # Parse querystring
-            parse_result = urlparse(request.build_absolute_uri())
-            query_params = parse_qs(parse_result.query)
             # make dictionary key all lowercase
-            params = dict((k.lower(), v) for k, v in query_params.items())
-            if 'getmap' == params.get('request', [''])[0].lower():
-                layers = params.get('layers')
-                layers = [l.split(':')[-1] for l in layers]
-                params['layers'] = layers
-                # only use style from first layer
-                sld = get_sld_style(layers[0] if layers else '')
-                if sld:
-                    params['sld'] = sld
-            if 'getlegendgraphic' == params.get('request', [''])[0].lower():
-                layer = params.get('layer')
-                layer = [l.split(':')[-1] for l in layer]
-                params['layer'] = layer
-                # only use style from first layer
-                sld = get_sld_style(layer[0] if layer else '')
-                if sld:
-                    params['sld'] = sld
+            params = dict({k.lower(): v for k, v in request.GET.items()})
+            wms_request = params.get('request', '')
+
+            layer_key = None
+            # let's we check the params based on request
+            if 'getmap' == wms_request.lower():
+                layer_key = 'layers'
+            elif 'getlegendgraphic' == wms_request.lower():
+                layer_key = 'layer'
+
+            # if there is layer key, process it
+            # - change the layer not to use :
+            # - check the sld
+            if layer_key:
+                layers = params.get(layer_key, None)
+                if layers:
+                    layers = [l.split(':')[-1] for l in layers.split(',')]
+                    params[layer_key] = ','.join(layers)
+                    # only use style from first layer
+                    sld = get_sld_style(layers[0] if layers else '')
+                    if sld:
+                        params['sld'] = sld
             mapserver_url = '{}?{}'.format(mapserver_url, urlencode(params, doseq=True))
             response = requests.get(mapserver_url)
             return HttpResponse(
