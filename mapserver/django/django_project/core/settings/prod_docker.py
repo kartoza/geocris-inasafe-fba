@@ -13,3 +13,5 @@ DATABASES = {
         'NAME': os.path.join(ABS_PATH('./'), 'db.sqlite3'),
     }
 }
+
+FIXTURES = '/home/web/fixtures'
