@@ -7,6 +7,7 @@ from fba.models.base import base_model
 
 class HazardEvent(base_model):
     """ Model for hazard event queue """
+    id = models.AutoField(primary_key=True)
     flood_map_id = models.IntegerField()
     acquisition_date = models.DateTimeField()
     forecast_date = models.DateTimeField(blank=True, null=True)

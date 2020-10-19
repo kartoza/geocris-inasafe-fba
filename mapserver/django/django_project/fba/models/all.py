@@ -111,7 +111,7 @@ class Country(base_model):
 class District(base_model):
     id = models.IntegerField()
     geom = models.MultiPolygonField(blank=True, null=True)
-    country_code = models.FloatField(blank=True, null=True)
+    country = models.ForeignKey(Country, models.DO_NOTHING, db_column='country_code', blank=True, null=True)
     prov_code = models.FloatField(blank=True, null=True)
     dc_code = models.FloatField(primary_key=True)
     name = models.CharField(max_length=254, blank=True, null=True)
@@ -364,7 +364,7 @@ class SubDistrict(base_model):
     id = models.IntegerField()
     geom = models.MultiPolygonField(blank=True, null=True)
     prov_code = models.SmallIntegerField(blank=True, null=True)
-    dc_code = models.SmallIntegerField(blank=True, null=True)
+    district = models.ForeignKey(District, models.DO_NOTHING, db_column='dc_code', blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     sub_dc_code = models.FloatField(primary_key=True)
 

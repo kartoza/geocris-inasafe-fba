@@ -1,8 +1,7 @@
-import json
 from rest_framework import serializers
-from rest_framework_gis.serializers import (
-    GeoFeatureModelSerializer, GeometrySerializerMethodField)
-from fba.models.all import HazardEvent, HazardMap, HazardType
+
+from fba.models.all import (
+    HazardEvent, HazardMap, HazardType)
 
 
 class HazardEventSerializer(serializers.Serializer):
