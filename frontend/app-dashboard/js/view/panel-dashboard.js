@@ -63,6 +63,8 @@ define([
             dispatcher.on('dashboard:change-trigger-status', this.changeStatus, this);
 
             this.$el = $(this.el);
+            // TODO: inject for now
+            dispatcher.trigger('flood:fetch-forecast', '2020/10/12', 59);
         },
         render: function (callback) {
             this.referer_region = [];
