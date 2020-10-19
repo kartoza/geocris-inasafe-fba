@@ -5,10 +5,11 @@ from rest_framework_gis.serializers import (
 from fba.models.all import HazardEvent, HazardMap, HazardType
 
 
-class HazardEventSerializer(serializers.ModelSerializer):
+class HazardEventSerializer(serializers.Serializer):
     """
     Serializer for hazard event model.
     """
+    id = serializers.IntegerField(read_only=True)
     hazard_map = serializers.SerializerMethodField()
     hazard_type = serializers.SerializerMethodField()
 
@@ -33,6 +34,7 @@ class HazardEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = HazardEvent
         fields = (
+            'id',
             'source',
             'notes',
             'forecast_date',

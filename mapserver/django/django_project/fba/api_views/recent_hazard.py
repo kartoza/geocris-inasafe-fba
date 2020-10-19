@@ -1,5 +1,4 @@
 # coding=utf-8
-from rest_framework import serializers
 from rest_framework.views import APIView, Response
 from fba.models.all import HazardEvent
 from fba.serializers.hazard_event import HazardEventSerializer
