@@ -37,4 +37,4 @@ where a.row_number = 1
     WITH NO DATA;
 
 create unique index if not exists mv_administrative_mapping_uindex
-    on mv_administrative_mapping(district_name, sub_district_name, village_name)
+    on mv_administrative_mapping(district_id, sub_district_id, village_id)
