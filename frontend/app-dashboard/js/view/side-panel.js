@@ -4,7 +4,7 @@ define([
     'jquery',
     'jqueryUi',
     'js/view/layers/upload-flood.js',
-    'js/view/panel-dashboard.js',
+    'js/view/panel-hazard-dashboard.js',
 ], function (Backbone, _, $, JqueryUi, FloodUploadView, DashboardView) {
     return Backbone.View.extend({
         el: "#side-panel",
@@ -16,7 +16,8 @@ define([
             'click .hide-browse-flood': 'hideBrowseFlood',
             'click .browse-arrow': 'fetchFloodById',
             'click #btn-browse-forecast': 'openBrowseByForecast',
-            'click #btn-browse-return-period': 'openBrowseByReturnPeriod'
+            'click #btn-browse-return-period': 'openBrowseByReturnPeriod',
+            'click .hazard-list': 'openPanelHazard'
         },
         initialize: function () {
             let that = this;
@@ -96,6 +97,17 @@ define([
             $('.panel-body-wrapper').not('.panel-welcome').not('.floating-panel').hide();
             $('.panel-welcome').show("slide", { direction: "right" }, 400);
             $('.browse-floods').addClass('bounce-7');
+        },
+        openPanelHazard: function (el) {
+            let $clickedElm = $(el.target);
+            const maxTries = 10;
+            let currentTry = 1;
+            while(!$clickedElm.hasClass('hazard-list') && currentTry < maxTries) {
+                currentTry += 1;
+                $clickedElm = $clickedElm.parent();
+            }
+            const hazardId = $clickedElm.data('id');
+            dispatcher.trigger('hazard:fetch-hazard-event-summary', hazardId);
         }
     })
 });

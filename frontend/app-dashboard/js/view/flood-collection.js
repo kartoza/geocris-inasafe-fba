@@ -7,6 +7,7 @@ define([
     'utils',
     'js/model/forecast_event.js',
     'js/model/trigger_status.js',
+    'js/model/hazard.js',
     'js/model/district_summary.js',
     'js/model/subdistrict_summary.js',
     'js/model/village_summary.js',
@@ -19,7 +20,7 @@ define([
     'js/model/world_population_district_summary.js',
     'js/model/world_population_sub_district_summary.js',
     'js/model/world_population_village_summary.js',
-], function (Backbone, _, moment, L, Wellknown, utils, ForecastEvent, TriggerStatusCollection,
+], function (Backbone, _, moment, L, Wellknown, utils, ForecastEvent, TriggerStatusCollection, HazardCollection,
              DistrictSummaryCollection, SubDistrictSummaryCollection, VillageSummaryCollection,
              RoadDistrictSummaryCollection, RoadSubDistrictSummaryCollection, RoadVillageSummaryCollection,
              PopulationDistrictSummaryCollection, PopulationSubDistrictSummaryCollection, PopulationVillageSummaryCollection,
@@ -75,6 +76,7 @@ define([
             this.datepicker_browse = null;
 
             // model instance
+            this.hazards = new HazardCollection();
             this.trigger_statuses = new TriggerStatusCollection();
             this.village_summaries = new VillageSummaryCollection();
             this.district_summaries = new DistrictSummaryCollection();
@@ -98,10 +100,26 @@ define([
             dispatcher.on('flood:fetch-stats-data-population', this.fetchPopulationStatisticData, this);
             dispatcher.on('flood:deselect-forecast', this.deselectForecast, this);
             dispatcher.on('flood:fetch-historical-forecast', this.fetchHistoricalForecastCollection, this);
+            dispatcher.on('hazard:fetch-hazard-event-summary', this.fetchHazardEventSummary, this)
 
 
             // get forecast collections
-            this.initializeTriggerStatusLegend();
+            // this.initializeTriggerStatusLegend();
+
+            // Get recent hazard events
+            this.initializeRecentHazard();
+
+        },
+        initializeRecentHazard: function () {
+            const that = this;
+            that.hazards.fetch()
+                .then(function (data) {
+                    that.$flood_summary.html('');
+                    let hazardListTemplate = _.template($('#hazard-list').html());
+                    data.forEach(function (value) {
+                        that.$flood_summary.append(hazardListTemplate(value));
+                    });
+                })
 
         },
         initializeTriggerStatusLegend: function(){
@@ -212,6 +230,41 @@ define([
                     console.log(data);
                 }
             )
+        },
+        fitToHazardExtent: function (hazard) {
+            let coordinates = [[hazard.extent.y_min, hazard.extent.x_min], [hazard.extent.y_max, hazard.extent.x_max]];
+            dispatcher.trigger('map:fit-bounds', coordinates)
+        },
+        fetchHazardEventSummary: function (hazardId) {
+            const that = this;
+            const hazard = that.hazards.get(hazardId);
+            if (typeof hazard === 'undefined') {
+                console.error('Hazard could not be found');
+                return false;
+            }
+            if (!hazard.extent) {
+                hazard.fetchExtent().then(
+                    function (extent) {
+                        hazard.extent = extent;
+                        that.fitToHazardExtent(hazard);
+                        that.selectHazard(hazard);
+                    }
+                )
+            } else {
+                that.fitToHazardExtent(hazard);
+                that.selectHazard(hazard);
+            }
+        },
+        selectHazard: function (hazard) {
+            const that = this;
+            this.selected_forecast = hazard;
+            hazard.fetchSummary().then(function (summary) {
+                dispatcher.trigger('map:draw-forecast-layer', hazard, function () {
+                    dispatcher.trigger('side-panel:open-dashboard', function () {
+                        return summary
+                    });
+                });
+            });
         },
         fetchHistoricalForecastCollection: function(forecast_date_range_start, forecast_date_range_end){
             const today = moment().momentDateOnly().utc();

@@ -376,6 +376,15 @@
 
 </body>
 
+<script type='text/template' id='hazard-list'>
+    <div>
+        <div class="flood-count hazard-list" style="background-color: #1b6d85; color: white; border-bottom: 1px solid white" data-id="<%= id %>">
+            <div class="title" style="font-size: 18pt"><%= hazard_map.place_name %></div>
+            <div class="subtitle" style="font-size: 12pt; font-weight: lighter"><%= hazard_type %></div>
+        </div>
+    </div>
+</script>
+
 <script type='text/template' id='-filter-multiselect'>
     <div class="inner-panel">
         <% if(options.length > 0) { %>
@@ -392,7 +401,7 @@
 
 <script type="text/template" id="dashboard-template">
     <div class="panel-title" id="main-panel-header">
-        Flood Forecast Summary: <%= flood_name %>
+        Flood Forecast Summary: <%= name %>
     </div>
     <div class="flood-summary-info">
         <table>
