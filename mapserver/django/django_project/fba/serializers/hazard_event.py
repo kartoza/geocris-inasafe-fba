@@ -4,45 +4,30 @@ from fba.models.all import (
     HazardEvent, HazardMap, HazardType)
 
 
-class HazardEventSerializer(serializers.Serializer):
+class HazardEventSerializer(serializers.ModelSerializer):
     """
     Serializer for hazard event model.
     """
-    id = serializers.IntegerField(read_only=True)
     hazard_map = serializers.SerializerMethodField()
     hazard_type = serializers.SerializerMethodField()
 
-    def get_hazard_type(self, obj):
+    def get_hazard_type(self, obj: HazardEvent):
         try:
-            hazard_type = HazardType.objects.get(
-                id=obj.hazard_type_id
-            )
+            hazard_type = obj.hazard_type
             return hazard_type.name
         except HazardType.DoesNotExist:
             return '-'
 
-    def get_hazard_map(self, obj):
+    def get_hazard_map(self, obj: HazardEvent):
         try:
-            hazard_map = HazardMap.objects.get(
-                id=obj.flood_map_id
-            )
+            hazard_map = obj.hazard_map
             return HazardMapSerializer(hazard_map).data
         except HazardMap.DoesNotExist:
             return '-'
 
     class Meta:
         model = HazardEvent
-        fields = (
-            'id',
-            'source',
-            'notes',
-            'forecast_date',
-            'acquisition_date',
-            'link',
-            'hazard_type',
-            'trigger_status',
-            'hazard_map'
-        )
+        fields = '__all__'
 
 
 class HazardMapSerializer(serializers.ModelSerializer):
@@ -51,7 +36,4 @@ class HazardMapSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = HazardMap
-        fields = (
-            'notes',
-            'place_name'
-        )
+        fields = '__all__'

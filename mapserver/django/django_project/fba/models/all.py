@@ -3,12 +3,14 @@
 #   * Rearrange models' order
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
+#   * Remove `managed = False` lines if you wish to allow Django to create,
+#   modify, and delete the table
+# Feel free to rename the models, but don't rename db_table values or field
+# names.
 from django.contrib.gis.db import models
+
 from fba.models.base import base_model
 from fba.models.hazard_event import HazardEvent
-from fba.models.hazard_event_queue import HazardEventQueue
 
 
 class BuildingTypeClass(base_model):
@@ -30,7 +32,8 @@ class Census(base_model):
     females = models.BigIntegerField(blank=True, null=True)
     males = models.BigIntegerField(blank=True, null=True)
     unemployed = models.BigIntegerField(blank=True, null=True)
-    village = models.ForeignKey('Village', models.DO_NOTHING, unique=True, blank=True, null=True)
+    village = models.ForeignKey('Village', models.DO_NOTHING, unique=True,
+                                blank=True, null=True)
 
     class Meta:
         managed = False
@@ -43,8 +46,14 @@ class CensusKemendagri(base_model):
     no_kab = models.FloatField(blank=True, null=True)
     no_kec = models.FloatField(blank=True, null=True)
     no_kel = models.FloatField(blank=True, null=True)
-    kode_desa_field = models.CharField(db_column='kode_desa_', max_length=25, blank=True, null=True)  # Field renamed because it ended with '_'.
-    nama_prop_field = models.CharField(db_column='nama_prop_', max_length=40, blank=True, null=True)  # Field renamed because it ended with '_'.
+    kode_desa_field = models.CharField(db_column='kode_desa_', max_length=25,
+                                       blank=True,
+                                       null=True)  # Field renamed because
+    # it ended with '_'.
+    nama_prop_field = models.CharField(db_column='nama_prop_', max_length=40,
+                                       blank=True,
+                                       null=True)  # Field renamed because
+    # it ended with '_'.
     nama_kab_s = models.CharField(primary_key=True, max_length=40)
     nama_kec_s = models.CharField(max_length=40)
     nama_kel_s = models.CharField(max_length=40)
@@ -68,7 +77,9 @@ class CensusKemendagri(base_model):
     u65 = models.FloatField(blank=True, null=True)
     u70 = models.FloatField(blank=True, null=True)
     u75 = models.FloatField(blank=True, null=True)
-    p01_belum_field = models.FloatField(db_column='p01_belum_', blank=True, null=True)  # Field renamed because it ended with '_'.
+    p01_belum_field = models.FloatField(db_column='p01_belum_', blank=True,
+                                        null=True)  # Field renamed because
+    # it ended with '_'.
 
     class Meta:
         managed = False
@@ -78,7 +89,8 @@ class CensusKemendagri(base_model):
 
 class Config(base_model):
     key = models.CharField(unique=True, max_length=255, blank=True, null=True)
-    value = models.TextField(blank=True, null=True)  # This field type is a guess.
+    value = models.TextField(blank=True,
+                             null=True)  # This field type is a guess.
 
     class Meta:
         managed = False
@@ -111,7 +123,9 @@ class Country(base_model):
 class District(base_model):
     id = models.IntegerField()
     geom = models.MultiPolygonField(blank=True, null=True)
-    country = models.ForeignKey(Country, models.DO_NOTHING, db_column='country_code', blank=True, null=True)
+    country = models.ForeignKey(Country, models.DO_NOTHING,
+                                db_column='country_code', blank=True,
+                                null=True)
     prov_code = models.FloatField(blank=True, null=True)
     dc_code = models.FloatField(primary_key=True)
     name = models.CharField(max_length=254, blank=True, null=True)
@@ -124,7 +138,9 @@ class District(base_model):
 class DistrictTriggerStatus(base_model):
     id = models.AutoField(primary_key=True)
     district_id = models.FloatField(blank=True, null=True)
-    trigger_status = models.ForeignKey('TriggerStatus', models.DO_NOTHING, db_column='trigger_status', blank=True, null=True)
+    trigger_status = models.ForeignKey('TriggerStatus', models.DO_NOTHING,
+                                       db_column='trigger_status', blank=True,
+                                       null=True)
     flood_event_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -146,7 +162,9 @@ class Hazard(base_model):
 
 
 class HazardArea(base_model):
-    depth_class = models.ForeignKey('HazardClass', models.DO_NOTHING, db_column='depth_class', blank=True, null=True)
+    depth_class = models.ForeignKey('HazardClass', models.DO_NOTHING,
+                                    db_column='depth_class', blank=True,
+                                    null=True)
     geometry = models.MultiPolygonField(blank=True, null=True)
 
     class Meta:
@@ -155,8 +173,10 @@ class HazardArea(base_model):
 
 
 class HazardAreas(base_model):
-    flood_map = models.ForeignKey('HazardMap', models.DO_NOTHING, blank=True, null=True)
-    flooded_area = models.ForeignKey(HazardArea, models.DO_NOTHING, blank=True, null=True)
+    flood_map = models.ForeignKey('HazardMap', models.DO_NOTHING, blank=True,
+                                  null=True)
+    flooded_area = models.ForeignKey(HazardArea, models.DO_NOTHING,
+                                     blank=True, null=True)
 
     class Meta:
         managed = False
@@ -168,7 +188,9 @@ class HazardClass(base_model):
     min_m = models.FloatField(blank=True, null=True)
     max_m = models.FloatField(blank=True, null=True)
     label = models.CharField(max_length=255, blank=True, null=True)
-    hazard_type = models.ForeignKey('HazardType', models.DO_NOTHING, db_column='hazard_type', blank=True, null=True)
+    hazard_type = models.ForeignKey('HazardType', models.DO_NOTHING,
+                                    db_column='hazard_type', blank=True,
+                                    null=True)
 
     class Meta:
         managed = False
@@ -180,7 +202,8 @@ class HazardClass(base_model):
 
 class HazardMap(base_model):
     notes = models.CharField(max_length=255, blank=True, null=True)
-    measuring_station = models.ForeignKey('ReportingPoint', models.DO_NOTHING, blank=True, null=True)
+    measuring_station = models.ForeignKey('ReportingPoint', models.DO_NOTHING,
+                                          blank=True, null=True)
     place_name = models.CharField(max_length=255, blank=True, null=True)
     return_period = models.IntegerField(blank=True, null=True)
 
@@ -207,14 +230,18 @@ class LayerStyles(base_model):
     f_table_catalog = models.CharField(max_length=255, blank=True, null=True)
     f_table_schema = models.CharField(max_length=255, blank=True, null=True)
     f_table_name = models.CharField(max_length=255, blank=True, null=True)
-    f_geometry_column = models.CharField(max_length=255, blank=True, null=True)
+    f_geometry_column = models.CharField(max_length=255, blank=True,
+                                         null=True)
     stylename = models.CharField(max_length=30, blank=True, null=True)
-    styleqml = models.TextField(blank=True, null=True)  # This field type is a guess.
-    stylesld = models.TextField(blank=True, null=True)  # This field type is a guess.
+    styleqml = models.TextField(blank=True,
+                                null=True)  # This field type is a guess.
+    stylesld = models.TextField(blank=True,
+                                null=True)  # This field type is a guess.
     useasdefault = models.BooleanField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     owner = models.CharField(max_length=30, blank=True, null=True)
-    ui = models.TextField(blank=True, null=True)  # This field type is a guess.
+    ui = models.TextField(blank=True,
+                          null=True)  # This field type is a guess.
     update_time = models.DateTimeField(blank=True, null=True)
 
     class Meta:
@@ -242,12 +269,29 @@ class OsmBuildings(base_model):
     name = models.CharField(max_length=255, blank=True, null=True)
     leisure = models.CharField(max_length=255, blank=True, null=True)
     height = models.IntegerField(blank=True, null=True)
-    building_levels = models.CharField(db_column='building:levels', max_length=255, blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    building_height = models.IntegerField(db_column='building:height', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    building_min_level = models.IntegerField(db_column='building:min_level', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    roof_height = models.IntegerField(db_column='roof:height', blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    roof_material = models.CharField(db_column='roof:material', max_length=255, blank=True, null=True)  # Field renamed to remove unsuitable characters.
-    building_material = models.CharField(db_column='building:material', max_length=255, blank=True, null=True)  # Field renamed to remove unsuitable characters.
+    building_levels = models.CharField(db_column='building:levels',
+                                       max_length=255, blank=True,
+                                       null=True)  # Field renamed to
+    # remove unsuitable characters.
+    building_height = models.IntegerField(db_column='building:height',
+                                          blank=True,
+                                          null=True)  # Field renamed to
+    # remove unsuitable characters.
+    building_min_level = models.IntegerField(db_column='building:min_level',
+                                             blank=True,
+                                             null=True)  # Field renamed to
+    # remove unsuitable characters.
+    roof_height = models.IntegerField(db_column='roof:height', blank=True,
+                                      null=True)  # Field renamed to remove
+    # unsuitable characters.
+    roof_material = models.CharField(db_column='roof:material',
+                                     max_length=255, blank=True,
+                                     null=True)  # Field renamed to remove
+    # unsuitable characters.
+    building_material = models.CharField(db_column='building:material',
+                                         max_length=255, blank=True,
+                                         null=True)  # Field renamed to
+    # remove unsuitable characters.
     use = models.CharField(max_length=255, blank=True, null=True)
     religion = models.CharField(max_length=255, blank=True, null=True)
     type = models.CharField(max_length=255, blank=True, null=True)
@@ -262,9 +306,12 @@ class OsmBuildings(base_model):
     building_road_length = models.FloatField(blank=True, null=True)
     building_road_density_score = models.FloatField(blank=True, null=True)
     total_vulnerability = models.FloatField(blank=True, null=True)
-    village = models.ForeignKey('Village', models.DO_NOTHING, blank=True, null=True)
-    sub_district = models.ForeignKey('SubDistrict', models.DO_NOTHING, blank=True, null=True)
-    district = models.ForeignKey(District, models.DO_NOTHING, blank=True, null=True)
+    village = models.ForeignKey('Village', models.DO_NOTHING, blank=True,
+                                null=True)
+    sub_district = models.ForeignKey('SubDistrict', models.DO_NOTHING,
+                                     blank=True, null=True)
+    district = models.ForeignKey(District, models.DO_NOTHING, blank=True,
+                                 null=True)
     building_road_density = models.IntegerField(blank=True, null=True)
     building_id = models.IntegerField(blank=True, null=True)
 
@@ -282,14 +329,22 @@ class OsmRoads(base_model):
     oneway = models.SmallIntegerField(blank=True, null=True)
     z_order = models.IntegerField(blank=True, null=True)
     service = models.CharField(max_length=255, blank=True, null=True)
-    class_field = models.CharField(db_column='class', max_length=255, blank=True, null=True)  # Field renamed because it was a Python reserved word.
+    class_field = models.CharField(db_column='class', max_length=255,
+                                   blank=True,
+                                   null=True)  # Field renamed because it
+    # was a Python reserved word.
     geometry = models.LineStringField(blank=True, null=True)
     road_type = models.CharField(max_length=50, blank=True, null=True)
-    road_type_score = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    road_type_score = models.DecimalField(max_digits=65535,
+                                          decimal_places=65535, blank=True,
+                                          null=True)
     road_id = models.IntegerField(blank=True, null=True)
-    village = models.ForeignKey('Village', models.DO_NOTHING, blank=True, null=True)
-    sub_district = models.ForeignKey('SubDistrict', models.DO_NOTHING, blank=True, null=True)
-    district = models.ForeignKey(District, models.DO_NOTHING, blank=True, null=True)
+    village = models.ForeignKey('Village', models.DO_NOTHING, blank=True,
+                                null=True)
+    sub_district = models.ForeignKey('SubDistrict', models.DO_NOTHING,
+                                     blank=True, null=True)
+    district = models.ForeignKey(District, models.DO_NOTHING, blank=True,
+                                 null=True)
 
     class Meta:
         managed = False
@@ -321,7 +376,9 @@ class ProgressStatus(base_model):
 
 class ReportNotes(base_model):
     notes = models.TextField(blank=True, null=True)
-    hazard_type = models.ForeignKey(HazardType, models.DO_NOTHING, db_column='hazard_type', blank=True, null=True)
+    hazard_type = models.ForeignKey(HazardType, models.DO_NOTHING,
+                                    db_column='hazard_type', blank=True,
+                                    null=True)
     order = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -352,7 +409,8 @@ class RoadTypeClass(base_model):
 
 
 class SpreadsheetReports(base_model):
-    flood_event = models.ForeignKey(HazardEvent, models.DO_NOTHING, blank=True, null=True)
+    flood_event = models.ForeignKey(HazardEvent, models.DO_NOTHING,
+                                    blank=True, null=True)
     spreadsheet = models.BinaryField(blank=True, null=True)
 
     class Meta:
@@ -364,7 +422,8 @@ class SubDistrict(base_model):
     id = models.IntegerField()
     geom = models.MultiPolygonField(blank=True, null=True)
     prov_code = models.SmallIntegerField(blank=True, null=True)
-    district = models.ForeignKey(District, models.DO_NOTHING, db_column='dc_code', blank=True, null=True)
+    district = models.ForeignKey(District, models.DO_NOTHING,
+                                 db_column='dc_code', blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     sub_dc_code = models.FloatField(primary_key=True)
 
@@ -375,7 +434,9 @@ class SubDistrict(base_model):
 
 class SubDistrictTriggerStatus(base_model):
     sub_district_id = models.FloatField(blank=True, null=True)
-    trigger_status = models.ForeignKey('TriggerStatus', models.DO_NOTHING, db_column='trigger_status', blank=True, null=True)
+    trigger_status = models.ForeignKey('TriggerStatus', models.DO_NOTHING,
+                                       db_column='trigger_status', blank=True,
+                                       null=True)
     flood_event_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -418,7 +479,9 @@ class Village(base_model):
 
 class VillageTriggerStatus(base_model):
     village_id = models.FloatField(blank=True, null=True)
-    trigger_status = models.ForeignKey(TriggerStatus, models.DO_NOTHING, db_column='trigger_status', blank=True, null=True)
+    trigger_status = models.ForeignKey(TriggerStatus, models.DO_NOTHING,
+                                       db_column='trigger_status', blank=True,
+                                       null=True)
     flood_event_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -436,7 +499,8 @@ class WaterwayTypeClass(base_model):
 
 class WorldPop(base_model):
     rid = models.AutoField(primary_key=True)
-    rast = models.TextField(blank=True, null=True)  # This field type is a guess.
+    rast = models.TextField(blank=True,
+                            null=True)  # This field type is a guess.
     filename = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -474,7 +538,9 @@ class WorldPopSubDistrictStats(base_model):
     prov_code = models.SmallIntegerField(blank=True, null=True)
     dc_code = models.SmallIntegerField(blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
-    sub_dc_code = models.DecimalField(unique=True, max_digits=65535, decimal_places=65535, blank=True, null=True)
+    sub_dc_code = models.DecimalField(unique=True, max_digits=65535,
+                                      decimal_places=65535, blank=True,
+                                      null=True)
     pop_count = models.FloatField(blank=True, null=True)
     pop_sum = models.FloatField(blank=True, null=True)
     pop_mean = models.FloatField(blank=True, null=True)

@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models
 
-from fba.models.all import District, SubDistrict, Country
+from fba.models.all import District, SubDistrict
 from fba.models.base import base_model
 from fba.models.hazard_event import HazardEvent
 
@@ -41,21 +41,12 @@ class BaseSummaryStats(base_model):
     flood_event = models.ForeignKey(HazardEvent, models.DO_NOTHING,
                                     db_column='flood_event_id', blank=True,
                                     null=True)
-    trigger_status = models.ForeignKey('TriggerStatus', models.DO_NOTHING, db_column='trigger_status', blank=True, null=True)
+    trigger_status = models.ForeignKey('TriggerStatus', models.DO_NOTHING,
+                                       db_column='trigger_status', blank=True,
+                                       null=True)
 
     class Meta:
         abstract = True
-
-    @classmethod
-    def filter_by_event_id(cls, event_id):
-        return cls.objects.raw(f'SELECT * FROM {cls._meta.db_table} WHERE flood_event_id = %s;', [event_id])
-
-    @classmethod
-    def filter_by_event_id_and_admin_id(cls, event_id, admin_field, admin_id):
-        return cls.objects.raw(
-            f'SELECT * FROM {cls._meta.db_table} '
-            f'WHERE flood_event_id = ? '
-            f'AND {admin_field} = ?', [event_id, admin_id])
 
 
 class BaseBuildingSummaryStats(BaseSummaryStats):
@@ -103,7 +94,9 @@ class BuildingSummaryDistrictStats(BaseBuildingSummaryStats):
 
 class BuildingSummarySubDistrictStats(BaseBuildingSummaryStats):
 
-    sub_district = models.ForeignKey(SubDistrict, models.DO_NOTHING, db_column='sub_district_id', blank=True, null=True)
+    sub_district = models.ForeignKey(SubDistrict, models.DO_NOTHING,
+                                     db_column='sub_district_id', blank=True,
+                                     null=True)
 
     class Meta:
         managed = False
@@ -121,14 +114,17 @@ class BaseCensusPopulationSummaryStats(BaseSummaryStats):
 
 class CensusPopulationSummaryDistrictStats(BaseCensusPopulationSummaryStats):
 
-    district = models.ForeignKey(District, models.DO_NOTHING, db_column='district_id', blank=True, null=True)
+    district = models.ForeignKey(District, models.DO_NOTHING,
+                                 db_column='district_id', blank=True,
+                                 null=True)
 
     class Meta:
         managed = False
         db_table = 'mv_flood_event_population_district_summary'
 
 
-class CensusPopulationSummarySubDistrictStats(BaseCensusPopulationSummaryStats):
+class CensusPopulationSummarySubDistrictStats(
+        BaseCensusPopulationSummaryStats):
 
     sub_district = models.ForeignKey(SubDistrict, models.DO_NOTHING,
                                      db_column='sub_district_id', blank=True,
