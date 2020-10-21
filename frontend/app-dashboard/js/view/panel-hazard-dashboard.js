@@ -82,7 +82,7 @@ define([
                 lead_time = '-';
             }
             let event_status = 'Current';
-            if(floodCollectionView.selected_forecast.is_historical){
+            if(floodCollectionView.selected_forecast.attributes.is_historical){
                 event_status = 'Historical'
             }
             $(that.general_summary).html(general_template({
@@ -115,7 +115,8 @@ define([
             let trigger_status = $("#status").attr('data-region-trigger-status');
             let region = overall['region'];
             if (main_panel) {
-                $('.btn-back-summary-panel').hide();
+                // TODO: We can now go back from main panel
+                $('.btn-back-summary-panel').show();
                 let referer = {
                     region: 'district',
                     id: 'main',
@@ -289,6 +290,10 @@ define([
             let region_id = $button.attr('data-region-id');
             let trigger_status = $button.attr('data-region-trigger-status');
             let main = false;
+            if(region_id === ''){
+                dispatcher.trigger('flood:deselect-forecast')
+                return
+            }
             if(region_id === 'main'){
                 main = true
             }

@@ -261,6 +261,16 @@ define([
             hazard.fetchSummary().then(function (summary) {
                 dispatcher.trigger('map:draw-forecast-layer', hazard, function () {
                     dispatcher.trigger('side-panel:open-dashboard', function () {
+                        // TODO: Update me: Patch for legacy code
+                        that.fetchVillageData(that.selected_forecast.id);
+                        that.fetchSubDistrictData(that.selected_forecast.id);
+                        that.fetchDistrictData(that.selected_forecast.id);
+                        that.fetchRoadVillageData(that.selected_forecast.id);
+                        that.fetchRoadSubDistrictData(that.selected_forecast.id);
+                        that.fetchRoadDistrictData(that.selected_forecast.id);
+                        that.fetchPopulationVillageData(that.selected_forecast.id);
+                        that.fetchPopulationSubDistrictData(that.selected_forecast.id);
+                        that.fetchPopulationDistrictData(that.selected_forecast.id);
                         return summary
                     });
                 });
