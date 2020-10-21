@@ -134,7 +134,9 @@ define([
             forecast.fetchExtent()
                 .then(function (extent) {
                     // create WMS layer
+                    console.log('extent', extent)
                     let forecast_layer = forecast.leafletLayer();
+                    console.log('forecast_layer',forecast_layer)
                     // add layer to leaflet
                     if(that.forecast_layer){
                         that.removeOverlayLayer(that.forecast_layer);

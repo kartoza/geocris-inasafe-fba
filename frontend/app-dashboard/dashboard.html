@@ -376,6 +376,23 @@
 
 </body>
 
+<script type='text/template' id='hazard-list'>
+    <div>
+        <div class="container-fluid flood-count hazard-list" style="background-color: #1b6d85; color: white; border-bottom: 1px solid white" data-id="<%= id %>">
+            <div class="row" style="padding-left: 10px; padding-right: 10px;">
+                <div class="col-md-6">
+                    <div class="title" style="font-size: 2.5em"><%= hazard_map.place_name %></div>
+                </div>
+                <div class="col-md-6" style="font-size: 9pt; font-weight: lighter">
+                    <div class="subtitle" style="border-bottom: 1px solid white; margin-bottom: 3px;">Hazard type : <%= hazard_type %></div>
+                    <div class="date" style="border-bottom: 1px solid white; margin-bottom: 3px;">Forecast date : <%= new Date(forecast_date).toISOString().split('T')[0] %></div>
+                    <div class="date" style="border-bottom: 1px solid white; margin-bottom: 3px;">Acquisition date : <%= new Date(acquisition_date).toISOString().split('T')[0] %></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
 <script type='text/template' id='-filter-multiselect'>
     <div class="inner-panel">
         <% if(options.length > 0) { %>
@@ -392,7 +409,7 @@
 
 <script type="text/template" id="dashboard-template">
     <div class="panel-title" id="main-panel-header">
-        Flood Forecast Summary: <%= flood_name %>
+        Flood Forecast Summary: <%= name %>
     </div>
     <div class="flood-summary-info">
         <table>

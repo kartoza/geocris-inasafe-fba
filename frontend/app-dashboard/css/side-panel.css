@@ -480,3 +480,13 @@ form label {
 .box-content-value {
     margin-top: -5px;
 }
+
+.hazard-list:hover {
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+.recent-hazard-title {
+    font-size: 15pt;
+    margin-bottom: 10px;
+}
