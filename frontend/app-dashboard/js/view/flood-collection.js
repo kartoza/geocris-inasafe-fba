@@ -114,7 +114,7 @@ define([
             const that = this;
             that.hazards.fetch()
                 .then(function (data) {
-                    that.$flood_summary.html('');
+                    that.$flood_summary.html(`<div class="recent-hazard-title">RECENT FORECAST</div>`);
                     let hazardListTemplate = _.template($('#hazard-list').html());
                     data.forEach(function (value) {
                         that.$flood_summary.append(hazardListTemplate(value));

@@ -76,9 +76,11 @@ define([
 
             let flood_acquisition_date = new Date(floodCollectionView.selected_forecast.attributes.acquisition_date);
             let flood_forecast_date = new Date(floodCollectionView.selected_forecast.attributes.forecast_date);
-            console.log(floodCollectionView.selected_forecast.attributes)
 
             let lead_time = floodCollectionView.selected_forecast.attributes.lead_time;
+            if (typeof lead_time === 'undefined') {
+                lead_time = '-';
+            }
             let event_status = 'Current';
             if(floodCollectionView.selected_forecast.is_historical){
                 event_status = 'Historical'
