@@ -119,7 +119,7 @@ class Command(BaseCommand):
                     notes='valid_time:{validtime}'.format(
                         validtime=properties['validtime']
                     ),
-                    place_name=properties['ncstormid']
+                    place_name=properties['stormname']
                 )
 
                 # Hazard areas
