@@ -11,6 +11,7 @@ from django.contrib.gis.db import models
 
 from fba.models.base import base_model
 from fba.models.hazard_event import HazardEvent
+from fba.models.hazard_event_queue import HazardEventQueue  # noqa
 
 
 class BuildingTypeClass(base_model):
@@ -141,7 +142,7 @@ class DistrictTriggerStatus(base_model):
     trigger_status = models.ForeignKey('TriggerStatus', models.DO_NOTHING,
                                        db_column='trigger_status', blank=True,
                                        null=True)
-    flood_event_id = models.IntegerField(blank=True, null=True)
+    hazard_event_id = models.IntegerField(db_column='flood_event_id', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -173,10 +174,13 @@ class HazardArea(base_model):
 
 
 class HazardAreas(base_model):
-    flood_map = models.ForeignKey('HazardMap', models.DO_NOTHING, blank=True,
-                                  null=True)
-    flooded_area = models.ForeignKey(HazardArea, models.DO_NOTHING,
-                                     blank=True, null=True)
+    hazard_map = models.ForeignKey('HazardMap', models.DO_NOTHING,
+                                   db_column='flood_map',
+                                   blank=True,
+                                   null=True)
+    impacted_area = models.ForeignKey(HazardArea, models.DO_NOTHING,
+                                      db_column='flooded_area',
+                                      blank=True, null=True)
 
     class Meta:
         managed = False
@@ -409,8 +413,9 @@ class RoadTypeClass(base_model):
 
 
 class SpreadsheetReports(base_model):
-    flood_event = models.ForeignKey(HazardEvent, models.DO_NOTHING,
-                                    blank=True, null=True)
+    hazard_event = models.ForeignKey(HazardEvent, models.DO_NOTHING,
+                                     db_column='flood_event',
+                                     blank=True, null=True)
     spreadsheet = models.BinaryField(blank=True, null=True)
 
     class Meta:
@@ -437,7 +442,8 @@ class SubDistrictTriggerStatus(base_model):
     trigger_status = models.ForeignKey('TriggerStatus', models.DO_NOTHING,
                                        db_column='trigger_status', blank=True,
                                        null=True)
-    flood_event_id = models.IntegerField(blank=True, null=True)
+    hazard_event_id = models.IntegerField(db_column='flood_event_id',
+                                          blank=True, null=True)
 
     class Meta:
         managed = False
@@ -482,7 +488,9 @@ class VillageTriggerStatus(base_model):
     trigger_status = models.ForeignKey(TriggerStatus, models.DO_NOTHING,
                                        db_column='trigger_status', blank=True,
                                        null=True)
-    flood_event_id = models.IntegerField(blank=True, null=True)
+    hazard_event_id = models.IntegerField(
+        db_column='flood_event_id',
+        blank=True, null=True)
 
     class Meta:
         managed = False

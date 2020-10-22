@@ -41,6 +41,7 @@ define([
         },
         initialize: function () {
 
+            this.summary_collection = floodCollectionView
             panel_handlers = [
                 new BuildingSummaryPanel(this),
                 new RoadSummaryPanel(this),
@@ -200,9 +201,9 @@ define([
                         country_name: country_name,
                         name: item['name'],
                         loading_template: that.loading_template,
-                        flooded_road_count: that.loading_template,
-                        flooded_building_count: that.loading_template,
-                        flooded_population_count: that.loading_template,
+                        impacted_road_count: that.loading_template,
+                        impacted_building_count: that.loading_template,
+                        impacted_population_count: that.loading_template,
                         trigger_status: trigger_status
                     }));
                 }
@@ -226,7 +227,7 @@ define([
                     // continue if there is no data for current row
                     continue;
                 }
-                let exposed_count = item[`flooded_${exposure_name}_count`];
+                let exposed_count = item[`impacted_${exposure_name}_count`];
                 let total_score = exposed_count ? exposed_count : '-';
                 let $el = $wrapper.find(`[data-region-id=${item[id_field]}] .score.${exposure_name}`);
                 $el.html(parseFloat(total_score).numberWithCommas());
@@ -268,9 +269,9 @@ define([
                 .attr('data-region-id', that.referer_region[that.referer_region.length -1].id)
                 .attr('data-region-trigger-status', that.referer_region[that.referer_region.length -1].trigger_status);
             this.changeStatus(trigger_status);
-            dispatcher.trigger('flood:fetch-stats-data', region, region_id, false);
-            dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, false);
-            dispatcher.trigger('flood:fetch-stats-data-population', region, region_id, false);
+            dispatcher.trigger('flood:fetch-stats-data', region, region_id, false, 'building');
+            dispatcher.trigger('flood:fetch-stats-data', region, region_id, false, 'road');
+            dispatcher.trigger('flood:fetch-stats-data', region, region_id, false, 'population');
             this.fetchExtent(region_id, region);
             let forecast_id = floodCollectionView.selected_forecast.id;
             let hazard_type_slug = floodCollectionView.selected_forecast.hazardTypeSlug();
@@ -316,9 +317,9 @@ define([
                 .attr('data-region-trigger-status', referer_trigger_status);
             this.changeStatus(trigger_status);
             this.panel_handlers.map(o => o.stats_data = []);
-            dispatcher.trigger('flood:fetch-stats-data', region, region_id, main);
-            dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, main);
-            dispatcher.trigger('flood:fetch-stats-data-population', region, region_id, main);
+            dispatcher.trigger('flood:fetch-stats-data', region, region_id, main, 'building');
+            dispatcher.trigger('flood:fetch-stats-data', region, region_id, main, 'road');
+            dispatcher.trigger('flood:fetch-stats-data', region, region_id, main, 'population');
             this.fetchExtent(region_id, region);
             let forecast_id = floodCollectionView.selected_forecast.id;
             let hazard_type_slug = floodCollectionView.selected_forecast.hazardTypeSlug();

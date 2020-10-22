@@ -31,47 +31,47 @@ define([
             let graph_data = [];
             let flood_graph_data = [];
             let backgroundColours = [];
-            let total_flooded_count_key = `flooded_${exposure_name}_count`;
+            let total_impacted_count_key = `impacted_${exposure_name}_count`;
             let total_count_key = `${exposure_name}_count`;
             let unlisted_key = [
-                'id', 'flood_event_id', 'total_vulnerability_score', total_flooded_count_key, total_count_key,
+                'id', 'hazard_event_id', 'total_vulnerability_score', total_impacted_count_key, total_count_key,
                 'village_id', 'name', 'region', 'district_id', 'sub_district_id', 'sub_dc_code', 'village_code', 'dc_code',
                 'trigger_status'
             ];
             let primary_exposure_flood_data = [];
             let primary_exposure_data = [];
-            let flooded_count_key_suffix = `_flooded_${exposure_name}_count`;
+            let impacted_count_key_suffix = `_impacted_${exposure_name}_count`;
             let total_count_key_suffix = `_${exposure_name}_count`;
             let label = [];
             for (let key in data) {
                 let is_in_unlisted = unlisted_key.indexOf(key) > -1;
                 if(is_in_unlisted) { continue; }
 
-                let is_flooded_count = key.endsWith(flooded_count_key_suffix);
+                let is_impacted_count = key.endsWith(impacted_count_key_suffix);
                 let is_primary_exposure = key.indexOf(this.primary_exposure_key) > -1;
 
-                if(is_primary_exposure && is_flooded_count){
+                if(is_primary_exposure && is_impacted_count){
                     // Record primary exposure data for pie chart
                     primary_exposure_flood_data = data[key];
-                    primary_exposure_data = data[key.replace(flooded_count_key_suffix, total_count_key_suffix)];
+                    primary_exposure_data = data[key.replace(impacted_count_key_suffix, total_count_key_suffix)];
                 }
-                else if(is_flooded_count){
-                    // Record flooded data for bar chart
-                    let breakdown_key = key.replace(flooded_count_key_suffix, '');
-                    let total_count_key = key.replace(flooded_count_key_suffix, total_count_key_suffix);
+                else if(is_impacted_count){
+                    // Record impacted data for bar chart
+                    let breakdown_key = key.replace(impacted_count_key_suffix, '');
+                    let total_count_key = key.replace(impacted_count_key_suffix, total_count_key_suffix);
                     flood_graph_data.push({
                         y: breakdown_key,
                         x: data[key]
                     })
 
-                    // Figure out non flooded count
-                    let non_flooded_count = data[total_count_key] - data[key];
-                    if(isNaN(non_flooded_count)){
-                        non_flooded_count = 0;
+                    // Figure out non impacted count
+                    let non_impacted_count = data[total_count_key] - data[key];
+                    if(isNaN(non_impacted_count)){
+                        non_impacted_count = 0;
                     }
                     graph_data.push({
                         y: breakdown_key,
-                        x: non_flooded_count
+                        x: non_impacted_count
                     });
 
                     // Figure out total count
@@ -133,7 +133,7 @@ define([
             };
 
             let is_vulnerability_score_exists = data['total_vulnerability_score'] !== undefined;
-            let is_exposed_count_exists = data[total_flooded_count_key] !== undefined;
+            let is_exposed_count_exists = data[total_impacted_count_key] !== undefined;
             let $vulnerability_info = $parentWrapper.find('.vulnerability-score');
             if(is_vulnerability_score_exists){
                 let total_vulnerability_score = parseFloat(data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2) : 0);
@@ -143,7 +143,7 @@ define([
             else{
                 $vulnerability_info.parent().hide();
             }
-            $parentWrapper.find('.exposed-count').html(parseFloat(is_exposed_count_exists ? data[total_flooded_count_key] : 0).numberWithCommas());
+            $parentWrapper.find('.exposed-count').html(parseFloat(is_exposed_count_exists ? data[total_impacted_count_key] : 0).numberWithCommas());
 
             this.renderChartData(datasets, ctx, this.primary_exposure_label, datasetsPrimaryExposure, ctxPrimaryExposure, this.other_category_exposure_label);
         },

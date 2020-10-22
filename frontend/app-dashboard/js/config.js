@@ -74,7 +74,7 @@ require([
     'utils',
     'js/view/map.js',
     'js/request.js',
-    'js/view/flood-collection.js',
+    'js/view/summary-collection.js',
     'js/model/hazard_type.js',
 ], function ($, bootstrap, Backbone, _, moment, L, LDraw, AirDatepicker, AirDatepickerEN, utils, Map, RequestView, FloodCollectionView, HazardTypeCollection) {
     AppRequest = new RequestView();

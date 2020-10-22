@@ -19,7 +19,7 @@ class TestGenerateMultipleHazard(test.LiveServerTestCase):
         areas: HazardAreas
         for event in events:
             for areas in event.hazard_map.hazardareas_set.all():
-                area = areas.flooded_area
+                area = areas.impacted_area
                 areas.delete()
                 area.delete()
 
@@ -45,7 +45,7 @@ class TestGenerateMultipleHazard(test.LiveServerTestCase):
 
         # Create new hazard area
         area: HazardArea
-        for area in [a.flooded_area for a in hazard_areas.all()]:
+        for area in [a.impacted_area for a in hazard_areas.all()]:
             area = HazardArea.objects.create(
                 depth_class=area.depth_class,
                 geometry=area.geometry
