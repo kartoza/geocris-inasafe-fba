@@ -1,8 +1,9 @@
 define([
     'backbone',
     'jquery',
-    'utils'
-], function (Backbone, $, utils) {
+    'utils',
+    'js/model/overall_summary.js'
+], function (Backbone, $, utils, OverallSummaryCollection) {
 
     return Backbone.View.extend({
         _panel_key: 'generic',
@@ -10,8 +11,11 @@ define([
         primary_exposure_key: 'residential',
         primary_exposure_label: `Residential ${this._panel_key}`,
         other_category_exposure_label: `Other ${this._panel_key}`,
-        initialize: function(panel_dashboard){
-            this.panel_dashboard = panel_dashboard;
+
+        initialize: function (panel_dashboard){
+            this.collection = new OverallSummaryCollection()
+            this.panel_dashboard = panel_dashboard
+            dispatcher.on('summary-panel:fetch-summary', this.fetchSummary, this)
         },
         reset: function(){
             this.stats_data = []
@@ -214,5 +218,8 @@ define([
                 }
             });
         },
+        render: function (){
+            this.renderChartElement(this.stats_data, this._panel_key)
+        }
     });
 });

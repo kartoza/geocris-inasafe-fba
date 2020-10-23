@@ -28,6 +28,9 @@ define([
             else if(this.admin_level){
                 urlString = `${urlString}summary-stats/${this.admin_level}/`
             }
+            else {
+                urlString = `${urlString}summary-stats/all`
+            }
             return urlString;
         }
     });

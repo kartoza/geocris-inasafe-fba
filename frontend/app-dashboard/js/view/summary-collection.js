@@ -219,18 +219,9 @@ define([
             }
         },
         selectHazard: function (hazard) {
-            const that = this;
             this.selected_forecast = hazard;
-            let callback = () => {
-                dispatcher.trigger('map:draw-forecast-layer', hazard, function () {
-                    dispatcher.trigger('side-panel:open-dashboard', function () {
-                        that.fetchStatisticData('district', null, true, 'population')
-                        that.fetchStatisticData('district', null, true, 'building')
-                        that.fetchStatisticData('district', null, true, 'road')
-                    });
-                });
-            }
-            this.fetchDistrictData(hazard.id, null, callback)
+            dispatcher.trigger('map:draw-forecast-layer', hazard)
+            dispatcher.trigger('side-panel:open-dashboard')
         },
         fetchHistoricalForecastCollection: function(forecast_date_range_start, forecast_date_range_end){
             const today = moment().momentDateOnly().utc();

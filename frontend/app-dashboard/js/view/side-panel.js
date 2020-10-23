@@ -4,7 +4,7 @@ define([
     'jquery',
     'jqueryUi',
     'js/view/layers/upload-flood.js',
-    'js/view/panel-hazard-dashboard.js',
+    'js/view/panels/hazard-dashboard-panel.js',
 ], function (Backbone, _, $, JqueryUi, FloodUploadView, DashboardView) {
     return Backbone.View.extend({
         el: "#side-panel",
@@ -87,7 +87,7 @@ define([
             $wrapper.parent().show("slide", { direction: "right" }, 400);
         },
         openDashboard: function (callback) {
-            this.dashboard.render(callback);
+            this.dashboard.selectHazard(floodCollectionView.selected_forecast)
             $('.panel-body-wrapper').not('.floating-panel').hide();
             $('#panel-dashboard').show("slide", { direction: "right" }, 400);
         },
