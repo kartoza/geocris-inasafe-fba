@@ -287,6 +287,10 @@ define([
             else{
                 this.$chart_score_panel.hide()
             }
+            // render map
+            dispatcher.trigger('map:show-exposed-roads', this.current_hazard.id, this.current_hazard.hazardTypeSlug(), this.current_region, this.current_region_id);
+            dispatcher.trigger('map:show-region-boundary', this.current_region, this.current_region_id);
+            dispatcher.trigger('map:show-exposed-buildings', this.current_hazard.id, this.current_hazard.hazardTypeSlug(), this.current_region, this.current_region_id);
         }
     })
 })
