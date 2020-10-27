@@ -1,8 +1,17 @@
+:root {
+    /* CSS HEX */
+    --light-cyan: #d1faffff;
+    --indian-red: #db5461ff;
+    --cerulean-frost: #6a8eaeff;
+    --forest-green-crayola: #57a773ff;
+    --dark-spring-green: #157145ff;
+}
+
 html, body {
     margin: 0;
     height: 100%;
     width: 100%;
-    font-family: Ubuntu, SansSerif;
+    font-family: Roboto, Ubuntu, SansSerif;
 }
 
 body {
