@@ -157,7 +157,7 @@ form label {
 .trigger-status-0 {
     /* no activation */
     color: black;
-    background-color: #72CA7A !important;
+    background-color: var(--cerulean-frost) !important;
 }
 
 .trigger-status-1 {
@@ -235,7 +235,7 @@ form label {
 }
 
 #status {
-    height: 73px;
+    height: 60px;
     vertical-align: middle;
     text-align: center;
     font-weight: bold;
@@ -265,18 +265,17 @@ form label {
 }
 
 .box-vulnerability, .box-summary-count, .box-exposed {
-    height: 70px;
-    border: 2px solid #CA6060;
+    height: 80px;
+    border: 2px solid var(--indian-red);
     margin-top: 10px;
     text-align: center;
-    width: 48%;
-    padding: 0;
+    padding: 5px;
     border-radius: 3px;
 }
 
 .box-count {
     height: 70px;
-    border: 2px solid #CA6060;
+    border: 2px solid var(--indian-red);
     text-align: center;
     padding: 0;
     width: 100%;
@@ -351,18 +350,27 @@ form label {
     height: 60px;
 }
 
-.flood-summary-info table, #region-summary-panel table {
-    width: 100%;
+
+.flood-summary-info td {
+    /* These are technically the same, but use both */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    -ms-word-break: break-all;
+    /* This is the dangerous one in WebKit, as it breaks things wherever */
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;
+
+    /* Adds a hyphen where the word breaks, if supported (No Blink) */
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
 }
 
-.flood-summary-info tr, .flood-summary-info td {
-    padding: 3px 10px;
-    border: 1px solid #dddddd;
-    border-collapse: collapse;
-}
-
-.flood-summary-info tr:nth-child(odd), #region-summary-panel tr:nth-child(4n+1), #region-summary-panel tr:nth-child(4n+2) {
-    background: #F0F0F0;
+.flood-summary-info {
+    padding: 10px 24px 0 25px;
 }
 
 .item-header {

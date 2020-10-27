@@ -55,18 +55,18 @@
 					-->
                 </div>
                 <div class="panel-body">
-                    <div class="row Infographics">
-                        <div class="col-lg-2 landing-page-icon">
-                            <img src="images/download-icon.svg">
-                        </div>
-                        <div class="col-lg-10 text-justify">
-                            <span>
-								Click the download button on the top right of
-								the hazard forecast summary to download the hazard
-								impact forecast report.
-                            </span>
-                        </div>
-                    </div>
+<!--                    <div class="row Infographics">-->
+<!--                        <div class="col-lg-2 landing-page-icon">-->
+<!--                            <img src="images/download-icon.svg">-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-10 text-justify">-->
+<!--                            <span>-->
+<!--								Click the download button on the top right of-->
+<!--								the hazard forecast summary to download the hazard-->
+<!--								impact forecast report.-->
+<!--                            </span>-->
+<!--                        </div>-->
+<!--                    </div>-->
 <!--                    <div class="row Infographics">-->
 <!--                        <div class="col-lg-2 landing-page-icon">-->
 <!--                            <img src="images/add-flood.svg">-->
@@ -250,16 +250,19 @@
                 </div>
             </div>
             <div id="panel-dashboard" style="display: none">
-                <div id="status">
+                <div id="status" class="trigger-status-0">
                     <div class="col-lg-2">
                         <button class="btn btn-arrow-white btn-back-summary-panel" data-region="" data-region-id="" style="display: none"><i class="fa fa-chevron-circle-left" aria-hidden="true"></i></button></div>
                     <div class="col-lg-8">
                         <div class="status-wrapper">
-                            <div>Trigger Status:</div>
-                            <div id="action-status">-</div>
+                            <h4 id="action-status">Summary</h4>
                         </div>
                     </div>
-                    <div class="col-lg-2"><button class="btn btn-arrow-white pull-right download-spreadsheet" style="margin: 7px 0 !important;"><img src="images/download-icon-white.svg" style="height: 23px"><i class="fa fa-spinner fa-spin fa-fw download-spreadsheet-loading"></i></button></div>
+                    <div class="col-lg-2">
+                        <button class="btn btn-arrow-white pull-right download-spreadsheet" style="margin: 7px 0 !important;" data-toggle="tooltip" data-placement="bottom" title="Download the hazard impact forecast report">
+                            <img src="images/download-icon-white.svg" style="height: 23px"><i class="fa fa-spinner fa-spin fa-fw download-spreadsheet-loading"></i>
+                        </button>
+                    </div>
                 </div>
                 <div id="flood-general-summary"></div>
                 <div id="flood-sub-summary"></div>
@@ -378,10 +381,10 @@
 
 <script type='text/template' id='hazard-list'>
     <div>
-        <div class="container-fluid flood-count hazard-list" style="background-color: #1b6d85; color: white; border-bottom: 1px solid white" data-id="<%= id %>">
+        <div class="container-fluid flood-count hazard-list" style="background-color: var(--cerulean-frost); color: white; border-bottom: 1px solid white" data-id="<%= id %>">
             <div class="row" style="padding-left: 10px; padding-right: 10px;">
                 <div class="col-md-6">
-                    <div class="title" style="font-size: 2.5em"><%= hazard_map.place_name %></div>
+                    <div class="title" style="font-size: 1.5em; text-align: left"><%= hazard_map.place_name %></div>
                 </div>
                 <div class="col-md-6" style="font-size: 9pt; font-weight: lighter">
                     <div class="subtitle" style="border-bottom: 1px solid white; margin-bottom: 3px;">Hazard type : <%= hazard_type %></div>
@@ -408,16 +411,13 @@
 </script>
 
 <script type="text/template" id="dashboard-template">
-    <div class="panel-title" id="main-panel-header">
-        Summary for: <%= hazard_type %> <%= notes %>
-    </div>
     <div class="flood-summary-info">
-        <table>
+       <table class="table table-striped">
             <tr>
-                <td>
+                <td style="width: 30%">
                     Event Date
                 </td>
-                <td>
+                <td style="width: 70%">
                     <%= forecast_date %>
                 </td>
             </tr>
@@ -426,7 +426,7 @@
                     Source
                 </td>
                 <td>
-                    <%= source %>
+                    <% if ( source.startsWith('http') ) { %> <a target="_blank" href="<%= source %>"><%= source %> </a> <% } else { %> <%= source %> <% } %>
                 </td>
             </tr>
             <tr>
@@ -442,7 +442,7 @@
                     Link
                 </td>
                 <td>
-                    <%= link %>
+                    <% if ( link.startsWith('http') ) { %> <a target="_blank" href="<%= link %>"><%= link %> </a> <% } else { %> <%= link %> <% } %>
                 </td>
             </tr>
             <tr>
@@ -477,13 +477,7 @@
         </div>
         <div class="tab-wrapper tab-building">
             <div class="col-lg-12">
-                <div class="col-lg-5 box-vulnerability box-wrapper">
-                    <div class="box-content">
-                        <div class="vulnerability-score box-content-value">-</div>
-                        <div class="subtext">Vulnerability Score Total</div>
-                    </div>
-                </div>
-                <div class="col-lg-5 box-exposed box-wrapper">
+                <div class="col-lg-12 box-exposed box-wrapper">
                     <div class="box-content">
                         <div class="exposed-count box-content-value">-</div>
                         <div class="subtext">Potentially affected buildings</div>
@@ -494,7 +488,7 @@
                 <canvas class="summary-chart-primary" style="height: 250px"></canvas>
             </div>
             <div class="col-lg-12 panel-chart" style="min-height: 350px">
-                <canvas class="summary-chart" style="height: 350px"></canvas>
+                <canvas class="summary-chart" style="height: 350px; width: 100%"></canvas>
             </div>
         </div>
         <div class="tab-wrapper tab-road" style="display: none">

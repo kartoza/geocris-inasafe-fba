@@ -15,6 +15,7 @@ define([
         template: _.template($('#dashboard-template').html()),
         loading_template: '<i class="fa fa-spinner fa-spin fa-fw"></i>',
         general_summary: '#flood-general-summary',
+        status_wrapper: '#action-status',
         el: '#panel-dashboard',
         events: {
             'click .drilldown': 'drilldown',
@@ -66,6 +67,10 @@ define([
             let that = this;
             let $action = $(that.status_wrapper);
             $action.html(that.loading_template);
+
+            // Show back button
+            $('.btn-back-summary-panel').show();
+
             let flood_acquisition_date = new Date(floodCollectionView.selected_forecast.attributes.acquisition_date);
             let flood_forecast_date = new Date(floodCollectionView.selected_forecast.attributes.forecast_date);
 
@@ -91,7 +96,56 @@ define([
                     event_status: event_status
                 })
             )
+
+            // Panel header
+            $action.html(`Summary for ${attrs.hazard_map.place_name}`);
+
             // render charts
-        }
+        },
+        backPanelDrilldown: function (e) {
+            let that = this;
+            this.referer_region.pop();
+
+            let $button = $(e.target).closest('.btn-back-summary-panel');
+            let region = $button.attr('data-region');
+            let region_id = $button.attr('data-region-id');
+            let trigger_status = $button.attr('data-region-trigger-status');
+            let main = false;
+            if(region_id === ''){
+                dispatcher.trigger('flood:deselect-forecast')
+                return
+            }
+            if(region_id === 'main'){
+                main = true
+            }
+
+            let referer_region = '';
+            let referer_region_id = '';
+            let referer_trigger_status = 0;
+            try {
+                this.referer_region.pop();
+                referer_region = that.referer_region[that.referer_region.length - 1].region;
+                referer_region_id = that.referer_region[that.referer_region.length - 1].id;
+                referer_trigger_status = that.referer_region[that.referer_region.length - 1].trigger_status;
+            }catch (err){
+
+            }
+
+            $('.btn-back-summary-panel')
+                .attr('data-region', referer_region)
+                .attr('data-region-id', referer_region_id)
+                .attr('data-region-trigger-status', referer_trigger_status);
+            this.changeStatus(trigger_status);
+            this.panel_handlers.map(o => o.stats_data = []);
+            dispatcher.trigger('flood:fetch-stats-data', region, region_id, main, 'building');
+            dispatcher.trigger('flood:fetch-stats-data', region, region_id, main, 'road');
+            dispatcher.trigger('flood:fetch-stats-data', region, region_id, main, 'population');
+            this.fetchExtent(region_id, region);
+            let forecast_id = floodCollectionView.selected_forecast.id;
+            let hazard_type_slug = floodCollectionView.selected_forecast.hazardTypeSlug();
+            dispatcher.trigger('map:show-exposed-roads', forecast_id, hazard_type_slug, region, region_id);
+            dispatcher.trigger('map:show-region-boundary', region, region_id);
+            dispatcher.trigger('map:show-exposed-buildings', forecast_id, hazard_type_slug, region, region_id);
+        },
     })
 })
