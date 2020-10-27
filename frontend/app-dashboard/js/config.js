@@ -80,6 +80,9 @@ require([
     AppRequest = new RequestView();
     dispatcher = _.extend({}, Backbone.Events);
 
+    // Initialize all tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
     // we get the hazardTypeCollection
     hazardTypeCollection = new HazardTypeCollection()
     hazardTypeCollection.fetch().then(function (data) {
