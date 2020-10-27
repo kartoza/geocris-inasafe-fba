@@ -10,7 +10,7 @@ define([
     'leafletAwesomeIcon'
 ], function (Backbone, $, Basemap, Layers, SidePanelView, IntroView, DepthClassCollection, LeafletWMSLegend, leafletAwesomeIcon) {
     return Backbone.View.extend({
-        defaultZoom: 11,
+        defaultZoom: 5,
         wmsExposedBuildingsLegendURI: function (hazard_type) {
             return `${geoserverUrl}?${$.param({
                 SERVICE: 'WMS',
@@ -86,17 +86,23 @@ define([
         },
         fetchBounds: function(){
             let that=this;
-            AppRequest.get(
-                `${postgresUrl}rpc/kartoza_fba_global_extent`,
-                null,
-                {
-                    Accept: 'application/vnd.pgrst.object+json'
-                }
-            ).then(function (extent) {
-                // lat lon format
-                that.initBounds = [[extent.y_min, extent.x_min], [extent.y_max, extent.x_max]];
-                that.map.fitBounds(that.initBounds);
-            });
+            if(defaultInitialMapBounds.length === 0){
+                AppRequest.get(
+                    `${postgresUrl}rpc/kartoza_fba_global_extent`,
+                    null,
+                    {
+                        Accept: 'application/vnd.pgrst.object+json'
+                    }
+                ).then(function (extent) {
+                    // lat lon format
+                    that.initBounds = [[extent.y_min, extent.x_min], [extent.y_max, extent.x_max]];
+                    that.map.fitBounds(that.initBounds);
+                });
+            }
+            else {
+                this.initBounds = defaultInitialMapBounds
+                this.map.fitBounds(defaultInitialMapBounds)
+            }
         },
         addOverlayLayer: function(layer, name){
             this.layer_control.addOverlay(layer, name);
@@ -113,7 +119,6 @@ define([
             }
             dispatcher.trigger('map:redraw');
             this.map.fitBounds(this.initBounds);
-            this.map.setZoom(this.defaultZoom);
             if(resetView) {
                 dispatcher.trigger('side-panel:open-welcome')
             }

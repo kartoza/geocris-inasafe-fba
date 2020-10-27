@@ -2,8 +2,10 @@ define([
     'backbone',
     'jquery',
     'utils',
+    'chartjs',
+    'chartPluginLabel',
     'js/model/overall_summary.js'
-], function (Backbone, $, utils, OverallSummaryCollection) {
+], function (Backbone, $, utils, Chart, ChartJsPlugin, OverallSummaryCollection) {
 
     return Backbone.View.extend({
         _panel_key: 'generic',
@@ -12,10 +14,10 @@ define([
         primary_exposure_label: `Residential ${this._panel_key}`,
         other_category_exposure_label: `Other ${this._panel_key}`,
 
-        initialize: function (panel_dashboard){
+        initialize: function (opt){
             this.collection = new OverallSummaryCollection()
-            this.panel_dashboard = panel_dashboard
-            dispatcher.on('summary-panel:fetch-summary', this.fetchSummary, this)
+            this.panel_dashboard = opt.panel_dashboard
+            dispatcher.on(this.panel_dashboard.published_events.region_change, this.fetchSummary, this)
         },
         reset: function(){
             this.stats_data = []
@@ -23,9 +25,17 @@ define([
         panelKey: function(){
             return this._panel_key;
         },
+        show_loading: function (){
+            // TODO: should swap with loading image here
+        },
         renderChartElement: function (data, exposure_name) {
             exposure_name = exposure_name ? exposure_name : this.panelKey();
             let $parentWrapper = $(`#chart-score-panel .tab-${exposure_name}`);
+            if(!this.stats_data){
+                // if we have no data, hide the panel.
+                $parentWrapper.hide()
+                return
+            }
             $parentWrapper.find('.summary-chart').remove();
             $parentWrapper.find('.panel-chart').html('<canvas class="summary-chart" style="height: 250px"></canvas>');
             $parentWrapper.find('.summary-chart-primary').remove();

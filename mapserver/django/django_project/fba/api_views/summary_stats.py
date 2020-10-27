@@ -29,7 +29,8 @@ class SummaryStatsAPI(generics.ListAPIView):
         # Attempt to fetch roads stats
         # Attempt to fetch population stats
         id = kwargs.get('id')
-        admin_level = kwargs.get('admin_level', '').replace('-', '_')
+        admin_level = kwargs.get('admin_level', 'district').replace('-', '_')
+        admin_id = kwargs.get('admin_id')
         # not actually used but a REST API convention
         parent_admin_level = kwargs.get('parent_admin_level', '').replace(
             '-', '_')
@@ -110,6 +111,15 @@ class SummaryStatsAPI(generics.ListAPIView):
         parent_level_info = parent_level[admin_level]
         parent_field = parent_level_info['parent_field']
         parent_name_field = parent_level_info['parent_name_field']
+
+        # further filter by admin_id
+        if admin_id:
+            admin_id_scope_filter = {
+                admin_id_field: admin_id
+            }
+            building_stats = building_stats.filter(**admin_id_scope_filter)
+            road_stats = road_stats.filter(**admin_id_scope_filter)
+            population_stats = population_stats.filter(**admin_id_scope_filter)
 
         # further filter by parent id
         if parent_admin_id:

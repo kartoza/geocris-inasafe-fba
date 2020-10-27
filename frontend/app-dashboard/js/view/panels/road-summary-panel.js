@@ -14,10 +14,14 @@ define([
             let that = this
             let hazard_id = this.panel_dashboard.current_hazard.id
             let current_region = this.panel_dashboard.current_region
+            this.show_loading()
             this.collection.admin_level = current_region
             this.collection.id = hazard_id
             this.collection.fetch().then((data) => {
-                that.stats_data = data.road_stats
+                // should only have at least one valid data
+                if(data && data[0]) {
+                    that.stats_data = data[0].census_population_stats
+                }
                 that.render()
             })
         }

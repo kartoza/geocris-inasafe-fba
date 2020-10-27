@@ -214,7 +214,6 @@ define([
             if(predefined_event){
                 that.fetchForecast(predefined_event.forecast_date, predefined_event.id)
             }
-        },
         updateDatePicker: function(){
             if(this.datepicker_browse){
                 this.datepicker_browse.update();

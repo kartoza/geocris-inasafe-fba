@@ -16,6 +16,9 @@ urlpatterns = [
     path('hazard-event/<id>/summary-stats/<admin_level>/',
          SummaryStatsAPI.as_view(),
          name='hazard-event-summary-stats-api'),
+    path('hazard-event/<id>/summary-stats/<admin_level>/<admin_id>',
+         SummaryStatsAPI.as_view(),
+         name='hazard-event-summary-stats-single-region-api'),
     path('hazard-event/<id>/summary-stats/'
          '<parent_admin_level>/<parent_admin_id>/<admin_level>/',
          SummaryStatsAPI.as_view(),
