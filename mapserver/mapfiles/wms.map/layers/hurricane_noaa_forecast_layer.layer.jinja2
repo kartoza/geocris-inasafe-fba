@@ -12,34 +12,18 @@
             row_number() OVER () AS gid,
             hazard_event.id as id,
             geometry,
-            depth_class
+            depth_class,
+            hazard_class.label as hazard_class
             from hazard_event
             inner join hazard_map on hazard_event.flood_map_id = hazard_map.id
             inner join hazard_areas on hazard_map.id = hazard_areas.flood_map_id
-            inner join hazard_area on hazard_areas.flooded_area_id = hazard_area.id) as subquery
+            inner join hazard_area on hazard_areas.flooded_area_id = hazard_area.id
+            inner join hazard_class on hazard_area.depth_class = hazard_class.id) as subquery
          using unique gid using srid=4326"
 
 		CLASS
-			NAME "PTC"
-			EXPRESSION ([depth_class] == 83)
-			STYLE
-				OPACITY 30.0
-				COLOR "#fbfbfb"
-			END
-		END
-
-		CLASS
-			NAME "Subtropical Storm"
-			EXPRESSION ([depth_class] == 84)
-			STYLE
-				OPACITY 30.0
-				COLOR "#fda7a7"
-			END
-		END
-
-		CLASS
-			NAME "Subtropical Depression"
-			EXPRESSION ([depth_class] == 85)
+			NAME "Hurricane (NOAA)"
+			EXPRESSION ([depth_class] >= 83)
 			STYLE
 				OPACITY 30.0
 				COLOR "#ff0000"
