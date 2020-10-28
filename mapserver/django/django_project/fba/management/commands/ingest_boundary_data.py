@@ -57,7 +57,7 @@ class Command(BaseCommand, BoundaryCSWConnectionMixin):
             r'^(?P<schema>.*)_bnd_adm(?P<adm_level>\d+)'
             r'_(?P<is_population>(pop_)?)polygon$')
 
-        for schema_name in schema_names:
+        for schema_name in sorted(schema_names):
             table_names = self.get_all_tables(conn, schema_name)
             table_names = sorted(table_names)
             table_names = [t for t in table_names if layer_pattern.match(t)]
@@ -114,17 +114,24 @@ class Command(BaseCommand, BoundaryCSWConnectionMixin):
                 }
 
                 # Table exists, get name, pop and geometry
+                print(f'Table name {table_name}')
                 for row in rows:
                     target_table_name = target_table_mapping[adm_level]
                     geometry = None
-                    if 'name' in header:
-                        name = row[header.index('name')]
+                    if f'adm{adm_level}' in header:
+                        name = row[header.index(f'adm{adm_level}')]
                     elif f'name_{adm_level}' in header:
                         name = row[header.index(f'name_{adm_level}')]
+                    elif 'name' in header:
+                        name = row[header.index('name')]
                     elif 'parish' in header:
                         name = row[header.index('parish')]
+                    elif 'loc_name' in header:
+                        name = row[header.index('loc_name')]
                     elif 'comm_name' in header:
                         name = row[header.index('comm_name')]
+                    elif 'identifica' in header:
+                        name = row[header.index('identifica')]
                     else:
                         if 'district' in header:
                             name = row[header.index('district')]
@@ -151,7 +158,7 @@ class Command(BaseCommand, BoundaryCSWConnectionMixin):
 
                     # if it has geometry, update admin boundary tables
                     if geometry:
-                        geojson = geometry.geojson
+                        geojson = geometry.geojson if hasattr(geometry, 'geojson') else geometry
                         geom = GEOSGeometry(str(geojson))
 
                         if not geom.ogr.geom_type == 'MultiPolygon':
