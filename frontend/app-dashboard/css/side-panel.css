@@ -235,12 +235,12 @@ form label {
 }
 
 #status {
-    height: 60px;
+    height: 70px;
     vertical-align: middle;
     text-align: center;
     font-weight: bold;
     color: white;
-    padding-top: 6px;
+    padding-top: 15px;
 }
 
 .status-wrapper {
@@ -255,13 +255,16 @@ form label {
 }
 
 .panel-title {
-    font-weight: normal !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6c757d;
     padding-top: 10px;
 }
 
 #panel-dashboard .panel-title {
     font-weight: normal !important;
-    font-size: 11pt;
+    font-size: 1.2em;
+    color: #495057;
 }
 
 .box-vulnerability, .box-summary-count, .box-exposed {
@@ -275,11 +278,10 @@ form label {
 
 .box-count {
     height: 70px;
-    border: 2px solid var(--indian-red);
-    text-align: center;
     padding: 0;
     width: 100%;
     border-radius: 3px;
+    color: #495057;
 }
 
 .box-count-left {
@@ -313,7 +315,6 @@ form label {
 }
 
 .subtext {
-    margin-top: -5px;
     font-size: 10px;
 }
 
@@ -497,4 +498,52 @@ form label {
 .recent-hazard-title {
     font-size: 15pt;
     margin-bottom: 10px;
+}
+
+.region-summary-panel-card {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.region-summary-panel-card .card-header {
+    text-align: center;
+}
+
+.card-header-title {
+    font-size: 1.3rem !important;
+    color: rgba(13,27,62,0.7)
+}
+
+.card-header-subtitle {
+    font-size: 1rem !important;
+    color: rgba(19, 30, 60, 0.7)
+}
+
+.card-header-next-btn {
+    position: absolute;
+    right: 0;
+    padding-top: 10px;
+    padding-right: 10px;
+}
+
+.region-summary-panel-card-content {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.card-shadow {
+    box-shadow: 0 0.46875rem 2.1875rem rgba(63,106,216,0.03), 0 0.9375rem 1.40625rem rgba(63,106,216,0.03), 0 0.25rem 0.53125rem rgba(63,106,216,0.05), 0 0.125rem 0.1875rem rgba(63,106,216,0.03);
+}
+
+#action-status {
+    font-weight: 300;
+}
+
+.region-summary-panel-card .box-icon {
+    font-size: 15pt;
+    color: #b3b3b3;
+}
+
+.summary-chart-primary {
+    max-height: 200px;
 }
