@@ -2,6 +2,7 @@ import re
 
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.management.base import BaseCommand
+from django.db import connections
 from osgeo import ogr
 
 from fba.management.commands.utils.csw_connection_mixin import \
@@ -48,6 +49,10 @@ class Command(BaseCommand, BoundaryCSWConnectionMixin):
             return ModelClass.objects.order_by('-id').first().id + 1
         except:
             return 1
+
+    def assign_admin_hierarchy(self):
+        with connections['backend'].cursor() as cursor:
+            cursor.execute('select kartoza_fba_assign_admin_hierarchy()')
 
     def handle(self, *args, **options):
         conn = self.create_connection()
@@ -229,3 +234,5 @@ class Command(BaseCommand, BoundaryCSWConnectionMixin):
                         }
                         census_entry, created = Census.objects.update_or_create(
                             **data)
+
+        self.assign_admin_hierarchy()

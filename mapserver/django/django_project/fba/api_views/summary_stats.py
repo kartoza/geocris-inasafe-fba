@@ -154,7 +154,7 @@ class SummaryStatsAPI(generics.ListAPIView):
             default_stat = pop_stat or building_stat or road_stat
 
             # Pull out basic metadata
-            result['name'] = getattr(pop_stat, admin_level).name
+            result['name'] = getattr(default_stat, admin_level).name
             parent_administrative = parent_level_info['parent'](default_stat)
             parent_administrative_id = parent_level_info['parent_field_id'](default_stat)
             result[parent_field] = parent_administrative_id

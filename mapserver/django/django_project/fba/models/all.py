@@ -110,6 +110,16 @@ class AdminBoundaryGlobalKeyMapping(base_model):
         db_table = 'admin_boundary_global_key_mapping'
 
 
+class BuildingGlobalKeyMapping(base_model):
+    id = models.BigAutoField(primary_key=True)
+    id_mapping = models.BigIntegerField()
+    key = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'building_global_key_mapping'
+
+
 class Country(base_model):
     id = models.IntegerField()
     geom = models.MultiPolygonField(blank=True, null=True)
@@ -175,11 +185,11 @@ class HazardArea(base_model):
 
 class HazardAreas(base_model):
     hazard_map = models.ForeignKey('HazardMap', models.DO_NOTHING,
-                                   db_column='flood_map',
+                                   db_column='flood_map_id',
                                    blank=True,
                                    null=True)
     impacted_area = models.ForeignKey(HazardArea, models.DO_NOTHING,
-                                      db_column='flooded_area',
+                                      db_column='flooded_area_id',
                                       blank=True, null=True)
 
     class Meta:

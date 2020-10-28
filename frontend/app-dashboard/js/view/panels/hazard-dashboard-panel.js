@@ -66,8 +66,8 @@ define([
             // load hazard data
             this.current_hazard = hazard
             this.render()
-            dispatcher.trigger(this.published_events.hazard_selected)
-            dispatcher.trigger(this.published_events.region_change)
+            dispatcher.trigger(this.published_events.hazard_selected, this)
+            dispatcher.trigger(this.published_events.region_change, this)
         },
         resetDashboard: function () {
             this.referer_region = [];
@@ -82,7 +82,7 @@ define([
                 '        No data available.' +
                 '    </div>');
             $('#status').removeClass().addClass('trigger-status-none');
-            dispatcher.trigger(this.published_events.reset)
+            dispatcher.trigger(this.published_events.reset, this)
         },
         hideDashboard: function () {
             this.referer_region = [];
@@ -95,7 +95,7 @@ define([
             let datepicker_data = $datepicker.data('datepicker');
             datepicker_data.clear();
             $('#panel-dashboard').hide();
-            dispatcher.trigger(this.published_events.hide)
+            dispatcher.trigger(this.published_events.hide, this)
         },
         switchTab: function (e) {
             let $div = $(e.target).closest('.tab-title');
@@ -231,7 +231,7 @@ define([
             this.render()
             dispatcher.trigger(this.published_events.region_change)
             // trigger map change
-            this.fetchExtent(new_admin_level, new_admin_id)
+            this.fetchExtent(this.current_region, this.current_region_id)
         },
         render: function (){
             // TODO: should also render JS route in the browser navbar URL

@@ -333,6 +333,14 @@ define([
                 return;
             }
 
+            id_field_key = {
+                country: 'country_code',
+                district: 'dc_code',
+                sub_district: 'sub_dc_code'
+            }
+
+            id_field = id_field_key[region]
+
             this.region_layer = L.tileLayer.wms(
                 geoserverUrl,
                 {
@@ -341,7 +349,7 @@ define([
                     transparent: true,
                     srs: 'EPSG:4326',
                     tiled: true,
-                    filter: toXmlAndFilter({id_code: region_id})
+                    filter: toXmlAndFilter({[id_field]: region_id})
                 });
             this.region_layer.setZIndex(20);
             this.addOverlayLayer(this.region_layer, 'Administrative Boundary');

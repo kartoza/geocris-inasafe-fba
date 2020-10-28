@@ -5,7 +5,16 @@ from owslib.csw import CatalogueServiceWeb, CswRecord
 from owslib.fes import PropertyIsLike
 
 
-class BoundaryCSWConnectionMixin:
+class CSWConnectionMixin:
+
+    def schema_filter(self):
+        raise NotImplementedError()
+
+    def table_filter(self):
+        raise NotImplementedError()
+
+    def datasource_filter(self):
+        raise NotImplementedError()
 
     def create_connection(self):
         csw = CatalogueServiceWeb('https://geocris2.cdema.org/catalog/')
@@ -23,8 +32,7 @@ class BoundaryCSWConnectionMixin:
         return response
 
     def get_table_header(self, conn: CatalogueServiceWeb, schema_name, table_name):
-        datasource_filter = PropertyIsLike('dc:source', table_name)
-        conn.getrecords2(constraints=[datasource_filter], esn='full')
+        conn.getrecords2(constraints=self.datasource_filter(table_name), esn='full')
         record: CswRecord = [r for r in conn.records.values()][0]
         wfs_ref = [
             ref for ref
@@ -36,8 +44,7 @@ class BoundaryCSWConnectionMixin:
         return [k for k in props.keys()] + ['geom']
 
     def get_admin_data(self, conn, schema_name, table_name):
-        datasource_filter = PropertyIsLike('dc:source', table_name)
-        conn.getrecords2(constraints=[datasource_filter], esn='full')
+        conn.getrecords2(constraints=self.datasource_filter(table_name), esn='full')
         record: CswRecord = [r for r in conn.records.values()][0]
         wfs_ref = [
             ref for ref
@@ -56,8 +63,7 @@ class BoundaryCSWConnectionMixin:
         return values
 
     def get_all_tables(self, conn: CatalogueServiceWeb, schema):
-        datasource_filter = PropertyIsLike('dc:source', f'{schema}_bnd_adm%')
-        conn.getrecords2(constraints=[datasource_filter], esn='full')
+        conn.getrecords2(constraints=self.table_filter(schema), esn='full')
         scheme_pattern = r'features/collections/(?P<schema>[a-z]{3})\.(?P<table>\w+)/items\.json'
         table_list = []
         startpos = 0
@@ -78,14 +84,13 @@ class BoundaryCSWConnectionMixin:
             if conn.results['nextrecord'] == 0:
                 break
             conn.getrecords2(
-                constraints=[datasource_filter],
+                constraints=self.table_filter(schema),
                 startposition=startpos,
                 esn='full')
         return table_list
 
     def get_all_schemas(self, conn: CatalogueServiceWeb):
-        administrative_record_filter = PropertyIsLike('csw:AnyText', 'Administrative Boundary')
-        conn.getrecords2(constraints=[administrative_record_filter], esn='full')
+        conn.getrecords2(constraints=self.schema_filter(), esn='full')
         scheme_pattern = r'features/collections/(?P<schema>[a-z]{3})\.(?P<table>\w+)/items\.json'
         schemas_set = set()
         startpos = 0
@@ -107,7 +112,43 @@ class BoundaryCSWConnectionMixin:
             if conn.results['nextrecord'] == 0:
                 break
             conn.getrecords2(
-                constraints=[administrative_record_filter],
+                constraints=self.schema_filter(),
                 startposition=startpos,
                 esn='full')
         return list(schemas_set)
+
+
+class BoundaryCSWConnectionMixin(CSWConnectionMixin):
+
+    def schema_filter(self):
+        return [
+            PropertyIsLike('csw:AnyText', 'Administrative Boundary')
+        ]
+
+    def table_filter(self, schema):
+        return [
+            PropertyIsLike('dc:source', f'{schema}_bnd_adm%')
+        ]
+
+    def datasource_filter(self, table_name):
+        return [
+            PropertyIsLike('dc:source', table_name)
+        ]
+
+
+class BuildingCSWConnectionMixin(CSWConnectionMixin):
+
+    def schema_filter(self):
+        return [
+            PropertyIsLike('csw:AnyText', 'Building')
+        ]
+
+    def table_filter(self, schema):
+        return [
+            PropertyIsLike('dc:subject', '%Infrastructure%')
+        ]
+
+    def datasource_filter(self, table_name):
+        return [
+            PropertyIsLike('dc:source', table_name)
+        ]
