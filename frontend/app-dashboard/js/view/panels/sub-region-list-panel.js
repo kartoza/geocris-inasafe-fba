@@ -90,7 +90,7 @@ define([
         render: function (){
             // Render all region summary as lists
             let that = this
-            let $table = $('<table></table>')
+            let $table = $('<div class="container"></div>')
             let title_template = this.sub_region_title_template
             let item_template = this.sub_region_item_template
             let sub_region = this.collection.admin_level
