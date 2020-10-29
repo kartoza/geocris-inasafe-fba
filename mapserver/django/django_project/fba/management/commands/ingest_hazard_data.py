@@ -2,6 +2,7 @@ import requests
 import json
 from datetime import datetime
 from django.core.management.base import BaseCommand
+from django.db import connections
 from django.utils.timezone import make_aware
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
 from fba.models.all import HazardArea, HazardMap, HazardAreas, HazardClass, HazardType
@@ -24,6 +25,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.request_data()
 
+    def recalculate_impact(self):
+        with connections['backend'].cursor() as cursor:
+            cursor.execute('select kartoza_calculate_impact()')
+
+
     def request_data(self):
         """Request data from geocris pg-featureserv"""
         forecast_cone_url = (
@@ -39,7 +45,7 @@ class Command(BaseCommand):
 
         # Hazard type
         hazard_type, _ = HazardType.objects.get_or_create(
-            name='Hurricane - NOAA'
+            name='Hurricane NOAA'
         )
 
         unique_storm_ids = []
@@ -155,3 +161,5 @@ class Command(BaseCommand):
             )
 
             print('Hazard Event Created = {}'.format(created))
+
+        self.recalculate_impact()

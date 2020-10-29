@@ -152,3 +152,21 @@ class BuildingCSWConnectionMixin(CSWConnectionMixin):
         return [
             PropertyIsLike('dc:source', table_name)
         ]
+
+
+class RoadCSWConnectionMixin(CSWConnectionMixin):
+
+    def schema_filter(self):
+        return [
+            PropertyIsLike('csw:AnyText', 'Roads')
+        ]
+
+    def table_filter(self, schema):
+        return [
+            PropertyIsLike('dc:subject', '%Roads%')
+        ]
+
+    def datasource_filter(self, table_name):
+        return [
+            PropertyIsLike('dc:source', table_name)
+        ]

@@ -120,6 +120,16 @@ class BuildingGlobalKeyMapping(base_model):
         db_table = 'building_global_key_mapping'
 
 
+class RoadGlobalKeyMapping(base_model):
+    id = models.BigAutoField(primary_key=True)
+    id_mapping = models.BigIntegerField()
+    key = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'road_global_key_mapping'
+
+
 class Country(base_model):
     id = models.IntegerField()
     geom = models.MultiPolygonField(blank=True, null=True)
