@@ -4,14 +4,17 @@ AS $$
 BEGIN
     UPDATE osm_buildings
     SET
-        village_id = v.village_code,
-        sub_district_id = s.sub_dc_code,
-        district_id = d.dc_code
+        village_id = res.village_id,
+        sub_district_id = res.sub_district_id,
+        district_id = res.district_id
     FROM
-         village v
-             JOIN sub_district s ON st_within(v.geom, s.geom)
-             JOIN district d ON st_within(s.geom, d.geom)
-    WHERE st_within(geometry, v.geom) and village_id is null;
+         (select osm_id, village_id, sub_district_id, district_id
+                from
+            (select * from osm_buildings where village_id is null) b
+                JOIN village v ON st_within(b.geometry, v.geom)
+                 JOIN sub_district s ON st_intersects(v.geom, s.geom)
+                 JOIN district d ON st_intersects(s.geom, d.geom)) res
+    WHERE res.osm_id = osm_buildings.osm_id;
  RETURN 'OK';
 END
 $$;

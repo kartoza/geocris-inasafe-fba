@@ -47,5 +47,5 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_population_district_summary AS
          JOIN district on flooded_count.district_id = district.dc_code
   WITH NO DATA;
 
-CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_population_district_summary_pkey ON
+CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_population_district_summary_idx ON
     mv_flood_event_population_district_summary(id)

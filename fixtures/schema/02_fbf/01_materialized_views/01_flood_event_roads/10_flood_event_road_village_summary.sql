@@ -205,5 +205,5 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_road_village_summary AS
                                                       b.flood_event_id))))
     WITH NO DATA;
 
-CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_road_district_summary ON
-    mv_flood_event_road_district_summary(id)
+CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_road_village_summary_idx ON
+    mv_flood_event_road_village_summary(id)

@@ -1,7 +1,7 @@
 --
 -- Name: mv_flood_event_district_summary; Type: MATERIALIZED VIEW; Schema: public; Owner: -
 --
-DROP MATERIALIZED VIEW IF EXISTS public.mv_flood_event_district_summary;
+DROP MATERIALIZED VIEW IF EXISTS public.mv_flood_event_district_summary CASCADE ;
 CREATE MATERIALIZED VIEW public.mv_flood_event_district_summary AS
  WITH non_flooded_count_selection AS (
          SELECT b_1.district_id,
@@ -191,5 +191,5 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_district_summary AS
      LEFT JOIN public.district_trigger_status b ON (((b.district_id = flooded_aggregate_count.district_id) AND (flooded_aggregate_count.flood_event_id = b.flood_event_id))))
   WITH NO DATA;
 
-CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_district_summary ON
+CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_district_summary_idx ON
     mv_flood_event_district_summary(id)

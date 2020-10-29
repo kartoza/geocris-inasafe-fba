@@ -199,5 +199,5 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_village_summary AS
      LEFT JOIN public.village_trigger_status b ON (((b.village_id = flooded_aggregate_count.village_id) AND (flooded_aggregate_count.flood_event_id = b.flood_event_id))))
   WITH NO DATA;
 
-CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_village_summary ON
+CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_village_summary_idx ON
     mv_flood_event_village_summary(id)

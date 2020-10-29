@@ -195,5 +195,5 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_sub_district_summary AS
      LEFT JOIN public.sub_district_trigger_status b ON (((b.sub_district_id = (flooded_aggregate_count.sub_district_id)::double precision) AND (flooded_aggregate_count.flood_event_id = b.flood_event_id))))
   WITH NO DATA;
 
-CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_sub_district_summary ON
+CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_sub_district_summary_idx ON
     mv_flood_event_sub_district_summary(id)

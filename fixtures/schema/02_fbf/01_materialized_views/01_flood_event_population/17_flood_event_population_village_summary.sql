@@ -53,5 +53,5 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_population_village_summary AS
          JOIN village region on flooded_count.village_id = region.village_code
   WITH NO DATA;
 
-CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_population_village_summary ON
+CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_population_village_summary_idx ON
     mv_flood_event_population_village_summary(id)
