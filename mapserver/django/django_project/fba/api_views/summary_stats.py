@@ -149,7 +149,7 @@ class SummaryStatsAPI(generics.ListAPIView):
             }).first()
             road_stat = road_stats.filter(**{
                 admin_id_field: admin_id
-            })
+            }).first()
 
             default_stat = pop_stat or building_stat or road_stat
 

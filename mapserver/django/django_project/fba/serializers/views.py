@@ -59,7 +59,7 @@ class RoadSummaryDistrictSerializer(serializers.ModelSerializer):
     district_id = serializers.SerializerMethodField()
 
     def get_name(self, obj: RoadSummaryDistrictStats):
-        return obj. district.name
+        return obj.district.name
 
     def get_district_id(self, obj: RoadSummaryDistrictStats):
         return obj.district.id
