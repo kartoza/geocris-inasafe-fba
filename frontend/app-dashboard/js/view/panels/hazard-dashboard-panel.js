@@ -20,7 +20,7 @@ define([
         status_wrapper: '#action-status',
         back_button: '.btn-back-summary-panel',
         chart_score_panel: '#chart-score-panel',
-        top_admin_level: 'district',
+        top_admin_level: 'country',
         el: '#panel-dashboard',
         events: {
             'click .btn-back-summary-panel': 'backPanelDrilldown',

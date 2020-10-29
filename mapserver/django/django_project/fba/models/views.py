@@ -1,6 +1,9 @@
 from django.contrib.gis.db import models
+from django.db.models.aggregates import Sum
+from django.db.models.manager import BaseManager
+from django.db.models.query import QuerySet
 
-from fba.models.all import District, SubDistrict
+from fba.models.all import District, SubDistrict, Country
 from fba.models.base import base_model
 from fba.models.hazard_event import HazardEvent
 
@@ -36,6 +39,20 @@ class AdministrativeMapping(base_model):
         db_table = 'mv_administrative_mapping'
 
 
+class CountryFilterQuerySet(QuerySet):
+
+    def filter(self, **kwargs):
+        filter_args = kwargs
+        if 'country_id' in filter_args:
+            country_id = filter_args.get('country_id')
+            del filter_args['country_id']
+            filter_args['district__country__country_code'] = country_id
+        return super().filter(**filter_args)
+
+
+CountryFilterManager = CountryFilterQuerySet.as_manager
+
+
 class BaseSummaryStats(base_model):
 
     hazard_event = models.ForeignKey(HazardEvent, models.DO_NOTHING,
@@ -47,6 +64,16 @@ class BaseSummaryStats(base_model):
 
     class Meta:
         abstract = True
+
+    @classmethod
+    def aggregate_stats_by(cls, **kwargs):
+        # infer field lists
+        fields: [models.FloatField] = [f for f in cls._meta.fields if isinstance(f, models.FloatField)]
+        aggregate_mapping = {
+            f.name: Sum(f.name) for f in fields
+        }
+        return cls.objects.all().filter(**kwargs).aggregate(
+            **aggregate_mapping)
 
 
 class BaseBuildingSummaryStats(BaseSummaryStats):
@@ -81,11 +108,24 @@ class BaseBuildingSummaryStats(BaseSummaryStats):
         abstract = True
 
 
+class BuildingSummaryCountryStats(BaseBuildingSummaryStats):
+
+    country = models.ForeignKey(Country, models.DO_NOTHING,
+                                 db_column='country_id', blank=True,
+                                 null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'mv_flood_event_country_summary'
+
+
 class BuildingSummaryDistrictStats(BaseBuildingSummaryStats):
 
     district = models.ForeignKey(District, models.DO_NOTHING,
                                  db_column='district_id', blank=True,
                                  null=True)
+
+    objects = CountryFilterManager()
 
     class Meta:
         managed = False
@@ -138,11 +178,24 @@ class BaseRoadSummaryStats(BaseSummaryStats):
         abstract = True
 
 
+class RoadSummaryCountryStats(BaseRoadSummaryStats):
+
+    country = models.ForeignKey(Country, models.DO_NOTHING,
+                                 db_column='country_id', blank=True,
+                                 null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'mv_flood_event_road_country_summary'
+
+
 class RoadSummaryDistrictStats(BaseRoadSummaryStats):
 
     district = models.ForeignKey(District, models.DO_NOTHING,
                                  db_column='district_id', blank=True,
                                  null=True)
+
+    objects = CountryFilterManager()
 
     class Meta:
         managed = False
@@ -172,11 +225,24 @@ class BaseCensusPopulationSummaryStats(BaseSummaryStats):
         abstract = True
 
 
+class CensusPopulationSummaryCountryStats(BaseCensusPopulationSummaryStats):
+
+    country = models.ForeignKey(Country, models.DO_NOTHING,
+                                 db_column='country_id', blank=True,
+                                 null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'mv_flood_event_population_country_summary'
+
+
 class CensusPopulationSummaryDistrictStats(BaseCensusPopulationSummaryStats):
 
     district = models.ForeignKey(District, models.DO_NOTHING,
                                  db_column='district_id', blank=True,
                                  null=True)
+
+    objects = CountryFilterManager()
 
     class Meta:
         managed = False

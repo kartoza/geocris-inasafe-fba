@@ -1,18 +1,21 @@
 from rest_framework import generics
-from rest_framework import generics
 from rest_framework.response import Response
 
 from fba.models.views import (
     CensusPopulationSummarySubDistrictStats,
     BuildingSummaryDistrictStats,
     BuildingSummarySubDistrictStats, CensusPopulationSummaryDistrictStats,
-    RoadSummaryDistrictStats, RoadSummarySubDistrictStats)
+    RoadSummaryDistrictStats, RoadSummarySubDistrictStats,
+    BuildingSummaryCountryStats, RoadSummaryCountryStats,
+    CensusPopulationSummaryCountryStats)
 from fba.serializers.views import (
     BuildingSummaryDistrictSerializer,
     BuildingSummarySubDistrictSerializer,
     CensusPopulationSummaryDistrictSerializer,
     CensusPopulationSummarySubDistrictSerializer,
-    RoadSummaryDistrictSerializer, RoadSummarySubDistrictSerializer)
+    RoadSummaryDistrictSerializer, RoadSummarySubDistrictSerializer,
+    BuildingSummaryCountrySerializer, RoadSummaryCountrySerializer,
+    CensusPopulationSummaryCountrySerializer)
 
 
 class SummaryStatsAPI(generics.ListAPIView):
@@ -37,26 +40,32 @@ class SummaryStatsAPI(generics.ListAPIView):
         # Used for a drilldown operations (scoping by parent id)
         parent_admin_id = kwargs.get('parent_admin_id')
         building_models = {
+            'country': BuildingSummaryCountryStats,
             'district': BuildingSummaryDistrictStats,
             'sub_district': BuildingSummarySubDistrictStats
         }
         building_serializers = {
+            'country': BuildingSummaryCountrySerializer,
             'district': BuildingSummaryDistrictSerializer,
             'sub_district': BuildingSummarySubDistrictSerializer
         }
         road_models = {
+            'country': RoadSummaryCountryStats,
             'district': RoadSummaryDistrictStats,
             'sub_district': RoadSummarySubDistrictStats
         }
         road_serializers = {
+            'country': RoadSummaryCountrySerializer,
             'district': RoadSummaryDistrictSerializer,
             'sub_district': RoadSummarySubDistrictSerializer
         }
         population_models = {
+            'country': CensusPopulationSummaryCountryStats,
             'district': CensusPopulationSummaryDistrictStats,
             'sub_district': CensusPopulationSummarySubDistrictStats
         }
         population_serializers = {
+            'country': CensusPopulationSummaryCountrySerializer,
             'district': CensusPopulationSummaryDistrictSerializer,
             'sub_district': CensusPopulationSummarySubDistrictSerializer
         }
@@ -94,6 +103,7 @@ class SummaryStatsAPI(generics.ListAPIView):
         overall_stats = []
 
         parent_level = {
+            'country': None,
             'district': {
                 'parent_field': 'country_id',
                 'parent_name_field': 'country_name',
@@ -109,8 +119,9 @@ class SummaryStatsAPI(generics.ListAPIView):
         }
 
         parent_level_info = parent_level[admin_level]
-        parent_field = parent_level_info['parent_field']
-        parent_name_field = parent_level_info['parent_name_field']
+        if parent_level_info:
+            parent_field = parent_level_info['parent_field']
+            parent_name_field = parent_level_info['parent_name_field']
 
         # further filter by admin_id
         if admin_id:
@@ -155,10 +166,11 @@ class SummaryStatsAPI(generics.ListAPIView):
 
             # Pull out basic metadata
             result['name'] = getattr(default_stat, admin_level).name
-            parent_administrative = parent_level_info['parent'](default_stat)
-            parent_administrative_id = parent_level_info['parent_field_id'](default_stat)
-            result[parent_field] = parent_administrative_id
-            result[parent_name_field] = parent_administrative.name
+            if parent_level_info:
+                parent_administrative = parent_level_info['parent'](default_stat)
+                parent_administrative_id = parent_level_info['parent_field_id'](default_stat)
+                result[parent_field] = parent_administrative_id
+                result[parent_name_field] = parent_administrative.name
 
             # merge statistics
             result['census_population_stats'] = population_serializer(
@@ -172,5 +184,32 @@ class SummaryStatsAPI(generics.ListAPIView):
 
         # Apply sort criteria.
         # Default sort by parent name, then current admin level name
-        overall_stats.sort(key=lambda stat: (stat[parent_name_field], stat['name']))
+        try:
+            overall_stats.sort(key=lambda stat: (stat[parent_name_field], stat['name']))
+        except NameError:
+            # in case no parent
+            overall_stats.sort(
+                key=lambda stat: stat['name'])
         return Response(overall_stats)
+
+
+class SummaryStatsAllAPI(generics.RetrieveAPIView):
+    """API to return aggregate summary of all region in a hazard event."""
+
+    def retrieve(self, request, *args, **kwargs):
+        # Fetch country level stats based on hazard event
+        id = kwargs.get('id')
+
+        buildings_stat = BuildingSummaryCountryStats.aggregate_stats_by(
+            hazard_event__id=id)
+        road_stat = RoadSummaryCountryStats.aggregate_stats_by(
+            hazard_event__id=id)
+        population_stat = CensusPopulationSummaryCountryStats.aggregate_stats_by(
+            hazard_event__id=id)
+
+        return Response({
+            'hazard_event_id': id,
+            'building_stats': buildings_stat,
+            'road_stats': road_stat,
+            'population_stats': population_stat
+        })

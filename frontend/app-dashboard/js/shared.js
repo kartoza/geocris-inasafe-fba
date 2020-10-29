@@ -58,3 +58,9 @@ function toXmlAndFilter(data) {
     filter += '</Filter>'
     return filter
 }
+
+const id_key =  {
+    country: 'country_id',
+    district: 'district_id',
+    sub_district: 'sub_district_id'
+}

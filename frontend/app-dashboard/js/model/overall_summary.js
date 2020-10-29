@@ -14,7 +14,6 @@ define([
         model: StatsSummary,
         urlRoot: fbaProxyURL + '/api/hazard-event/',
         url: function () {
-            console.log(this.urlRoot)
             let urlString = `${this.urlRoot}${this.id}/`;
             if(this.parent_id && this.parent_level && this.admin_level){
                 urlString = `${urlString}summary-stats/${this.parent_level}/${this.parent_id}/${this.admin_level}/`
@@ -29,8 +28,9 @@ define([
                 urlString = `${urlString}summary-stats/${this.admin_level}/`
             }
             else {
-                urlString = `${urlString}summary-stats/all`
+                urlString = `${urlString}summary-stats/all/`
             }
+            console.log(urlString)
             return urlString;
         }
     });

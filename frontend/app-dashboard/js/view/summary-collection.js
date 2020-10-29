@@ -33,11 +33,7 @@ define([
             'blur': 'onFocusOut'
         },
         legend: [],
-        keyStats: {
-            'district': 'district_id',
-            'sub_district': 'sub_district_id',
-            'village': 'village_id'
-        },
+        keyStats: id_key,
         initialize: function () {
             // jquery element
             this.$flood_info = this.$el.find('.flood-info');
@@ -447,12 +443,6 @@ define([
                 // TODO: add country and sub districts
                 'district': that.districtStats,
                 'sub_district': that.subDistrictStats
-            };
-
-            let id_key = {
-                'district': 'district_id',
-                'sub_district': 'sub_district_id',
-                'village': 'village_id'
             };
 
             let tab_name_key = {

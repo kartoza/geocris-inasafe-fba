@@ -5,7 +5,24 @@ from fba.models.views import (
     BuildingSummarySubDistrictStats,
     CensusPopulationSummaryDistrictStats,
     CensusPopulationSummarySubDistrictStats, RoadSummaryDistrictStats,
-    RoadSummarySubDistrictStats)
+    RoadSummarySubDistrictStats, BuildingSummaryCountryStats,
+    RoadSummaryCountryStats, CensusPopulationSummaryCountryStats)
+
+
+class BuildingSummaryCountrySerializer(serializers.ModelSerializer):
+
+    name = serializers.SerializerMethodField()
+    country_id = serializers.SerializerMethodField()
+
+    def get_name(self, obj: BuildingSummaryCountryStats):
+        return obj.country.name
+
+    def get_country_id(self, obj: BuildingSummaryCountryStats):
+        return obj.country.id
+
+    class Meta:
+        model = BuildingSummaryCountryStats
+        fields = '__all__'
 
 
 class BuildingSummaryDistrictSerializer(serializers.ModelSerializer):
@@ -53,6 +70,22 @@ class BuildingSummarySubDistrictSerializer(serializers.ModelSerializer):
         # ]
 
 
+class RoadSummaryCountrySerializer(serializers.ModelSerializer):
+
+    name = serializers.SerializerMethodField()
+    country_id = serializers.SerializerMethodField()
+
+    def get_name(self, obj: RoadSummaryCountryStats):
+        return obj.country.name
+
+    def get_country_id(self, obj: RoadSummaryCountryStats):
+        return obj.country.id
+
+    class Meta:
+        model = RoadSummaryCountryStats
+        fields = '__all__'
+
+
 class RoadSummaryDistrictSerializer(serializers.ModelSerializer):
 
     name = serializers.SerializerMethodField()
@@ -96,6 +129,22 @@ class RoadSummarySubDistrictSerializer(serializers.ModelSerializer):
         #     'sub_district',
         #     'trigger_status'
         # ]
+
+
+class CensusPopulationSummaryCountrySerializer(serializers.ModelSerializer):
+
+    name = serializers.SerializerMethodField()
+    country_id = serializers.SerializerMethodField()
+
+    def get_name(self, obj: CensusPopulationSummaryCountryStats):
+        return obj. country.name
+
+    def get_country_id(self, obj: CensusPopulationSummaryCountryStats):
+        return obj.country.id
+
+    class Meta:
+        model = CensusPopulationSummaryCountryStats
+        fields = '__all__'
 
 
 class CensusPopulationSummaryDistrictSerializer(serializers.ModelSerializer):

@@ -16,6 +16,11 @@ define([
         loading_template: '<i class="fa fa-spinner fa-spin fa-fw"></i>',
         sub_region_title_template: _.template($('#region-title-panel-template').html()),
         sub_region_item_template: _.template($('#region-summary-panel-template').html()),
+        sub_region_mapping: {
+            country: 'district',
+            district: 'sub_district',
+            sub_district: null
+        },
         events: {
             'click .drilldown': 'drilldown'
         },
@@ -41,14 +46,7 @@ define([
         fetchRegionSummary: function (){
             let that = this
             let hazard_id = this.panel_dashboard.current_hazard.id
-            let sub_region_mapping = {
-                district: 'sub_district',
-                sub_district: null
-            }
-            let id_key = {
-                district: 'district_id',
-                sub_district: 'sub_district_id'
-            }
+            let sub_region_mapping = this.sub_region_mapping
             this.show_loading()
             this.stats_data = []
             this.parent_region = this.panel_dashboard.current_region

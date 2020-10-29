@@ -360,12 +360,6 @@ define([
             }
             dispatcher.trigger('map:redraw');
 
-            let id_key = {
-                'district': 'district_id',
-                'sub_district': 'sub_district_id',
-                'village': 'village_id',
-            }
-
             if(region_id === 'main'){
                 return;
             }
@@ -401,12 +395,6 @@ define([
             }
 
             dispatcher.trigger('map:redraw');
-
-            let id_key = {
-                'district': 'district_id',
-                'sub_district': 'sub_district_id',
-                'village': 'village_id',
-            };
 
             if(region_id === 'main'){
                 return;
