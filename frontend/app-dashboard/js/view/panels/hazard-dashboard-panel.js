@@ -2,11 +2,12 @@ define([
     'backbone',
     'jquery',
     'utils',
+    'filesaver',
     'js/view/panels/building-summary-panel.js',
     'js/view/panels/road-summary-panel.js',
     'js/view/panels/population-summary-panel.js',
     'js/view/panels/sub-region-list-panel.js'
-], function (Backbone, $, utils,
+], function (Backbone, $, utils, fileSaver,
              BuildingSummaryPanel,
              RoadSummaryPanel,
              PopulationSummaryPanel,
@@ -114,6 +115,32 @@ define([
                 let target = $div.attr('tab-target');
                 $('.tab-' + target).show();
             }
+        },
+        downloadSpreadsheet: function (data) {
+            const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+                const byteCharacters = atob(b64Data);
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+                const byteNumbers = new Array(slice.length);
+                for (let i = 0; i < slice.length; i++) {
+                  byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                const byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+                }
+
+                const blob = new Blob(byteArrays, {type: contentType});
+                return blob;
+            };
+
+            let type = 'application/vnd.ms-excel';
+            const blob = b64toBlob(data, type);
+            saveAs(blob, floodCollectionView.selected_forecast.attributes.notes + ".xlsx");
+
         },
         fetchExcel: function (){
             let that = this;

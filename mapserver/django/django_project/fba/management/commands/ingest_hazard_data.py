@@ -25,9 +25,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.request_data()
 
-    def recalculate_impact(self):
+    def recalculate_impact(self, hazard):
         with connections['backend'].cursor() as cursor:
             cursor.execute('select kartoza_calculate_impact()')
+            cursor.execute(f'select kartoza_fba_generate_excel_report_for_flood({hazard.id})')
 
 
     def request_data(self):
@@ -162,4 +163,4 @@ class Command(BaseCommand):
 
             print('Hazard Event Created = {}'.format(created))
 
-        self.recalculate_impact()
+            self.recalculate_impact(hazard)

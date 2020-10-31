@@ -1,0 +1,69 @@
+
+    LAYER
+		NAME "hurricane_noaa_map_sub_district"
+        GROUP "hurricane_noaa_map"
+		METADATA
+			"ows_title" "hurricane_noaa_map_sub_district"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geom from (select
+                            row_number() over () as id,
+                            impact.flood_event_id,
+                            impact.sub_district_id,
+                            sub_district.name,
+                            sub_district.geom
+                        from
+                        (select
+                            flood_event_id,
+                            sub_district_id
+                        from
+                            mv_flood_event_sub_district_summary
+                        union
+                        select
+                            flood_event_id,
+                            sub_district_id
+                        from
+                            mv_flood_event_road_sub_district_summary
+                        union
+                        select
+                            flood_event_id,
+                            sub_district_id
+                        from
+                            mv_flood_event_population_sub_district_summary) impact
+                        join sub_district on impact.sub_district_id = sub_district.sub_dc_code) as subquery using unique id using srid=4326"
+
+		VALIDATION
+			'default_level'	'sub_district'
+			'default_area_id'	'-1'
+			'level'		'^[a-z_]+$'
+			'area_id'	'^[0-9]+$'
+		END
+
+		CLASS
+			NAME "highlight"
+			EXPRESSION ('%level%' = 'sub_district' AND [sub_district_id] = %area_id%)
+			STYLE
+				OPACITY 80.0
+				COLOR "#c60000"
+				OUTLINECOLOR "#ff0000"
+				OUTLINEWIDTH 10.0
+			END
+		END
+
+		CLASS
+			NAME "exposed"
+			LABEL
+				SIZE 6
+			END
+			EXPRESSION ('%level%' = 'sub_district' AND [sub_district_id] != %area_id%)
+			STYLE
+				OPACITY 100.0
+				COLOR "#c6c6c6"
+				OUTLINECOLOR "#000000"
+				OUTLINEWIDTH 1.0
+			END
+		END
+	END

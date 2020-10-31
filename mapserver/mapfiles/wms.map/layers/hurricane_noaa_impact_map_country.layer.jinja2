@@ -1,0 +1,69 @@
+
+    LAYER
+		NAME "hurricane_noaa_map_country"
+        GROUP "hurricane_noaa_map"
+		METADATA
+			"ows_title" "hurricane_noaa_map_country"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geom from (select
+                            row_number() over () as id,
+                            impact.flood_event_id,
+                            impact.country_id,
+                            country.name,
+                            country.geom
+                        from
+                        (select
+                            flood_event_id,
+                            country_id
+                        from
+                            mv_flood_event_country_summary
+                        union
+                        select
+                            flood_event_id,
+                            country_id
+                        from
+                            mv_flood_event_road_country_summary
+                        union
+                        select
+                            flood_event_id,
+                            country_id
+                        from
+                            mv_flood_event_population_country_summary) impact
+                        join country on impact.country_id = country.country_code) as subquery using unique id using srid=4326"
+
+		VALIDATION
+			'default_level'	'country'
+			'default_area_id'	'-1'
+			'level'		'^[a-z_]+$'
+			'area_id'	'^[0-9]+$'
+		END
+
+		CLASS
+			NAME "highlight"
+			EXPRESSION ('%level%' = 'country' AND [country_id] = %area_id%)
+			STYLE
+				OPACITY 80.0
+				COLOR "#c60000"
+				OUTLINECOLOR "#ff0000"
+				OUTLINEWIDTH 10.0
+			END
+		END
+
+		CLASS
+			NAME "exposed"
+			LABEL
+				SIZE 6
+			END
+			EXPRESSION (('%level%' = 'country' AND [country_id] != %area_id%) OR ('%level%' = 'district') OR ('%level%' = 'sub_district'))
+			STYLE
+				OPACITY 100.0
+				COLOR "#c6c6c6"
+				OUTLINECOLOR "#000000"
+				OUTLINEWIDTH 1.0
+			END
+		END
+	END
