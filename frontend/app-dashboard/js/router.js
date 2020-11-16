@@ -7,6 +7,7 @@ define(['backbone'], function (Backbone) {
             "hazard/:hazardId": "hazardEventSummary",
             "hazard/:hazardId/:country/:countryId": "hazardCountrySummary",
             "hazard/:hazardId/:country/:countryId/:district/:districtId": "hazardDistrictSummary",
+            "hazard/:hazardId/:country/:countryId/:district/:districtId/:subDistrict/:subDistrictId": "hazardSubDistrictSummary",
         },
         landingPage: function () {
             console.log('landing page');
@@ -33,6 +34,16 @@ define(['backbone'], function (Backbone) {
             this._callPromise('hazard:fetch-hazard-event-summary', hazardId).then(function () {
                 that._callPromise('dashboard:drilldown', country, countryId).then(function () {
                     that._callPromise('dashboard:drilldown', district, districtId)
+                });
+            })
+        },
+        hazardSubDistrictSummary: function (hazardId, country, countryId, district, districtId, subDistrict, subDistrictId) {
+            let that = this;
+            this._callPromise('hazard:fetch-hazard-event-summary', hazardId).then(function () {
+                that._callPromise('dashboard:drilldown', country, countryId).then(function () {
+                    that._callPromise('dashboard:drilldown', district, districtId).then(function () {
+                        that._callPromise('dashboard:drilldown', subDistrict, subDistrictId)
+                    })
                 });
             })
         }
