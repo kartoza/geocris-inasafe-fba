@@ -62,6 +62,7 @@ define([
             // events
             dispatcher.on('dashboard:reset', this.resetDashboard, this);
             dispatcher.on('dashboard:hide', this.hideDashboard, this);
+            dispatcher.on('dashboard:drilldown', this.drilldown, this);
         },
         selectHazard: function (hazard) {
             // load hazard data
@@ -82,7 +83,6 @@ define([
                 '<div class="panel-title">' +
                 '        No data available.' +
                 '    </div>');
-            $('#status').removeClass().addClass('trigger-status-none');
             dispatcher.trigger(this.published_events.reset, this)
         },
         hideDashboard: function () {
@@ -227,6 +227,7 @@ define([
             // no parent means return to hazard selections
             if(referer_empty){
                 this.resetDashboard()
+                router.navigate('/', { trigger: false })
                 dispatcher.trigger('flood:deselect-forecast')
                 return
             }
@@ -253,6 +254,11 @@ define([
                 this.parent_region = null
                 this.parent_region_id = null
             }
+
+            const fragmentString = Backbone.history.fragment
+            let fragmentArray = fragmentString.split('/')
+            fragmentArray = fragmentArray.splice(0, fragmentArray.length - 2)
+            router.navigate(fragmentArray.join('/'), { trigger: false })
 
             // trigger rerender
             this.render()

@@ -107,6 +107,7 @@ define([
                 $clickedElm = $clickedElm.parent();
             }
             const hazardId = $clickedElm.data('id');
+            router.navigate(`hazard/${hazardId}`, {trigger: false});
             dispatcher.trigger('hazard:fetch-hazard-event-summary', hazardId);
         }
     })

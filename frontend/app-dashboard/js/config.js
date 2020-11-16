@@ -62,6 +62,7 @@ require.config({
     }
 });
 require([
+    'router',
     'jquery',
     'bootstrap',
     'backbone',
@@ -76,9 +77,12 @@ require([
     'js/request.js',
     'js/view/summary-collection.js',
     'js/model/hazard_type.js',
-], function ($, bootstrap, Backbone, _, moment, L, LDraw, AirDatepicker, AirDatepickerEN, utils, Map, RequestView, FloodCollectionView, HazardTypeCollection) {
-    AppRequest = new RequestView();
+], function (Router, $, bootstrap, Backbone, _, moment, L, LDraw, AirDatepicker, AirDatepickerEN, utils, Map, RequestView, FloodCollectionView, HazardTypeCollection) {
     dispatcher = _.extend({}, Backbone.Events);
+    router = new Router();
+    Backbone.history.start({hashChange: true, root: "/"});
+
+    AppRequest = new RequestView();
 
     // Initialize all tooltips
     $('[data-toggle="tooltip"]').tooltip();

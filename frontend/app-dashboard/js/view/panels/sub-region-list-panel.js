@@ -38,6 +38,7 @@ define([
             let $button = $(e.target).closest('.drilldown')
             let region = $button.attr('data-region');
             let region_id = parseInt($button.attr('data-region-id'));
+            router.navigate(`${Backbone.history.fragment}/${region}/${region_id}`, { trigger: false });
             this.panel_dashboard.drilldown(region, region_id)
         },
         show_loading: function (){
