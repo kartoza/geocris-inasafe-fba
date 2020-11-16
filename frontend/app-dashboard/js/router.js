@@ -5,9 +5,9 @@ define(['backbone'], function (Backbone) {
         routes: {
             "": "landingPage",
             "hazard/:hazardId": "hazardEventSummary",
-            "hazard/:hazardId/:country/:countryId": "hazardCountrySummary",
-            "hazard/:hazardId/:country/:countryId/:district/:districtId": "hazardDistrictSummary",
-            "hazard/:hazardId/:country/:countryId/:district/:districtId/:subDistrict/:subDistrictId": "hazardSubDistrictSummary",
+            "hazard/:hazardId/:country/:countryId": "hazardDrillDownSummary",
+            "hazard/:hazardId/:country/:countryId/:district/:districtId": "hazardDrillDownSummary",
+            "hazard/:hazardId/:country/:countryId/:district/:districtId/:subDistrict/:subDistrictId": "hazardDrillDownSummary",
         },
         landingPage: function () {
             console.log('landing page');
@@ -23,30 +23,24 @@ define(['backbone'], function (Backbone) {
         hazardEventSummary: function (hazardId) {
             this._callPromise('hazard:fetch-hazard-event-summary', hazardId)
         },
-        hazardCountrySummary: function (hazardId, country, countryId) {
-            let that = this;
+        _drillDown: function (...drillDownParams) {
+            const that = this;
+            that._callPromise('dashboard:drilldown', drillDownParams[0], drillDownParams[1]).then(function () {
+                drillDownParams.splice(0, 2)
+                if (drillDownParams.length >= 2) {
+                    that._drillDown(...drillDownParams)
+                }
+            });
+        },
+        hazardDrillDownSummary: function (hazardId, ...drillDownParams) {
+            const that = this;
+            drillDownParams = drillDownParams.filter(function (el) {
+                return el != null;
+            });
             this._callPromise('hazard:fetch-hazard-event-summary', hazardId).then(function () {
-                that._callPromise('dashboard:drilldown', country, countryId);
+                that._drillDown(...drillDownParams);
             })
         },
-        hazardDistrictSummary: function (hazardId, country, countryId, district, districtId) {
-            let that = this;
-            this._callPromise('hazard:fetch-hazard-event-summary', hazardId).then(function () {
-                that._callPromise('dashboard:drilldown', country, countryId).then(function () {
-                    that._callPromise('dashboard:drilldown', district, districtId)
-                });
-            })
-        },
-        hazardSubDistrictSummary: function (hazardId, country, countryId, district, districtId, subDistrict, subDistrictId) {
-            let that = this;
-            this._callPromise('hazard:fetch-hazard-event-summary', hazardId).then(function () {
-                that._callPromise('dashboard:drilldown', country, countryId).then(function () {
-                    that._callPromise('dashboard:drilldown', district, districtId).then(function () {
-                        that._callPromise('dashboard:drilldown', subDistrict, subDistrictId)
-                    })
-                });
-            })
-        }
     })
 
 });
