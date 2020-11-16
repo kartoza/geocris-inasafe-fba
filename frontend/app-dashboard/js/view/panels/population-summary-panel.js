@@ -34,7 +34,7 @@ define([
             SummaryPanel.prototype.renderChartElement.call(this, data, exposure_name);
             let $parentWrapper = $(`#chart-score-panel .tab-${exposure_name}`);
             let is_exposed_census_count_exists = data['census_count'] !== undefined;
-            $parentWrapper.find('.exposed-census-count').html(is_exposed_census_count_exists ? data['census_count'] : 0);
+            $parentWrapper.find('.exposed-census-count').html(is_exposed_census_count_exists ? data['census_count'].numberWithCommas() : 0);
         }
     });
 });
