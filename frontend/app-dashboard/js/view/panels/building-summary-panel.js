@@ -20,7 +20,7 @@ define([
             this.collection.fetch().then((data) => {
                 // should only have at least one valid data
                 if(data && data[0]) {
-                    that.stats_data = data[0].census_population_stats
+                    that.stats_data = data[0].building_stats
                 }
                 that.render()
             })
