@@ -132,6 +132,12 @@ define([
                     backgroundColor: ['#e5e5e5', '#82B7CA']
                 }]
             };
+            let graph_data_exists = false;
+            graph_data.forEach(function (item) {
+                if (item.x > 0) {
+                    graph_data_exists = true;
+                }
+            })
             let ctx = $parentWrapper.find('.summary-chart').get(0).getContext('2d');
             let datasets = {
                 labels: humanLabel,
@@ -160,6 +166,9 @@ define([
             $parentWrapper.find('.exposed-count').html(parseFloat(is_exposed_count_exists ? data[total_impacted_count_key] : 0).numberWithCommas());
 
             this.renderChartData(datasets, ctx, this.primary_exposure_label, datasetsPrimaryExposure, ctxPrimaryExposure, this.other_category_exposure_label);
+            if (!graph_data_exists) {
+                $parentWrapper.find('.summary-chart').remove();
+            }
         },
         renderChartData: function (datasets, ctx, title, datasetsPrimaryExposure, ctxPrimaryExposure, title2) {
             new Chart(ctxPrimaryExposure, {
