@@ -5,6 +5,7 @@ var AppRequest;
 var floodCollectionView;
 var hazardTypeCollection;
 var resetView = true;
+var drilldownKeys = [];
 
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;

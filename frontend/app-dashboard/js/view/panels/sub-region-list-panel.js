@@ -13,7 +13,9 @@ define([
     return Backbone.View.extend({
         el: '#flood-sub-summary',
         sub_summary: '#flood-sub-summary',
-        loading_template: '<i class="fa fa-spinner fa-spin fa-fw"></i>',
+        loading_template: '<div class="loading-container"><div class="loadingio-spinner-rolling-3csfszrmzsl"><div class="ldio-bq98c4iogw">\n' +
+            '<div></div>\n' +
+            '</div></div></div>',
         sub_region_title_template: _.template($('#region-title-panel-template').html()),
         sub_region_item_template: _.template($('#region-summary-panel-template').html()),
         sub_region_mapping: {
