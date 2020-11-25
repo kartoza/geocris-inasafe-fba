@@ -1,0 +1,23 @@
+
+    LAYER
+		NAME "hurricane_noaa_exposed_roads"
+		METADATA
+			"ows_title" "hurricane_noaa_exposed_roads"
+		END
+		STATUS ON
+		TYPE LINE
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from mv_flood_event_roads using unique id"
+
+		CLASS
+			NAME "Exposed Roads"
+			EXPRESSION ([depth_class] >= 83)
+			STYLE
+				OPACITY 100.0
+				COLOR "#e53123"
+				OUTLINECOLOR "#ff0000"
+				OUTLINEWIDTH 0.6
+			END
+		END
+	END

@@ -25,6 +25,7 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_population_district_summary AS
         group by a.flood_event_id, a.district_id
         )
     select
+           row_number() over () as id,
            flooded_count.flood_event_id,
            flooded_count.district_id,
            district.name,
@@ -46,3 +47,5 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_population_district_summary AS
          JOIN district on flooded_count.district_id = district.dc_code
   WITH NO DATA;
 
+CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_population_district_summary_idx ON
+    mv_flood_event_population_district_summary(id)

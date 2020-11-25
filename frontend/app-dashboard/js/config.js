@@ -5,7 +5,7 @@ require.config({
         'jqueryUi': 'libs/jquery-ui-1.12.1/jquery-ui.min',
         'backbone': 'libs/backbone.js/1.4.0/backbone-min',
         'leaflet': 'libs/leaflet/1.5.1/leaflet-src',
-        'bootstrap': 'libs/bootstrap/3.3.5/js/bootstrap.min',
+        'bootstrap': 'libs/bootstrap-4.4.1/js/bootstrap.bundle.min',
         'underscore': 'libs/underscore.js/1.9.1/underscore-min',
         'moment': 'libs/moment/2.24.0/moment.min',
         'rangeSlider': 'libs/ion-rangeslider/2.3.0/js/ion.rangeSlider.min',
@@ -62,6 +62,7 @@ require.config({
     }
 });
 require([
+    'router',
     'jquery',
     'bootstrap',
     'backbone',
@@ -74,11 +75,17 @@ require([
     'utils',
     'js/view/map.js',
     'js/request.js',
-    'js/view/flood-collection.js',
+    'js/view/summary-collection.js',
     'js/model/hazard_type.js',
-], function ($, bootstrap, Backbone, _, moment, L, LDraw, AirDatepicker, AirDatepickerEN, utils, Map, RequestView, FloodCollectionView, HazardTypeCollection) {
-    AppRequest = new RequestView();
+], function (Router, $, bootstrap, Backbone, _, moment, L, LDraw, AirDatepicker, AirDatepickerEN, utils, Map, RequestView, FloodCollectionView, HazardTypeCollection) {
     dispatcher = _.extend({}, Backbone.Events);
+    router = new Router();
+    Backbone.history.start({hashChange: true, root: "/"});
+
+    AppRequest = new RequestView();
+
+    // Initialize all tooltips
+    $('[data-toggle="tooltip"]').tooltip();
 
     // we get the hazardTypeCollection
     hazardTypeCollection = new HazardTypeCollection()

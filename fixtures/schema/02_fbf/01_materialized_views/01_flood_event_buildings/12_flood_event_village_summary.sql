@@ -164,7 +164,9 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_village_summary AS
              JOIN non_flooded_count_selection b_1 ON (((a.district_id = b_1.district_id) AND (a.sub_district_id = b_1.sub_district_id) AND (a.village_id = b_1.village_id))))
              JOIN public.village ON ((village.village_code = a.village_id)))
         )
- SELECT flooded_aggregate_count.flood_event_id,
+ SELECT
+    row_number() over () as id,
+    flooded_aggregate_count.flood_event_id,
     flooded_aggregate_count.district_id,
     flooded_aggregate_count.sub_district_id,
     flooded_aggregate_count.village_id,
@@ -196,3 +198,6 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_village_summary AS
    FROM (flooded_aggregate_count
      LEFT JOIN public.village_trigger_status b ON (((b.village_id = flooded_aggregate_count.village_id) AND (flooded_aggregate_count.flood_event_id = b.flood_event_id))))
   WITH NO DATA;
+
+CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_village_summary_idx ON
+    mv_flood_event_village_summary(id)

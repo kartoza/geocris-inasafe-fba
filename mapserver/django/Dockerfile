@@ -5,8 +5,8 @@ MAINTAINER Irwan Fathurrahman<meomancer@gmail.com>
 
 # Pandoc needed to generate rst dumps, uic compressor needed for django-pipeline
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update -y
-RUN apt-get install -y python3-pip python3-dev gdal-bin gettext libcurl4-openssl-dev libssl-dev yui-compressor git vim
+RUN apt-get update -y && apt-get -y dist-upgrade
+RUN apt-get install -y python3-pip python3-dev gdal-bin python3-gdal gettext libcurl4-openssl-dev libssl-dev yui-compressor git vim
 
 ENV PATH /usr/local/bin:$PATH
 

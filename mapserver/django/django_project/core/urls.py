@@ -4,16 +4,15 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import include
-
+from django.urls import include, path
 
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'', include('mapserver.urls')),
-    url(r'', include('fba.urls')),
-    url(r'^api-auth/', include('rest_framework.urls'))
+    path('admin/', admin.site.urls),
+    path('', include('mapserver.urls')),
+    path('api/', include('fba.urls')),
+    path('api-auth/', include('rest_framework.urls'))
 ]
 
 if settings.DEBUG:

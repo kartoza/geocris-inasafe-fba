@@ -10,7 +10,7 @@ define([
     'leafletAwesomeIcon'
 ], function (Backbone, $, Basemap, Layers, SidePanelView, IntroView, DepthClassCollection, LeafletWMSLegend, leafletAwesomeIcon) {
     return Backbone.View.extend({
-        defaultZoom: 11,
+        defaultZoom: 5,
         wmsExposedBuildingsLegendURI: function (hazard_type) {
             return `${geoserverUrl}?${$.param({
                 SERVICE: 'WMS',
@@ -67,9 +67,7 @@ define([
             this.listenTo(dispatcher, 'map:remove-geojson', this.removeGeojsonLayer);
             this.map.fitWorld();
             let that = this;
-            setTimeout(() =>{
-                that.fetchBounds();
-            }, 1000);
+            that.fetchBounds();
 
             // dispatcher registration
             dispatcher.on('map:draw-forecast-layer', this.drawForecastLayer, this);
@@ -86,17 +84,23 @@ define([
         },
         fetchBounds: function(){
             let that=this;
-            AppRequest.get(
-                `${postgresUrl}rpc/kartoza_fba_global_extent`,
-                null,
-                {
-                    Accept: 'application/vnd.pgrst.object+json'
-                }
-            ).then(function (extent) {
-                // lat lon format
-                that.initBounds = [[extent.y_min, extent.x_min], [extent.y_max, extent.x_max]];
-                that.map.fitBounds(that.initBounds);
-            });
+            if(defaultInitialMapBounds.length === 0){
+                AppRequest.get(
+                    `${postgresUrl}rpc/kartoza_fba_global_extent`,
+                    null,
+                    {
+                        Accept: 'application/vnd.pgrst.object+json'
+                    }
+                ).then(function (extent) {
+                    // lat lon format
+                    that.initBounds = [[extent.y_min, extent.x_min], [extent.y_max, extent.x_max]];
+                    that.map.fitBounds(that.initBounds);
+                });
+            }
+            else {
+                this.initBounds = defaultInitialMapBounds
+                this.map.fitBounds(defaultInitialMapBounds)
+            }
         },
         addOverlayLayer: function(layer, name){
             this.layer_control.addOverlay(layer, name);
@@ -113,7 +117,6 @@ define([
             }
             dispatcher.trigger('map:redraw');
             this.map.fitBounds(this.initBounds);
-            this.map.setZoom(this.defaultZoom);
             if(resetView) {
                 dispatcher.trigger('side-panel:open-welcome')
             }
@@ -134,7 +137,9 @@ define([
             forecast.fetchExtent()
                 .then(function (extent) {
                     // create WMS layer
+                    console.log('extent', extent)
                     let forecast_layer = forecast.leafletLayer();
+                    console.log('forecast_layer',forecast_layer)
                     // add layer to leaflet
                     if(that.forecast_layer){
                         that.removeOverlayLayer(that.forecast_layer);
@@ -326,6 +331,14 @@ define([
                 return;
             }
 
+            id_field_key = {
+                country: 'country_code',
+                district: 'dc_code',
+                sub_district: 'sub_dc_code'
+            }
+
+            id_field = id_field_key[region]
+
             this.region_layer = L.tileLayer.wms(
                 geoserverUrl,
                 {
@@ -334,7 +347,7 @@ define([
                     transparent: true,
                     srs: 'EPSG:4326',
                     tiled: true,
-                    filter: toXmlAndFilter({id_code: region_id})
+                    filter: toXmlAndFilter({[id_field]: region_id})
                 });
             this.region_layer.setZIndex(20);
             this.addOverlayLayer(this.region_layer, 'Administrative Boundary');
@@ -344,12 +357,6 @@ define([
                 this.removeOverlayLayer(this.exposed_buildings_layer);
             }
             dispatcher.trigger('map:redraw');
-
-            let id_key = {
-                'district': 'district_id',
-                'sub_district': 'sub_district_id',
-                'village': 'village_id',
-            }
 
             if(region_id === 'main'){
                 return;
@@ -386,12 +393,6 @@ define([
             }
 
             dispatcher.trigger('map:redraw');
-
-            let id_key = {
-                'district': 'district_id',
-                'sub_district': 'sub_district_id',
-                'village': 'village_id',
-            };
 
             if(region_id === 'main'){
                 return;

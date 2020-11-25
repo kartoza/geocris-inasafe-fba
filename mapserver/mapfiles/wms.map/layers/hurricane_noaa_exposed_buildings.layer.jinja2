@@ -1,0 +1,23 @@
+
+    LAYER
+		NAME "hurricane_noaa_exposed_buildings"
+		METADATA
+			"ows_title" "hurricane_noaa_exposed_buildings"
+		END
+		STATUS ON
+		TYPE POINT
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from mv_flood_event_buildings using unique id"
+
+		CLASS
+			NAME "Exposed Buildings"
+			EXPRESSION ([depth_class] >= 83)
+			STYLE
+				SYMBOL "circle"
+				SIZE 8
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END

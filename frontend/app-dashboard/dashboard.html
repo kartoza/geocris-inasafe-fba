@@ -7,7 +7,7 @@
     <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
     <link href="js/libs/leaflet/1.5.1/leaflet.css" rel="stylesheet" type="text/css" media="screen, projection"/>
     <link href="js/libs/leaflet.draw/1.0.4/leaflet.draw.css" rel="stylesheet" type="text/css" media="screen, projection"/>
-    <link href="js/libs/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen, projection"/>
+    <link href="js/libs/bootstrap-4.4.1/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen, projection"/>
     <link href="js/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" media="screen, projection"/>
     <link href="js/libs/ion-rangeslider/2.3.0/css/ion.rangeSlider.min.css" rel="stylesheet" type="text/css" media="screen, projection"/>
     <link href="js/libs/airdatepicker/css/datepicker.min.css" rel="stylesheet" type="text/css">
@@ -55,18 +55,18 @@
 					-->
                 </div>
                 <div class="panel-body">
-                    <div class="row Infographics">
-                        <div class="col-lg-2 landing-page-icon">
-                            <img src="images/download-icon.svg">
-                        </div>
-                        <div class="col-lg-10 text-justify">
-                            <span>
-								Click the download button on the top right of
-								the hazard forecast summary to download the hazard
-								impact forecast report.
-                            </span>
-                        </div>
-                    </div>
+<!--                    <div class="row Infographics">-->
+<!--                        <div class="col-lg-2 landing-page-icon">-->
+<!--                            <img src="images/download-icon.svg">-->
+<!--                        </div>-->
+<!--                        <div class="col-lg-10 text-justify">-->
+<!--                            <span>-->
+<!--								Click the download button on the top right of-->
+<!--								the hazard forecast summary to download the hazard-->
+<!--								impact forecast report.-->
+<!--                            </span>-->
+<!--                        </div>-->
+<!--                    </div>-->
 <!--                    <div class="row Infographics">-->
 <!--                        <div class="col-lg-2 landing-page-icon">-->
 <!--                            <img src="images/add-flood.svg">-->
@@ -250,16 +250,21 @@
                 </div>
             </div>
             <div id="panel-dashboard" style="display: none">
-                <div id="status">
-                    <div class="col-lg-2">
+                <div id="status" class="trigger-status-0 container-fluid">
+                    <div class="row">
+                    <div class="col-2">
                         <button class="btn btn-arrow-white btn-back-summary-panel" data-region="" data-region-id="" style="display: none"><i class="fa fa-chevron-circle-left" aria-hidden="true"></i></button></div>
-                    <div class="col-lg-8">
+                    <div class="col-8">
                         <div class="status-wrapper">
-                            <div>Trigger Status:</div>
-                            <div id="action-status">-</div>
+                            <h4 id="action-status">Summary</h4>
                         </div>
                     </div>
-                    <div class="col-lg-2"><button class="btn btn-arrow-white pull-right download-spreadsheet" style="margin: 7px 0 !important;"><img src="images/download-icon-white.svg" style="height: 23px"><i class="fa fa-spinner fa-spin fa-fw download-spreadsheet-loading"></i></button></div>
+                    <div class="col-2">
+                        <button class="btn btn-arrow-white pull-right download-spreadsheet" style="margin: 7px 0 !important;" data-toggle="tooltip" data-placement="bottom" title="Download the hazard impact forecast report">
+                            <img src="images/download-icon-white.svg" style="height: 23px"><i class="fa fa-spinner fa-spin fa-fw download-spreadsheet-loading"></i>
+                        </button>
+                    </div>
+                    </div>
                 </div>
                 <div id="flood-general-summary"></div>
                 <div id="flood-sub-summary"></div>
@@ -376,6 +381,23 @@
 
 </body>
 
+<script type='text/template' id='hazard-list'>
+    <div>
+        <div class="container-fluid flood-count hazard-list" style="background-color: var(--cerulean-frost); color: white; border-bottom: 1px solid white" data-id="<%= id %>">
+            <div class="row" style="padding-left: 10px; padding-right: 10px;">
+                <div class="col-md-6">
+                    <div class="title" style="font-size: 1.5em; text-align: left"><%= hazard_map.place_name %></div>
+                </div>
+                <div class="col-md-6" style="font-size: 9pt; font-weight: lighter">
+                    <div class="subtitle" style="border-bottom: 1px solid white; margin-bottom: 3px;">Hazard type : <%= hazard_type %></div>
+                    <div class="date" style="border-bottom: 1px solid white; margin-bottom: 3px;">Forecast date : <%= new Date(forecast_date).toISOString().split('T')[0] %></div>
+                    <div class="date" style="border-bottom: 1px solid white; margin-bottom: 3px;">Acquisition date : <%= new Date(acquisition_date).toISOString().split('T')[0] %></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
 <script type='text/template' id='-filter-multiselect'>
     <div class="inner-panel">
         <% if(options.length > 0) { %>
@@ -391,16 +413,13 @@
 </script>
 
 <script type="text/template" id="dashboard-template">
-    <div class="panel-title" id="main-panel-header">
-        Flood Forecast Summary: <%= flood_name %>
-    </div>
     <div class="flood-summary-info">
-        <table>
+       <table class="table table-striped">
             <tr>
-                <td>
+                <td style="width: 30%">
                     Event Date
                 </td>
-                <td>
+                <td style="width: 70%">
                     <%= forecast_date %>
                 </td>
             </tr>
@@ -409,7 +428,7 @@
                     Source
                 </td>
                 <td>
-                    <%= source %>
+                    <% if ( source.startsWith('http') ) { %> <a target="_blank" href="<%= source %>"><%= source %> </a> <% } else { %> <%= source %> <% } %>
                 </td>
             </tr>
             <tr>
@@ -425,7 +444,7 @@
                     Link
                 </td>
                 <td>
-                    <%= link %>
+                    <% if ( link.startsWith('http') ) { %> <a target="_blank" href="<%= link %>"><%= link %> </a> <% } else { %> <%= link %> <% } %>
                 </td>
             </tr>
             <tr>
@@ -447,7 +466,7 @@
         </table>
     </div>
     <div id="chart-score-panel">
-        <div class="col-lg-12 panel-title panel-sub-title" style="border-bottom: none !important; padding: 0 0 10px 0">
+        <div class="row panel-title panel-sub-title" style="border-bottom: none !important; padding: 0 0 10px 0">
             <div class="col-lg-6 tab-active tab-title" tab-target="building">
                 <i class="fa fa-building-o" aria-hidden="true"></i><span class="tab-name"> Buildings</span>
             </div>
@@ -460,57 +479,46 @@
         </div>
         <div class="tab-wrapper tab-building">
             <div class="col-lg-12">
-                <div class="col-lg-5 box-vulnerability box-wrapper">
-                    <div class="box-content">
-                        <div class="vulnerability-score box-content-value">-</div>
-                        <div class="subtext">Vulnerability Score Total</div>
-                    </div>
-                </div>
-                <div class="col-lg-5 box-exposed box-wrapper">
+                <div class="col-lg-12 box-exposed box-wrapper">
                     <div class="box-content">
                         <div class="exposed-count box-content-value">-</div>
                         <div class="subtext">Potentially affected buildings</div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12 panel-chart-primary" style="min-height: 250px">
+            <div class="col-lg-12 panel-chart-primary" style="min-height: 200px">
                 <canvas class="summary-chart-primary" style="height: 250px"></canvas>
             </div>
-            <div class="col-lg-12 panel-chart" style="min-height: 350px">
-                <canvas class="summary-chart" style="height: 350px"></canvas>
+            <div class="col-lg-12 panel-chart" style="min-height: 10px">
+                <canvas class="summary-chart" style="height: 10px; width: 100%"></canvas>
             </div>
         </div>
         <div class="tab-wrapper tab-road" style="display: none">
-            <div class="col-lg-12">
-                <div class="col-lg-5 box-vulnerability box-wrapper">
-                    <div class="box-content">
-                        <div class="vulnerability-score box-content-value">-</div>
-                        <div class="subtext">Vulnerability Score Total</div>
-                    </div>
-                </div>
-                <div class="col-lg-5 box-exposed box-wrapper">
+            <div class="row">
+                <div class="col-lg-12 box-exposed box-wrapper">
                     <div class="box-content">
                         <div class="exposed-count box-content-value">-</div>
                         <div class="subtext">Potentially affected roads</div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12 panel-chart-primary" style="min-height: 250px">
+            <div class="col-lg-12 panel-chart-primary" style="min-height: 200px">
                 <canvas class="summary-chart-primary" style="height: 50px"></canvas>
             </div>
-            <div class="col-lg-12 panel-chart" style="min-height: 350px">
-                <canvas class="summary-chart" style="height: 350px"></canvas>
+            <div class="col-lg-12 panel-chart" style="min-height: 10px">
+                <canvas class="summary-chart" style="height: 10px"></canvas>
             </div>
         </div>
         <div class="tab-wrapper tab-population" style="display: none">
-            <div class="col-lg-12">
-                <div class="col-lg-5 box-summary-count box-wrapper">
+            <div class="row">
+                <div class="col-lg-1"></div>
+                <div class="col-lg-10 box-summary-count box-wrapper">
                     <div class="box-content">
                         <div class="exposed-census-count summary-count box-content-value">-</div>
                         <div class="subtext">Population in affected admin boundaries</div>
-                        <div class="subtext">(Census data)</div>
                     </div>
                 </div>
+                <!--
                 <div class="col-lg-5 box-exposed box-wrapper">
                     <div class="box-content">
                         <div class="exposed-count box-content-value">-</div>
@@ -518,17 +526,19 @@
                         <div class="subtext">(World Population stats)</div>
                     </div>
                 </div>
+                -->
+                <div class="col-lg-1"></div>
             </div>
-            <div class="col-lg-12 panel-chart-primary" style="min-height: 250px">
+            <div class="col-lg-12 panel-chart-primary" style="min-height: 200px">
                 <canvas class="summary-chart-primary" style="height: 50px"></canvas>
             </div>
-            <div class="col-lg-12 panel-chart" style="min-height: 350px">
-                <canvas class="summary-chart" style="height: 350px"></canvas>
+            <div class="col-lg-12 panel-chart" style="min-height: 10px">
+                <canvas class="summary-chart" style="height: 10px"></canvas>
             </div>
         </div>
     </div>
-    <div id="region-summary-panel" style="border-top: 1px solid #ddd; padding-bottom: 35px">
-        </div>
+    <!--<div id="region-summary-panel" style="border-top: 1px solid #ddd; padding-bottom: 35px">-->
+    <!--   </div>-->
 </script>
 
 <script type="text/template" id="region-title-panel-template">
@@ -538,39 +548,43 @@
 </script>
 
 <script type="text/template" id="region-summary-panel-template">
-    <tr>
-        <td class="text-center item-header" colspan="3">
-            <button class="btn btn-arrow pull-right drilldown trigger-status-<%= trigger_status %>" data-region="<%= region %>" data-region-id="<%= id %>" data-region-trigger-status="<%= trigger_status %>"><i class="fa fa-chevron-circle-right" aria-hidden="true"></i></button>
-            <div><%= country_name %></div>
-            <div><%= name %></div>
-        </td>
-    </tr>
-    <tr data-region-id="<%= id %>">
-        <td class="box-count-left">
-            <div class="box-count box-wrapper">
-                <div class="box-content">
-                    <div class="score building box-content-value"><%= flooded_building_count %></div>
-                    <div class="subtext">Potentially affected buildings</div>
+    <div class="card card-shadow region-summary-panel-card">
+        <div class="card-header">
+            <button class="card-header-next-btn btn btn-arrow pull-right drilldown trigger-status-<%= trigger_status %>" data-region-name="<%= name %>" data-region="<%= region %>" data-region-id="<%= id %>" data-region-trigger-status="<%= trigger_status %>"><i class="fa fa-chevron-circle-right" aria-hidden="true"></i></button>
+            <div class="card-header-title"><%= country_name %></div>
+            <% if (country_name !== name) { %><div class="card-header-subtitle"><%= name %></div><% } %>
+        </div>
+        <div class="row region-summary-panel-card-content no-gutters">
+            <div class="col-md-4">
+                <div class="box-count box-wrapper">
+                    <div class="box-content">
+                        <div class="score building box-content-value">
+                            <i class="fa fa-building-o box-icon" aria-hidden="true"></i><% if (impacted_building_count) { %><%= numberWithCommas(impacted_building_count) %><% } else { %>&nbsp;-<% } %>
+                        </div>
+                        <div class="subtext">Potentially affected buildings
+                        </div>
+                    </div>
                 </div>
             </div>
-        </td>
-        <td class="box-count-middle">
-            <div class="box-count box-wrapper">
+            <div class="col-md-4">
+                <div class="box-count box-wrapper">
                 <div class="box-content">
-                    <div class="score road box-content-value"><%= flooded_road_count %></div>
+                    <div class="score road box-content-value"><i class="fa fa-road box-icon" aria-hidden="true"></i><% if (impacted_road_count) { %><%= numberWithCommas(impacted_road_count) %><% } else { %>&nbsp;-<% } %>
+                    </div>
                     <div class="subtext">Potentially affected roads</div>
                 </div>
             </div>
-        </td>
-        <td class="box-count-right">
-            <div class="box-count box-wrapper">
+            </div>
+            <div class="col-md-4">
+                 <div class="box-count box-wrapper">
                 <div class="box-content">
-                    <div class="score population box-content-value"><%= flooded_population_count %></div>
-                    <div class="subtext">Potentially affected population (World Population stats)</div>
+                    <div class="score population box-content-value"><i class="fa fa-users box-icon" aria-hidden="true"></i><%= numberWithCommas(impacted_population_count) %></div>
+                    <div class="subtext">Potentially affected population</div>
                 </div>
             </div>
-        </td>
-    </tr>
+            </div>
+        </div>
+    </div>
 </script>
 
 <!--TODO: We need to fix this by just get the geojson -->

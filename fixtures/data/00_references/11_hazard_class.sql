@@ -83,3 +83,12 @@ INSERT INTO public.hazard_class (id, label, hazard_type) VALUES (79, 'INTENSITY 
 INSERT INTO public.hazard_class (id, label, hazard_type) VALUES (80, 'INTENSITY : 160 - RADII : 34', 2) ON CONFLICT DO NOTHING ;
 INSERT INTO public.hazard_class (id, label, hazard_type) VALUES (81, 'INTENSITY : 160 - RADII : 50', 2) ON CONFLICT DO NOTHING ;
 INSERT INTO public.hazard_class (id, label, hazard_type) VALUES (82, 'INTENSITY : 160 - RADII : 64', 2) ON CONFLICT DO NOTHING ;
+
+
+-- Hurricane - NOAA
+INSERT INTO public.hazard_class (id, min_m, max_m, label, hazard_type) VALUES (83, null, null, 'Subtropical Storm', 3) ON CONFLICT DO NOTHING  ;
+INSERT INTO public.hazard_class (id, min_m, max_m, label, hazard_type) VALUES (84, null, null, 'Tropical Storm', 3) ON CONFLICT DO NOTHING  ;
+INSERT INTO public.hazard_class (id, min_m, max_m, label, hazard_type) VALUES (85, null, null, 'Tropical Depression', 3) ON CONFLICT DO NOTHING  ;
+INSERT INTO public.hazard_class (id, min_m, max_m, label, hazard_type) VALUES (86, null, null, 'Subtropical Storm', 3) ON CONFLICT DO NOTHING  ;
+INSERT INTO public.hazard_class (id, min_m, max_m, label, hazard_type) VALUES (87, null, null, 'Hurricane (Category 1-2)', 3) ON CONFLICT DO NOTHING  ;
+INSERT INTO public.hazard_class (id, min_m, max_m, label, hazard_type) VALUES (88, null, null, 'Major Hurricane (Category 3-5)', 3) ON CONFLICT DO NOTHING  ;

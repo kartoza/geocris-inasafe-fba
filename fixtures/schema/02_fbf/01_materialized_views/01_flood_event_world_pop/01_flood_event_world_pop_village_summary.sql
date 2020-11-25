@@ -21,6 +21,7 @@ from (
     join village b on a.village_code = b.village_code
 group by flood_event_id, a.dc_code, a.sub_dc_code, a.village_code, b.name)
     select
+        row_number() over () as id,
         a.flood_event_id,
         a.dc_code as district_id,
         a.sub_dc_code as sub_district_id,
@@ -33,3 +34,6 @@ group by flood_event_id, a.dc_code, a.sub_dc_code, a.village_code, b.name)
     join world_pop_village_stats b on a.village_code = b.village_code
     left join village_trigger_status c on a.flood_event_id = c.flood_event_id and a.village_code = c.village_id
 WITH NO DATA;
+
+CREATE UNIQUE INDEX IF NOT EXISTS mv_flood_event_world_pop_village_summary ON
+    mv_flood_event_world_pop_village_summary(id)

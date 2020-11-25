@@ -7,4 +7,5 @@ var postgresUrl = '{{ POSTGREST_BASE_URL }}/';
 var postgresBaseUrl = '{{ POSTGREST_BASE_URL }}';
 var layerNamespace = '{{ LAYER_NAMESPACE }}';
 var defaultBasemap = '{{ DEFAULT_BASEMAP }}';
+var defaultInitialMapBounds = {{ DEFAULT_INITIAL_MAP_BOUNDS }};
 var djangoUrl = '{{ DJANGO_URL }}';

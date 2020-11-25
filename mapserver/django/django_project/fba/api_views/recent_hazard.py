@@ -9,7 +9,7 @@ class RecentHazardList(APIView):
 
     def get(self, request):
         hazard_events = HazardEvent.objects.all().order_by(
-            '-acquisition_date'
+            '-forecast_date', '-acquisition_date'
         )[:5]
         hazard_event_serializer = HazardEventSerializer(
             hazard_events,

@@ -2,6 +2,7 @@ import requests
 import json
 from datetime import datetime
 from django.core.management.base import BaseCommand
+from django.db import connections
 from django.utils.timezone import make_aware
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
 from fba.models.all import HazardArea, HazardMap, HazardAreas, HazardClass, HazardType
@@ -17,11 +18,18 @@ class Command(BaseCommand):
         'MH': 'Major Hurricane (Category 3 -5)',
         'HU': 'Hurricane (Category 1 -2)',
         'TS': 'Tropical Storm',
-        'TD': 'Tropical Depression'
+        'STS': 'Subtropical Storm',
+        'TD': 'Tropical Depression',
     }
 
     def handle(self, *args, **options):
         self.request_data()
+
+    def recalculate_impact(self, hazard):
+        with connections['backend'].cursor() as cursor:
+            cursor.execute('select kartoza_calculate_impact()')
+            cursor.execute(f'select kartoza_fba_generate_excel_report_for_flood({hazard.id})')
+
 
     def request_data(self):
         """Request data from geocris pg-featureserv"""
@@ -38,7 +46,7 @@ class Command(BaseCommand):
 
         # Hazard type
         hazard_type, _ = HazardType.objects.get_or_create(
-            name='Hurricane'
+            name='Hurricane NOAA'
         )
 
         unique_storm_ids = []
@@ -48,7 +56,6 @@ class Command(BaseCommand):
             properties = feature['properties']
             if properties['ncstormid'] not in unique_storm_ids:
                 unique_storm_ids.append(properties['ncstormid'])
-
 
         print('Fetch latest storms')
         # Get the latest hazard event from storm_id
@@ -98,12 +105,12 @@ class Command(BaseCommand):
                 )
 
                 if not hazard_classes.exists():
-                    all_hazard_class = HazardClass.objects.all()
-                    hazard_class_last_id = all_hazard_class[all_hazard_class.count() - 1].id + 1
+                    all_hazard_class = [h for h in HazardClass.objects.all()]
+                    hazard_class_last_id = all_hazard_class[-1].id + 1
                     hazard_class, _ = HazardClass.objects.get_or_create(
                         label=storm_type,
                         hazard_type=hazard_type,
-                        id = hazard_class_last_id
+                        id=hazard_class_last_id
                     )
                 else:
                     hazard_class = hazard_classes[0]
@@ -120,13 +127,13 @@ class Command(BaseCommand):
                     notes='valid_time:{validtime}'.format(
                         validtime=properties['validtime']
                     ),
-                    place_name=properties['ncstormid']
+                    place_name=properties['stormname']
                 )
 
                 # Hazard areas
                 HazardAreas.objects.get_or_create(
-                    flood_map=hazard_map,
-                    flooded_area=hazard_area
+                    hazard_map=hazard_map,
+                    impacted_area=hazard_area
                 )
 
             latest_cone_data_prop = latest_cone_data['features'][0]['properties']
@@ -145,7 +152,7 @@ class Command(BaseCommand):
             hazard, created = HazardEvent.objects.get_or_create(
                 forecast_date=start_time_obj,
                 acquisition_date=ref_time_obj,
-                flood_map_id=hazard_map.id,
+                hazard_map_id=hazard_map.id,
                 hazard_type_id=hazard_type.id,
                 link=latest_cone_data_prop['url'],
                 source=latest_cone_data_prop['url'],
@@ -155,3 +162,5 @@ class Command(BaseCommand):
             )
 
             print('Hazard Event Created = {}'.format(created))
+
+            self.recalculate_impact(hazard)

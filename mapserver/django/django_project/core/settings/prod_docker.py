@@ -3,7 +3,8 @@
 from .prod import *  # noqa
 import os
 
-DEBUG = False
+DEBUG = ast.literal_eval(
+    os.environ.get('DEBUG', 'False'))
 
 ALLOWED_HOSTS = ['*']
 
@@ -19,8 +20,15 @@ DATABASES = {
         'PASSWORD': os.environ['POSTGRES_PASS'],
         'HOST': os.environ['POSTGRES_HOST'],
         'PORT': os.environ['POSTGRES_PORT'],
-        'TEST_NAME': 'unittests',
+        'TEST': {
+            'NAME': os.environ['POSTGRES_DB'],
+        }
     },
 }
 
 FIXTURES = '/home/web/fixtures'
+
+
+if DEBUG:
+    LOGGING['handlers']['console']['level'] = 'DEBUG'
+    LOGGING['root']['level'] = 'DEBUG'

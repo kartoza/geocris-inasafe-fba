@@ -18,6 +18,9 @@ services:
       - POSTGRES_PASS=${POSTGRES_PASS}
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
+      - MAPSERVER_PUBLIC_WMS_URL=${MAPSERVER_PUBLIC_WMS_URL}
+      - MAPSERVER_PUBLIC_OWS_URL=${MAPSERVER_PUBLIC_OWS_URL}
+      - MAPSERVER_PUBLIC_SLD_URL=${MAPSERVER_PUBLIC_SLD_URL}
       - POSTGREST_BASE_URL=${POSTGREST_BASE_URL}
     volumes:
       - ./fixtures:/home/web/fixtures
@@ -36,19 +39,18 @@ services:
     image: project_uwsgi
     command: uwsgi --ini /home/web/django_project/uwsgi.conf
     environment:
-      - DJANGO_SETTINGS_MODULE=core.settings.prod_docker
-      - VIRTUAL_HOST=project.com
-      - VIRTUAL_PORT=8080
-      - MAPSERVER_PUBLIC_WMS_URL=${MAPSERVER_PUBLIC_WMS_URL}
-      - MAPSERVER_PUBLIC_OWS_URL=${MAPSERVER_PUBLIC_OWS_URL}
-      - MAPSERVER_PUBLIC_SLD_URL=${MAPSERVER_PUBLIC_SLD_URL}
-      - POSTGREST_BASE_URL=${POSTGREST_BASE_URL}
-
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASS=${POSTGRES_PASS}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
+      DJANGO_SETTINGS_MODULE: core.settings.prod_docker
+      VIRTUAL_HOST: project.com
+      VIRTUAL_PORT: 8080
+      MAPSERVER_PUBLIC_WMS_URL: ${MAPSERVER_PUBLIC_WMS_URL}
+      MAPSERVER_PUBLIC_OWS_URL: ${MAPSERVER_PUBLIC_OWS_URL}
+      MAPSERVER_PUBLIC_SLD_URL: ${MAPSERVER_PUBLIC_SLD_URL}
+      POSTGREST_BASE_URL: ${POSTGREST_BASE_URL}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASS: ${POSTGRES_PASS}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
     volumes:
       - ./fixtures:/home/web/fixtures
       - ./django/django_project:/home/web/django_project

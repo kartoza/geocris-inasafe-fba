@@ -1,0 +1,21 @@
+
+    LAYER
+		NAME "country_boundary"
+		METADATA
+			"ows_title" "country_boundary"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geom from country using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				OPACITY 100.0
+				OUTLINECOLOR "#e31a1c"
+				OUTLINEWIDTH 0.26
+			END
+		END
+	END

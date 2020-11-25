@@ -13,6 +13,8 @@ MAP
 		"init=epsg:4326"
 	END
 
+    {% include "symbols.map.jinja2" %}
+
 	WEB
 		METADATA
 			"ows_title"	"inasafe-fba"
@@ -24,6 +26,9 @@ MAP
 
 	# Reporting point
 	{% include "layers/reporting_point.layer.jinja2" %}
+
+	# Country Boundary
+	{% include "layers/country_boundary.layer.jinja2" %}
 
 	# District Boundary
 	{% include "layers/district_boundary.layer.jinja2" %}
@@ -57,10 +62,16 @@ MAP
 
 	{% include "layers/flood_map_village.layer.jinja2" %}
 
-    # Flood
-	{% include "layers/hurricane_exposed_buildings.layer.jinja2" %}
+    # Hurricane
+	{% include "layers/hurricane_noaa_exposed_buildings.layer.jinja2" %}
 
-	{% include "layers/hurricane_exposed_roads.layer.jinja2" %}
+	{% include "layers/hurricane_noaa_exposed_roads.layer.jinja2" %}
 
-	{% include "layers/hurricane_forecast_layer.layer.jinja2" %}
+	{% include "layers/hurricane_noaa_forecast_layer.layer.jinja2" %}
+
+    {% include "layers/hurricane_noaa_impact_map_country.layer.jinja2" %}
+
+    {% include "layers/hurricane_noaa_impact_map_district.layer.jinja2" %}
+
+    {% include "layers/hurricane_noaa_impact_map_sub_district.layer.jinja2" %}
 END
