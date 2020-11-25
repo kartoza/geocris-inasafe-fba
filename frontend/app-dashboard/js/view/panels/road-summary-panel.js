@@ -14,8 +14,10 @@ define([
             let that = this
             let hazard_id = this.panel_dashboard.current_hazard.id
             let current_region = this.panel_dashboard.current_region
+            let region_id = this.panel_dashboard.current_region_id
             this.show_loading()
             this.collection.admin_level = current_region
+            this.collection.admin_id = region_id
             this.collection.id = hazard_id
             this.collection.fetch().then((data) => {
                 // should only have at least one valid data
