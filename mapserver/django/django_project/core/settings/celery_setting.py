@@ -60,6 +60,24 @@ CELERYBEAT_SCHEDULE = {
     }
 }
 
+CELERY_ANNOTATIONS = {
+    'fba.process_hazard_event_queue': {
+        'time_limit': 2 * 3600  # 2 hour limit
+    },
+    'fba.tasks.ingest_boundary_data': {
+        'time_limit': 2 * 3600  # 2 hour limit
+    },
+    'fba.tasks.ingest_building_data': {
+        'time_limit': 2 * 3600  # 2 hour limit
+    },
+    'fba.tasks.ingest_road_data': {
+        'time_limit': 2 * 3600  # 2 hour limit
+    },
+    'fba.tasks.ingest_hazard_data': {
+        'time_limit': 2 * 3600  # 2 hour limit
+    }
+}
+
 CELERY_TIMEZONE = 'UTC'
 
 #BROKER_URL = 'memory://localhost'
