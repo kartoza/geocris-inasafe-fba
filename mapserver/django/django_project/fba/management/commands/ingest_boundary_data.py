@@ -101,8 +101,11 @@ class Command(BaseCommand, BoundaryCSWConnectionMixin):
                 target_table_mapping = [
                     'country', 'district', 'sub_district', 'village']
 
-                rows = self.get_admin_data(conn, schema_name, table_name)
-                header = self.get_table_header(conn, schema_name, table_name)
+                try:
+                    rows = self.get_admin_data(conn, schema_name, table_name)
+                    header = self.get_table_header(conn, schema_name, table_name)
+                except:
+                    print(f'Failed to fetch data in {schema_name} {table_name}')
 
                 # Prepare common variables
                 Models = {
