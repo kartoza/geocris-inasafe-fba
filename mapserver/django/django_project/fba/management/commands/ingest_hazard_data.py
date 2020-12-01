@@ -25,9 +25,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('storm_ids', nargs='*', type=str)
+        parser.add_argument(
+            '--validtime',
+            dest='validtime',
+            type=int)
 
-    def handle(self, *args, storm_ids=None, **options):
-        self.request_data(unique_storm_ids=storm_ids)
+    def handle(self, *args, storm_ids=None, validtime=None, **options):
+        self.request_data(unique_storm_ids=storm_ids, validtime=validtime)
 
     def recalculate_impact(self, hazard):
         with connections['backend'].cursor() as cursor:
@@ -35,7 +39,7 @@ class Command(BaseCommand):
             cursor.execute('select kartoza_calculate_impact()')
             cursor.execute(f'select kartoza_fba_generate_excel_report_for_flood({hazard.id})')
 
-    def request_data(self, unique_storm_ids=None):
+    def request_data(self, unique_storm_ids=None, validtime=None):
         """Request data from geocris pg-featureserv"""
         if not unique_storm_ids:
             # Fetch active storm endpoint
@@ -71,10 +75,19 @@ class Command(BaseCommand):
         for unique_storm_id in list(unique_storm_ids):
             print(f'Processing storm id: {unique_storm_id}')
 
-            latest_cone_url = (
-                f'{self.base_url}/noaa/collections/noaa.coneforecast{unique_storm_id}'
-                f'/items.json?orderBy=validtime:D&limit=1'
-            )
+            if not validtime:
+                # find latest
+                latest_cone_url = (
+                    f'{self.base_url}/noaa/collections/noaa.coneforecast{unique_storm_id}'
+                    f'/items.json?orderBy=validtime:D&limit=1'
+                )
+            else:
+                # filter by time
+                latest_cone_url = (
+                    f'{self.base_url}/noaa/collections/noaa.coneforecast'
+                    f'{unique_storm_id}'
+                    f'/items.json?validtime={validtime}'
+                )
             print(f'Fetch cone URL: {latest_cone_url}')
             response = requests.get(latest_cone_url)
             latest_cone_data = response.json()
