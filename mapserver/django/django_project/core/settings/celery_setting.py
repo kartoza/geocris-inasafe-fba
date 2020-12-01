@@ -13,28 +13,36 @@ SCHEDULE_INGEST_BOUNDARY_DATA = ast.literal_eval(os.environ.get(
     'SCHEDULE_INGEST_BOUNDARY_DATA', '{}'
 ))
 SCHEDULE_INGEST_BOUNDARY_DATA = SCHEDULE_INGEST_BOUNDARY_DATA or {
-    'day_of_week': '*'
+    'day_of_week': '*',
+    'minute': 0,
+    'hour': 0
 }
 
 SCHEDULE_INGEST_BUILDING_DATA = ast.literal_eval(os.environ.get(
     'SCHEDULE_INGEST_BUILDING_DATA', '{}'
 ))
 SCHEDULE_INGEST_BUILDING_DATA = SCHEDULE_INGEST_BUILDING_DATA or {
-    'day_of_week': '*'
+    'day_of_week': '*',
+    'minute': 0,
+    'hour': 0
 }
 
 SCHEDULE_INGEST_ROAD_DATA = ast.literal_eval(os.environ.get(
     'SCHEDULE_INGEST_ROAD_DATA', '{}'
 ))
 SCHEDULE_INGEST_ROAD_DATA = SCHEDULE_INGEST_ROAD_DATA or {
-    'day_of_week': '*'
+    'day_of_week': '*',
+    'minute': 0,
+    'hour': 0
 }
 
 SCHEDULE_INGEST_HAZARD_DATA = ast.literal_eval(os.environ.get(
     'SCHEDULE_INGEST_HAZARD_DATA', '{}'
 ))
 SCHEDULE_INGEST_HAZARD_DATA = SCHEDULE_INGEST_HAZARD_DATA or {
-    'day_of_week': '*'
+    'day_of_week': '*',
+    'minute': 0,
+    'hour': 0
 }
 
 CELERYBEAT_SCHEDULE = {
