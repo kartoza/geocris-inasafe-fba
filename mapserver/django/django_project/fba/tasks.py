@@ -11,3 +11,35 @@ def process_hazard_event_queue():
     management.call_command(
         'process_hazard_event_queue'
     )
+
+
+@app.task
+def ingest_boundary_data():
+    logger.log(logging.INFO, 'Ingest boundary data')
+    management.call_command(
+        'ingest_boundary_data'
+    )
+
+
+@app.task
+def ingest_building_data():
+    logger.log(logging.INFO, 'Ingest boundary data')
+    management.call_command(
+        'ingest_building_data'
+    )
+
+
+@app.task
+def ingest_road_data():
+    logger.log(logging.INFO, 'Ingest boundary data')
+    management.call_command(
+        'ingest_road_data'
+    )
+
+
+@app.task
+def ingest_hazard_data():
+    logger.log(logging.INFO, 'Ingest boundary data')
+    management.call_command(
+        'ingest_hazard_data'
+    )

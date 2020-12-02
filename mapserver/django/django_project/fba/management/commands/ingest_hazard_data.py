@@ -1,4 +1,5 @@
 import requests
+import re
 import json
 from datetime import datetime
 from django.core.management.base import BaseCommand
@@ -22,59 +23,84 @@ class Command(BaseCommand):
         'TD': 'Tropical Depression',
     }
 
-    def handle(self, *args, **options):
-        self.request_data()
+    def add_arguments(self, parser):
+        parser.add_argument('storm_ids', nargs='*', type=str)
+        parser.add_argument(
+            '--validtime',
+            dest='validtime',
+            type=int)
+
+    def handle(self, *args, storm_ids=None, validtime=None, **options):
+        self.request_data(unique_storm_ids=storm_ids, validtime=validtime)
 
     def recalculate_impact(self, hazard):
         with connections['backend'].cursor() as cursor:
+            cursor.execute('select kartoza_process_hazard_event_queue()')
             cursor.execute('select kartoza_calculate_impact()')
             cursor.execute(f'select kartoza_fba_generate_excel_report_for_flood({hazard.id})')
 
-
-    def request_data(self):
+    def request_data(self, unique_storm_ids=None, validtime=None):
         """Request data from geocris pg-featureserv"""
-        forecast_cone_url = (
-            '{base_url}/noaa/collections/noaa.coneforecastal202020/items.json?limit={limit}'.format(
-                base_url=self.base_url,
-                limit=self.limit
-            )
-        )
+        if not unique_storm_ids:
+            # Fetch active storm endpoint
+            active_storm_url = f'{self.base_url}/noaa/functions/active_storms/items.json'
+            print('Request active storms...')
+            response = requests.get(active_storm_url)
+            try:
+                storm_tables = response.json()
+            except:
+                # No active storms currently
+                print('No active storms...')
+                exit(0)
 
-        print('Request forecast cones...')
-        response = requests.get(forecast_cone_url)
-        item_data = response.json()
+            # Get all latest storm ids
+            cone_forecast_pattern = re.compile(
+                r'coneforecast(?P<storm_id>.*)')
+
+            unique_storm_ids = set()
+            for table in storm_tables:
+                match = cone_forecast_pattern.search(table['_table_name'])
+                if match:
+                    storm_id = match.group('storm_id')
+                    unique_storm_ids.add(storm_id)
+                    print(f'Found latest storm id: {storm_id}')
 
         # Hazard type
         hazard_type, _ = HazardType.objects.get_or_create(
             name='Hurricane NOAA'
         )
 
-        unique_storm_ids = []
-
-        print('Get unique ids')
-        for feature in item_data['features']:
-            properties = feature['properties']
-            if properties['ncstormid'] not in unique_storm_ids:
-                unique_storm_ids.append(properties['ncstormid'])
-
         print('Fetch latest storms')
         # Get the latest hazard event from storm_id
-        for unique_storm_id in unique_storm_ids:
-            latest_cone_url = (
-                '{base_url}/noaa/collections/noaa.coneforecastal202020/items.json?orderBy=validtime:D&limit=1&ncstormid={id}'.format(
-                    base_url=self.base_url,
-                    id=unique_storm_id
+        for unique_storm_id in list(unique_storm_ids):
+            print(f'Processing storm id: {unique_storm_id}')
+
+            if not validtime:
+                # find latest
+                latest_cone_url = (
+                    f'{self.base_url}/noaa/collections/noaa.coneforecast{unique_storm_id}'
+                    f'/items.json?orderBy=validtime:D&limit=1'
                 )
-            )
+            else:
+                # filter by time
+                latest_cone_url = (
+                    f'{self.base_url}/noaa/collections/noaa.coneforecast'
+                    f'{unique_storm_id}'
+                    f'/items.json?validtime={validtime}'
+                )
+            print(f'Fetch cone URL: {latest_cone_url}')
             response = requests.get(latest_cone_url)
             latest_cone_data = response.json()
+            validtime = latest_cone_data['features'][0]['properties']['validtime']
+            cone_fid = latest_cone_data['features'][0]['id']
 
             latest_points_url = (
-                '{base_url}/noaa/collections/noaa.centerpositionforecastal202020/items.json?validtime={validtime}&orderBy=ogc_fid'.format(
-                    base_url=self.base_url,
-                    validtime=latest_cone_data['features'][0]['properties']['validtime']
-                )
+                f'{self.base_url}/noaa/collections'
+                f'/noaa.centerpositionforecast{unique_storm_id}'
+                f'/items.json?validtime={validtime}&orderBy=ogc_fid'
             )
+
+            print(f'Fetch points url: {latest_points_url}')
 
             response = requests.get(latest_points_url)
             latest_points_data = response.json()
@@ -149,18 +175,24 @@ class Command(BaseCommand):
             ref_time_obj = datetime.fromtimestamp(ref_time)
             ref_time_obj = make_aware(ref_time_obj)
 
+            hazard_source_link = (
+                f'{self.base_url}/noaa/collections'
+                f'/noaa.coneforecast{unique_storm_id}'
+                f'/items.html?ogc_fid={cone_fid}')
+
             hazard, created = HazardEvent.objects.get_or_create(
                 forecast_date=start_time_obj,
                 acquisition_date=ref_time_obj,
                 hazard_map_id=hazard_map.id,
                 hazard_type_id=hazard_type.id,
-                link=latest_cone_data_prop['url'],
+                link=hazard_source_link,
                 source=latest_cone_data_prop['url'],
                 notes='valid_time:{validtime}'.format(
                     **latest_cone_data_prop
                 )
             )
 
-            print('Hazard Event Created = {}'.format(created))
+            print(f'Hazard Event Created = {created}')
+            print(f'Hazard Event id = {hazard.id}')
 
             self.recalculate_impact(hazard)
